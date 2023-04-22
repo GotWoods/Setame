@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text;
 using ConfigMan.Data;
 using ConfigMan.Service;
@@ -34,6 +35,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]))
         };
     });
+
+
 
 builder.Services.AddCors(options =>
 {

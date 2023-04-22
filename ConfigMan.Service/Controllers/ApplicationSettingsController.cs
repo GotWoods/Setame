@@ -9,7 +9,7 @@ namespace ConfigMan.Service.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(Roles = "Administrator")]
 public class ApplicationSettingsController : ControllerBase
 {
     private readonly IApplicationService _applicationService;
@@ -24,6 +24,7 @@ public class ApplicationSettingsController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Application")]
     public async Task<ActionResult> Get() 
     {
         

@@ -22,16 +22,8 @@ public class ConfigManConfigurationProvider : Microsoft.Extensions.Configuration
         _serviceUri = serviceUri;
         _httpClient = new HttpClient();
 
-        // var tokenResponse = GetTokenAsync(serviceUri, application, clientSecret).GetAwaiter().GetResult();
-        // if (tokenResponse.IsError)
-        // {
-        //     throw new InvalidOperationException($"Error obtaining token: {tokenResponse.Error}");
-        // }
-
-        GetTokenAsync(serviceUri, application, clientSecret).GetAwaiter().GetResult();
-
-
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        GetTokenAsync(serviceUri, application, clientSecret).GetAwaiter().GetResult();
     }
 
     private async Task GetTokenAsync(Uri serviceUri, string clientId, string clientSecret)
@@ -51,8 +43,8 @@ public class ConfigManConfigurationProvider : Microsoft.Extensions.Configuration
         if (response.IsSuccessStatusCode)
         {
             var json = await response.Content.ReadAsStringAsync();
-            using JsonDocument jsonDoc = JsonDocument.Parse(json);
-            string token = jsonDoc.RootElement.GetProperty("token").GetString();
+            using var jsonDoc = JsonDocument.Parse(json);
+            var token = jsonDoc.RootElement.GetProperty("token").GetString();
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
@@ -60,21 +52,6 @@ public class ConfigManConfigurationProvider : Microsoft.Extensions.Configuration
         {
             throw new Exception($"Failed to fetch settings. Status code: {response.StatusCode}");
         }
-        //var discoveryResponse = await client.GetDiscoveryDocumentAsync(serviceUri.ToString());
-        // if (discoveryResponse.IsError)
-        // {
-        //     throw new InvalidOperationException($"Error obtaining discovery document: {discoveryResponse.Error}");
-        // }
-
-        // var tokenRequest = new ClientCredentialsTokenRequest
-        // {
-        //     Address = discoveryResponse.TokenEndpoint,
-        //     ClientId = clientId,
-        //     ClientSecret = clientSecret,
-        //     Scope = "getSettings"
-        // };
-
-        //return await client.RequestClientCredentialsTokenAsync(tokenRequest);
     }
 
     public override void Load()

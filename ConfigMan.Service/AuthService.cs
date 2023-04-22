@@ -17,14 +17,15 @@ namespace ConfigMan.Service
             _applicationService = applicationService;
         }
 
-        public string GenerateJwtToken(string userId)
+        public string GenerateJwtToken(string userId, string role)
         {
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]));
             var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new Claim[]
             {
-                new Claim(ClaimTypes.NameIdentifier, userId)
+                new Claim(ClaimTypes.NameIdentifier, userId),
+                new Claim(ClaimTypes.Role, role)
             };
 
             var tokenOptions = new JwtSecurityToken(

@@ -1,11 +1,13 @@
 ﻿using ConfigMan.Data;
 using ConfigMan.Data.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ConfigMan.Service.Controllers.MyApplication.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(Roles = "Administrator")]
 public class ApplicationsController : ControllerBase
 {
     private readonly IApplicationService _applicationService;

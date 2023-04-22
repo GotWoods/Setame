@@ -1,12 +1,15 @@
 ﻿using ConfigMan.Data;
 using ConfigMan.Data.Models;
 using ConfigMan.Service.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace ConfigMan.Service.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(Roles = "Administrator")]
 public class EnvironmentSettingsController : ControllerBase
 {
     private readonly IEnvironmentService _environmentService;

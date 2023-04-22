@@ -33,14 +33,14 @@ namespace ConfigMan.Service.Controllers
                     newAdminUser.Username = request.Username;
                     newAdminUser.Id = Guid.NewGuid();
                     await _userService.CreateUserAsync(newAdminUser, request.Password);
-                    var newUserToken  = _authService.GenerateJwtToken(newAdminUser.Id.ToString());
+                    var newUserToken  = _authService.GenerateJwtToken(newAdminUser.Id.ToString(), "Administrator");
                     return Ok(new { newUserToken });
                 }
 
                 return Unauthorized();
             }
 
-            var token = _authService.GenerateJwtToken(user.Id.ToString());
+            var token = _authService.GenerateJwtToken(user.Id.ToString(), "Administrator");
             return Ok(new { token });
         }
 
@@ -55,7 +55,7 @@ namespace ConfigMan.Service.Controllers
                 return Unauthorized();
             }
 
-            var token = _authService.GenerateJwtToken(application.Name);
+            var token = _authService.GenerateJwtToken(application.Name, "Application");
             return Ok(new { token });
         }
     }

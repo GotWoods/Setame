@@ -7,7 +7,7 @@ namespace ConfigMan.Service.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] 
+    [Authorize(Roles = "Administrator")]
     public class EnvironmentsController : ControllerBase
     {
         private readonly IEnvironmentService _environmentService;
