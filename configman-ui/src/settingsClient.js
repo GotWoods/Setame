@@ -2,201 +2,161 @@
 class SettingsClient {
     get apiUrl() {
         return window.appSettings.apiBaseUrl;
+    }
+    get authToken() {
+        return localStorage.getItem('authToken');
       }
 
     async apiRequest(url, options) {
         const response = await fetch(url, options);
-        if (response.status === 401) {
-            localStorage.removeItem('token');
-            window.location.href = '/login';
-        }
         return response;
     }
 
+    async handleResponse(response) {
+        if (response.ok) {
+            return await response.json();
+        } else {
+            throw new Error(`Request Failed. Status code: ${response.status}`);
+        }
+    }
+
+    getAuthHeaders() {
+        if (this.isJwtTokenExpired()) {
+           window.location.href = '/login';
+        }
+
+        return {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.authToken}`,
+        };
+    }
+
+
+    isJwtTokenExpired() {
+        try {
+
+            // Get the payload from the JWT token
+            const payloadBase64Url = this.authToken.split('.')[1];
+
+            // Decode the payload from Base64Url to a JSON string
+            const payloadJson = atob(payloadBase64Url.replace('-', '+').replace('_', '/'));
+
+            // Parse the JSON string to an object
+            const payload = JSON.parse(payloadJson);
+   
+            // Check if the "exp" (expiration) field is present in the payload
+            if (payload.exp) {
+             
+                // Get the current date in seconds
+                const currentTime = Math.floor(Date.now() / 1000);
+
+                // Check if the token has expired
+                return payload.exp <= currentTime;
+            } else {
+                // If there is no "exp" field, we can't determine if the token has expired or not
+                return false;
+            }
+        } catch (error) {
+            console.error('Error checking JWT token expiration:', error);
+            // In case of error, assume the token is invalid
+            return true;
+        }
+    }
 
     async login(username, password) {
         const response = await this.apiRequest(`${this.apiUrl}/api/Authentication/login`, {
-          method: 'POST',
-        headers: {
-                'Content-Type': 'application/json',
-            },
-          body: JSON.stringify({ username, password }),
-        });
-    
-        return this.handleResponse(response);
-      }
-    
-      async getEnvironments() {
-        const response = await this.apiRequest(`${this.apiUrl}/api/environments`, {
-          headers: this.getAuthHeaders(),
-        });
-    
-        return this.handleResponse(response);
-      }
-
-    async login(username, password) {
-        const response = await fetch(`${window.appSettings.apiBaseUrl}/api/Authentication/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ username, password }),
         });
-
-        if (response.ok) {
-            return await response.json();
-        } else {
-            throw new Error(`Failed to fetch data. Status code: ${response.status}`);
-        }
+        return this.handleResponse(response);
     }
 
     async getEnvironments() {
-        const response = await fetch(`${window.appSettings.apiBaseUrl}/api/environments`, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-            },
+        const response = await this.apiRequest(`${this.apiUrl}/api/environments`, {
+            headers: this.getAuthHeaders(),
         });
 
-        if (response.ok) {
-            return await response.json();
-        }
-        else {
-            throw new Error(`Failed to fetch data. Status code: ${response.status}`);
-        }
+        return this.handleResponse(response);
     }
 
     async deleteEnvironment(environment) {
-        const response = await fetch(`${window.appSettings.apiBaseUrl}/api/environments/${environment}`, {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environments/${environment}`, {
             method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-            },
+            headers: this.getAuthHeaders(),
         });
 
-        if (response.ok) {
-            return;
-        } else {
-            throw new Error(`Failed to delete data. Status code: ${response.status}`);
-        }
+        return this.handleResponse(response);
     }
 
+
     async updateEnvironmentSettings(allSettings) {
-        const response = await fetch(`${window.appSettings.apiBaseUrl}/api/environmentsettings`, {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentsettings`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-            },
+            headers: this.getAuthHeaders(),
             body: JSON.stringify(allSettings),
         });
 
-        if (response.ok) {
-            return;
-        } else {
-            throw new Error(`Failed to update data. Status code: ${response.status}`);
-        }
+        return this.handleResponse(response);
     }
 
     async updateEnvironmentSettings2(settingName, environment, newValue) {
-        const response = await fetch(`${window.appSettings.apiBaseUrl}/api/environmentsettings`, {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentsettings`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-            },
+            headers: this.getAuthHeaders(),
             body: JSON.stringify({ settingName, environment, value: newValue }),
         });
 
-        if (response.ok) {
-            return;
-        } else {
-            throw new Error(`Failed to update data. Status code: ${response.status}`);
-        }
+        return this.handleResponse(response);
     }
 
+
     async getAllApplications() {
-        const requestOptions = {
+        const response = await this.apiRequest(`${this.apiUrl}/api/applications`, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-            },
-        };
-        const response = await fetch(`${window.appSettings.apiBaseUrl}/api/applications`, requestOptions);
-        if (response.ok)
-            return await response.json();
-        else
-            throw new Error(`Failed to get applications. Status code: ${response.status}`);
+            headers: this.getAuthHeaders(),
+        });
+
+        return this.handleResponse(response);
     }
 
     async deleteApplication(applicationName) {
-        const requestOptions = {
+        const response = await this.apiRequest(`${this.apiUrl}/api/applications/${applicationName}`, {
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-            },
-        };
+            headers: this.getAuthHeaders(),
+        });
 
-        const response = await fetch(`${window.appSettings.apiBaseUrl}/api/applications/${applicationName}`, requestOptions);
-
-        if (!response.ok) {
-            throw new Error('Failed to delete application');
-        }
-
-
+        return this.handleResponse(response);
     }
 
     async getApplication(applicationName) {
-        const requestOptions = {
+        const response = await this.apiRequest(`${this.apiUrl}/api/applications/${applicationName}`, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-            },
-        };
+            headers: this.getAuthHeaders(),
+        });
 
-
-        const response = await fetch(`${window.appSettings.apiBaseUrl}/api/applications/${applicationName}`, requestOptions);
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch application');
-        }
-
-        return await response.json();
-
+        return this.handleResponse(response);
     }
 
     async addApplicationSetting(applicationName, allSettings) {
-        const requestOptions = {
+        const response = await this.apiRequest(`${this.apiUrl}/api/ApplicationSettings`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-            },
+            headers: this.getAuthHeaders(),
             body: JSON.stringify({
                 applicationId: applicationName,
                 settings: allSettings
             }),
-        };
+        });
 
-        const response = await fetch(
-            `${window.appSettings.apiBaseUrl}/api/ApplicationSettings`,
-            requestOptions
-        );
-
-        if (!response.ok) {
-            throw new Error('Failed to add setting');
-        }
+        return this.handleResponse(response);
     }
 
     async addGlobalApplicationSetting(applicationName, newSettingName, newSettingValue) {
-        const requestOptions = {
+        const response = await this.apiRequest(`${this.apiUrl}/api/ApplicationSettings`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-            },
+            headers: this.getAuthHeaders(),
             body: JSON.stringify({
                 applicationId: applicationName,
                 settings: [
@@ -207,58 +167,31 @@ class SettingsClient {
                     }
                 ]
             }),
-        };
+        });
 
-
-        const response = await fetch(
-            `${window.appSettings.apiBaseUrl}/api/ApplicationSettings`,
-            requestOptions
-        );
-
-        if (!response.ok) {
-            throw new Error('Failed to add setting');
-        }
+        return this.handleResponse(response);
     }
 
-    async addApplicaiton(applicationName, token) {
-        const requestOptions = {
+    async addApplication(applicationName, token) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/applications`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-            },
+            headers: this.getAuthHeaders(),
             body: JSON.stringify({ name: applicationName, token }),
-        };
+        });
 
-        const response = await fetch(
-            `${window.appSettings.apiBaseUrl}/api/applications`,
-            requestOptions
-        );
-
-        if (!response.ok) {
-            throw new Error('Failed to add application');
-        }
-
-
+        return this.handleResponse(response);
     }
 
     async addEnvironment(environmentName) {
-        const requestOptions = {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environments`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-            },
-            body: JSON.stringify({ name: environmentName })
-        };
+            headers: this.getAuthHeaders(),
+            body: JSON.stringify({ name: environmentName }),
+        });
 
-        const response = await fetch(`${window.appSettings.apiBaseUrl}/api/environments`, requestOptions);
+        return this.handleResponse(response);
+    }
 
-        if (!response.ok) {
-            throw new Error('Failed to add environment');
-        }
-
-    };
 
 }
 
