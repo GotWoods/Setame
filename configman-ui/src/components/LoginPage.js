@@ -1,27 +1,22 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Box, Paper, Container } from '@mui/material';
+import SettingsClient from '../settingsClient';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
+  const settingsClient = new SettingsClient();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch(`${window.appSettings.apiBaseUrl}/api/Authentication/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, password }),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
+    try {
+      const data = await settingsClient.login(username, password)
       localStorage.setItem('authToken', data.token);
-      window.location.href = '/'; // Redirect to the main page
-    } else {
+      window.location.href = '/';
+    } catch (error) {
       setError('Invalid username or password');
     }
   };

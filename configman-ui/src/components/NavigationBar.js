@@ -11,10 +11,13 @@ const TitleTypography = styled(Typography)({
 });
 
 const NavigationBar = () => {
+  const token = localStorage.getItem('authToken');
   return (
     <StyledAppBar position="static">
       <Toolbar>
         <TitleTypography variant="h6">ConfigMan</TitleTypography>
+        {token && (
+          <>
         <Button color="inherit" href="/environments">
           Environments
         </Button>
@@ -27,6 +30,8 @@ const NavigationBar = () => {
         <Button color="inherit" href="/users">
           Users
         </Button>
+        </>
+        )}
       </Toolbar>
     </StyledAppBar>
   );

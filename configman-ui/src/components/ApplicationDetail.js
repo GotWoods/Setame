@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import { SettingGridData, SettingGridItem } from './SettingGrid/SettingGridData';
 import SettingsGrid from './SettingGrid/SettingGrid';
+import SettingsClient from '../settingsClient';
 
 const ApplicationDetail = () => {
     const { applicationName } = useParams();
@@ -25,59 +26,24 @@ const ApplicationDetail = () => {
     const [newEnvironmentSettingName, setNewEnvironmentSettingName] = useState('');
     const [newEnvironmentSettings, setNewEnvironmentSettings] = useState({});
     const [transformedSettings, setTransformedSettings] = useState([]);
+    const settingsClient = new SettingsClient();
 
     useEffect(() => {
         fetchEnvironments();
     }, []);
 
     const fetchEnvironments = async () => {
-        const requestOptions = {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-            },
-        };
-
-        try {
-            const response = await fetch(`${window.appSettings.apiBaseUrl}/api/environments/`, requestOptions);
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch environments');
-            }
-
-            const environments = await response.json();
-            setEnvironments(environments);
-            fetchApplication(environments);
-        } catch (error) {
-            console.error('Error fetching environments:', error);
-        }
+        const environments = await settingsClient.getEnvironments()
+        setEnvironments(environments);
+        fetchApplication(environments);
     };
 
     const fetchApplication = async (environments) => {
-        const requestOptions = {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-            },
-        };
-
         try {
-            const response = await fetch(`${window.appSettings.apiBaseUrl}/api/applications/${applicationName}`, requestOptions);
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch application');
-            }
-
-            const data = await response.json();
+            const data = await settingsClient.getApplication(applicationName);
             setApplication(data);
             const transformedSettings = loadGrid(data.environmentSettings, environments);
             setTransformedSettings(transformedSettings);
-
-            //const transformedSettings = transformSettings(data.environmentSettings);
-            //setTransformedSettings(transformedSettings);
-
         } catch (error) {
             console.error('Error fetching application:', error);
         }
@@ -144,76 +110,19 @@ const ApplicationDetail = () => {
                 value: newEnvironmentSettings[env] || '',
             }
         });
-
-        const requestOptions = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-            },
-            body: JSON.stringify({
-                applicationId: applicationName,
-                settings: allSettings
-            }),
-        };
-
-        try {
-            const response = await fetch(
-                `${window.appSettings.apiBaseUrl}/api/ApplicationSettings`,
-                requestOptions
-            );
-
-            if (!response.ok) {
-                throw new Error('Failed to add setting');
-            }
-        } catch (error) {
-            console.error('Error adding setting:', error);
-        }
-
+        await settingsClient.addApplicationSetting(applicationName, allSettings);
         fetchApplication();
-        // });
-
     }
 
-    const handleSettingChange = async() => {
+    const handleSettingChange = async () => {
         //TOOD: callback for updating setting
     }
 
     const handleAddSetting = async () => {
-        const requestOptions = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-            },
-            body: JSON.stringify({
-                applicationId: applicationName,
-                settings: [
-                    {
-                        environment: "Default",
-                        name: newSettingName,
-                        value: newSettingValue,
-                    }
-                ]
-            }),
-        };
-
-        try {
-            const response = await fetch(
-                `${window.appSettings.apiBaseUrl}/api/ApplicationSettings`,
-                requestOptions
-            );
-
-            if (!response.ok) {
-                throw new Error('Failed to add setting');
-            }
-
-            setNewSettingName('');
-            setNewSettingValue('');
-            fetchApplication();
-        } catch (error) {
-            console.error('Error adding setting:', error);
-        }
+        await settingsClient.addGlobalApplicationSetting(applicationName, newSettingName, newSettingValue);
+        setNewSettingName('');
+        setNewSettingValue('');
+        fetchApplication();
     };
 
     if (!application) {

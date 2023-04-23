@@ -9,6 +9,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { SettingGridData, SettingGridItem } from './SettingGrid/SettingGridData';
 import SettingsGrid from './SettingGrid/SettingGrid';
+import SettingsClient from '../settingsClient';
 
 const EnvironmentSettings = () => {
   const [error, setError] = useState('');
@@ -18,29 +19,16 @@ const EnvironmentSettings = () => {
   const [currentEnvironment, setCurrentEnvironment] = useState(null);
   const [environmentDetailsDialogOpen, setEnvironmentDetailsDialogOpen] = useState(false);
   const [selectedEnvironment, setSelectedEnvironment] = useState(null);
+  const settingsClient = new SettingsClient();
 
   useEffect(() => {
     fetchEnvironments();
   }, []);
 
   const fetchEnvironments = async () => {
-    try {
-      const response = await fetch(`${window.appSettings.apiBaseUrl}/api/environments`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const transformedSettings = loadGrid(data);
-        setTransformedSettings(transformedSettings);
-      } else {
-        setError('Failed to fetch environments.');
-      }
-    } catch (err) {
-      setError('Failed to fetch environments.');
-    }
+      const data = await settingsClient.getEnvironments();
+      const transformedSettings = loadGrid(data);
+      setTransformedSettings(transformedSettings);
   };
 
   const handleDialogClose = () => {
@@ -59,24 +47,15 @@ const EnvironmentSettings = () => {
   const handleConfirmDeleteEnvironment = async () => {
     setDeleteConfirmationOpen(false);
     setEnvironmentDetailsDialogOpen(false);
-    const response = await fetch(`${window.appSettings.apiBaseUrl}/api/environments/${currentEnvironment}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-      },
-    });
-
-    if (response.ok) {
-      fetchEnvironments();
-    } else {
-      console.error('Error deleting environment:', await response.text());
-    }
+    await settingsClient.deleteEnvironment(currentEnvironment);
   };
 
   const loadGrid = (environments) => {
     var result = new SettingGridData();
     environments.forEach((env) => {
       result.environments.push(env.name);
+      if (env.settings == undefined)
+        return;
       env.settings.forEach((setting) => {
         if (!result.settings[setting.name]) {
           result.settings[setting.name] = [];
@@ -109,38 +88,14 @@ const EnvironmentSettings = () => {
       }
     });
 
-    const response = await fetch(`${window.appSettings.apiBaseUrl}/api/environmentsettings`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-      },
-      body: JSON.stringify(allSettings),
-    });
-
-    if (response.ok) {
-      fetchEnvironments();
-    } else {
-      console.error('Error adding setting:', await response.text());
-    }
+    await settingsClient.updateEnvironmentSettings(allSettings);
+    fetchEnvironments();
   };
 
   const handleSettingChange = async (settingName, environment, newValue) => {
     // Update the API with the new setting value
-    const response = await fetch(`${window.appSettings.apiBaseUrl}/api/environmentsettings`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-      },
-      body: JSON.stringify({ settingName, environment, value: newValue }),
-    });
-  
-    if (response.ok) {
-      fetchEnvironments();
-    } else {
-      console.error('Error updating setting:', await response.text());
-    }
+    await settingsClient.updateEnvironmentSettings2(settingName, environment, newValue);
+    fetchEnvironments();
   };
 
   return (
@@ -157,12 +112,12 @@ const EnvironmentSettings = () => {
         <h1>
           Environments
         </h1>
-<p>
-  TODO: Ability to set order of environments<br />
-  TODO: Edit/Delete settings<br />
-  TODO: Secret values<br />
-  TODO: Edit Environment dialog sucks<br />
-</p>
+        <p>
+          TODO: Ability to set order of environments<br />
+          TODO: Edit/Delete settings<br />
+          TODO: Secret values<br />
+          TODO: Edit Environment dialog sucks<br />
+        </p>
       </div>
 
       <AddEnvironmentDialog key={dialogOpen ? 'open' : 'closed'} open={dialogOpen} onClose={handleDialogClose} onEnvironmentAdded={fetchEnvironments} />

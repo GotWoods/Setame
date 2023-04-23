@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate, BrowserRouter } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
-import PrivateRoute from './components/PrivateRoute';
 import EnvironmentSettings from './components/EnvironmentSettings';
 import NavigationBar from './components/NavigationBar';
 import Applications from './components/Applications';
@@ -10,6 +9,7 @@ import Users from './components/Users';
 import './App.css';
 import VariableGroups from './components/VariableGroups';
 import Main from './components/Main';
+import ProtectedOutlet from './components/ProtectedOutlet';
 
 function App() {
   return (
@@ -18,14 +18,25 @@ function App() {
         <NavigationBar />
         <div className="main-content">
           <Routes>
-            {/* <Route exact path="/" render={() => <Navigate to="/login" />} /> */}
-            <Route path="/" element={<Main/> } />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/environments" element={<EnvironmentSettings />} />
-            <Route path="/applications" element={<Applications />} />
-            <Route path="/applicationDetail/:applicationName" element={<ApplicationDetail />} />
-            <Route path="/users" element={<Users />} />
-            <Route path="/variableGroups" element={<VariableGroups />} />
+            <Route path="/" element={<Main />}>
+              <Route element={<Main />} />
+            </Route>
+            <Route path="/environments" element={<ProtectedOutlet />}>
+              <Route index element={<EnvironmentSettings />} />
+            </Route>
+            <Route path="/applications" element={<ProtectedOutlet />}>
+              <Route index element={<Applications />} />
+            </Route>
+            <Route path="/applicationDetail/:applicationName" element={<ProtectedOutlet />}>
+              <Route index element={<ApplicationDetail />} />
+            </Route>
+            <Route path="/users" element={<ProtectedOutlet />}>
+              <Route index element={<Users />} />
+            </Route>
+            <Route path="/variableGroups" element={<ProtectedOutlet />}>
+              <Route index element={<VariableGroups />} />
+            </Route>
             {/* Add other routes here */}
           </Routes>
         </div>

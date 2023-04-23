@@ -5,37 +5,18 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
+import SettingsClient from '../settingsClient';
 
 const AddApplicationDialog = ({ open, onClose, onApplicationAdded }) => {
   const [applicationName, setApplicationName] = useState('');
   const [token, setToken] = useState('');
+  const settingsClient = new SettingsClient;
 
   const handleAddApplication = async () => {
-    const requestOptions = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-      },
-      body: JSON.stringify({ name: applicationName, token }),
-    };
-
-    try {
-      const response = await fetch(
-        `${window.appSettings.apiBaseUrl}/api/applications`,
-        requestOptions
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to add application');
-      }
-
-      onClose();
-      if (onApplicationAdded) {
-        onApplicationAdded();
-      }
-    } catch (error) {
-      console.error('Error adding application:', error);
+    await settingsClient.addApplicaiton(applicationName, token);
+    onClose();
+    if (onApplicationAdded) {
+      onApplicationAdded();
     }
   };
 
