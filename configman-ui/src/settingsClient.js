@@ -13,11 +13,14 @@ class SettingsClient {
     }
 
     async handleResponse(response) {
-        if (response.ok) {
+        if (response.status===200) {
+            console.log("resp", response);
             return await response.json();
-        } else {
-            throw new Error(`Request Failed. Status code: ${response.status}`);
         }
+
+        // } else {
+        //     throw new Error(`Request Failed. Status code: ${response.status}`);
+        // }
     }
 
     getAuthHeaders() {
@@ -75,15 +78,17 @@ class SettingsClient {
     }
 
     async getEnvironments() {
-        const response = await this.apiRequest(`${this.apiUrl}/api/environments`, {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets`, {
             headers: this.getAuthHeaders(),
         });
 
         return this.handleResponse(response);
     }
 
+    
+
     async deleteEnvironment(environment) {
-        const response = await this.apiRequest(`${this.apiUrl}/api/environments/${environment}`, {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environment}`, {
             method: 'DELETE',
             headers: this.getAuthHeaders(),
         });
@@ -91,8 +96,44 @@ class SettingsClient {
         return this.handleResponse(response);
     }
 
+    async addEnvironmentSet(environmentName) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets`, {
+            method: 'POST',
+            headers: this.getAuthHeaders(),
+            body: JSON.stringify({ name: environmentName }),
+        });
+        return this.handleResponse(response);
+    }
 
-    async updateEnvironmentSettings(allSettings) {
+    async updateEnvironmentSettings(env) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets`, {
+            method: 'PUT',
+            headers: this.getAuthHeaders(),
+            body: JSON.stringify({ env }),
+        });
+
+        return this.handleResponse(response);
+    }
+
+    async getEnvironmentGroups() {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentGroups`, {
+            headers: this.getAuthHeaders(),
+        });
+
+        return this.handleResponse(response);
+    }
+
+    async addEnvironmentGroup(environmentGroupName) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentGroups`, {
+            method: 'POST',
+            headers: this.getAuthHeaders(),
+            body: JSON.stringify({ name: environmentGroupName }),
+        });
+
+        return this.handleResponse(response);
+    }
+
+    async addEnvironmentSettings(allSettings) {
         const response = await this.apiRequest(`${this.apiUrl}/api/environmentsettings`, {
             method: 'POST',
             headers: this.getAuthHeaders(),
@@ -102,7 +143,7 @@ class SettingsClient {
         return this.handleResponse(response);
     }
 
-    async updateEnvironmentSettings2(settingName, environment, newValue) {
+    async updateEnvironmentSettings(settingName, environment, newValue) {
         const response = await this.apiRequest(`${this.apiUrl}/api/environmentsettings`, {
             method: 'PUT',
             headers: this.getAuthHeaders(),
@@ -182,16 +223,7 @@ class SettingsClient {
         return this.handleResponse(response);
     }
 
-    async addEnvironment(environmentName) {
-        const response = await this.apiRequest(`${this.apiUrl}/api/environments`, {
-            method: 'POST',
-            headers: this.getAuthHeaders(),
-            body: JSON.stringify({ name: environmentName }),
-        });
-
-        return this.handleResponse(response);
-    }
-
+   
 
 }
 

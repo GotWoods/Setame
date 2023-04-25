@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate, BrowserRouter } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
-import EnvironmentSettings from './components/EnvironmentSettings';
+import EnvironmentSets from './components/EnvironmentSets';
 import NavigationBar from './components/NavigationBar';
 import Applications from './components/Applications';
 import ApplicationDetail from './components/ApplicationDetail';
@@ -10,6 +10,7 @@ import './App.css';
 import VariableGroups from './components/VariableGroups';
 import Main from './components/Main';
 import ProtectedOutlet from './components/ProtectedOutlet';
+import EnvironmentGroups from './components/EnvironmentGroups';
 
 function App() {
   return (
@@ -23,13 +24,16 @@ function App() {
               <Route element={<Main />} />
             </Route>
             <Route path="/environments" element={<ProtectedOutlet />}>
-              <Route index element={<EnvironmentSettings />} />
+              <Route index element={<EnvironmentSets />} />
             </Route>
             <Route path="/applications" element={<ProtectedOutlet />}>
               <Route index element={<Applications />} />
             </Route>
             <Route path="/applicationDetail/:applicationName" element={<ProtectedOutlet />}>
               <Route index element={<ApplicationDetail />} />
+            </Route>
+            <Route path="/environmentGroups" element={<ProtectedOutlet />}>
+              <Route index element={<EnvironmentGroups />} />
             </Route>
             <Route path="/users" element={<ProtectedOutlet />}>
               <Route index element={<Users />} />

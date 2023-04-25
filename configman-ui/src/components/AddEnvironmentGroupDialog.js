@@ -8,12 +8,12 @@ import DialogTitle from '@mui/material/DialogTitle';
 import SettingsClient from '../settingsClient';
 
 
-const AddEnvironmentDialog = ({ open, onClose, onAdded, environmentSet }) => {
-  const [environmentName, setEnvironmentName] = useState('');
+const AddEnvironmentGroupDialog = ({ open, onClose, onAdded }) => {
+  const [environmentGroupName, setEnvironmentGroupName] = useState('');
   const settingsClient = new SettingsClient();
-  console.log("Env set", environmentSet);
-  const handleAddEnvironment = async () => {
-    await settingsClient.updateEnvironmentSettings(environmentName);
+
+  const handleAddEnvironmentGroup = async () => {
+    await settingsClient.addEnvironmentGroup(environmentGroupName);
     onClose();
     if (onAdded) {
       onAdded();
@@ -23,24 +23,24 @@ const AddEnvironmentDialog = ({ open, onClose, onAdded, environmentSet }) => {
     return (
       <div>
         <Dialog open={open} onClose={onClose} aria-labelledby="form-dialog-title">
-          <DialogTitle id="form-dialog-title">Add Environment</DialogTitle>
+          <DialogTitle id="form-dialog-title">Add Environment Group</DialogTitle>
           <DialogContent>
             <TextField
               autoFocus
               margin="dense"
               id="name"
-              label="Environment Name"
+              label="Environment Group Name"
               type="text"
               fullWidth
-              value={environmentName}
-              onChange={(e) => setEnvironmentName(e.target.value)}
+              value={environmentGroupName}
+              onChange={(e) => setEnvironmentGroupName(e.target.value)}
             />
           </DialogContent>
           <DialogActions>
             <Button onClick={onClose} color="primary">
               Cancel
             </Button>
-            <Button onClick={handleAddEnvironment} color="primary">
+            <Button onClick={handleAddEnvironmentGroup} color="primary">
               Add
             </Button>
           </DialogActions>
@@ -49,4 +49,4 @@ const AddEnvironmentDialog = ({ open, onClose, onAdded, environmentSet }) => {
     );
   };
 
-  export default AddEnvironmentDialog;
+  export default AddEnvironmentGroupDialog;

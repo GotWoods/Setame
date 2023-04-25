@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
+import AddEnvironmentSetDialog from './AddEnvironmentSetDialog';
 import AddEnvironmentDialog from './AddEnvironmentDialog';
 import '../App.css';
 import Dialog from '@mui/material/Dialog';
@@ -11,9 +12,15 @@ import { SettingGridData, SettingGridItem } from './SettingGrid/SettingGridData'
 import SettingsGrid from './SettingGrid/SettingGrid';
 import SettingsClient from '../settingsClient';
 
-const EnvironmentSettings = () => {
+const EnvironmentSets = () => {
   const [error, setError] = useState('');
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [environments, setEnvironments] = useState([]);
+  const [environmentSetDialogOpen, setEnvironmentSetDialogOpen] = useState(false);
+  const [environmentDialogOpen, setEnvironmentDialogOpen] = useState(false);
+  const [selectedEnvironmentSet, setSelectedEnvironmentSet] = useState(null);
+
+
+
   const [transformedSettings, setTransformedSettings] = useState([]);
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [currentEnvironment, setCurrentEnvironment] = useState(null);
@@ -26,13 +33,14 @@ const EnvironmentSettings = () => {
   }, []);
 
   const fetchEnvironments = async () => {
-      const data = await settingsClient.getEnvironments();
-      const transformedSettings = loadGrid(data);
-      setTransformedSettings(transformedSettings);
+    const data = await settingsClient.getEnvironments();
+    setEnvironments(data);
+    // const transformedSettings = loadGrid(data);
+    // setTransformedSettings(transformedSettings);
   };
 
-  const handleDialogClose = () => {
-    setDialogOpen(false);
+  const handleAddEnvironmentSetDialogClose = () => {
+    setEnvironmentSetDialogOpen(false);
   };
 
   const handleDeleteEnvironmentClick = (env) => {
@@ -48,33 +56,35 @@ const EnvironmentSettings = () => {
     setDeleteConfirmationOpen(false);
     setEnvironmentDetailsDialogOpen(false);
     await settingsClient.deleteEnvironment(currentEnvironment);
+    await fetchEnvironments();
   };
 
-  const loadGrid = (environments) => {
-    var result = new SettingGridData();
-    environments.forEach((env) => {
-      result.environments.push(env.name);
-      if (env.settings == undefined)
-        return;
-      env.settings.forEach((setting) => {
-        if (!result.settings[setting.name]) {
-          result.settings[setting.name] = [];
-        }
+  // const loadGrid = (environments) => {
+  //   var result = new SettingGridData();
+  //   environments.forEach((env) => {
+  //     result.environments.push(env.name);
+  //     if (env.settings == undefined)
+  //       return;
+  //     env.settings.forEach((setting) => {
+  //       if (!result.settings[setting.name]) {
+  //         result.settings[setting.name] = [];
+  //       }
 
-        if (!result.settings[setting.name][env.name]) {
-          result.settings[setting.name][env.name] = "";
-        }
-        result.settings[setting.name][env.name] = setting.value;
-      });
+  //       if (!result.settings[setting.name][env.name]) {
+  //         result.settings[setting.name][env.name] = "";
+  //       }
+  //       result.settings[setting.name][env.name] = setting.value;
+  //     });
 
-      console.log("final", result);
-    });
-    return result;
-  }
+  //     console.log("final", result);
+  //   });
+  //   return result;
+  // }
 
   const handleEnvironmentDetailsClick = (env) => {
+    console.log("Env", env);
     setSelectedEnvironment(env);
-    setCurrentEnvironment(env.name);
+    setCurrentEnvironment(env);
     setEnvironmentDetailsDialogOpen(true);
   };
 
@@ -88,13 +98,13 @@ const EnvironmentSettings = () => {
       }
     });
 
-    await settingsClient.updateEnvironmentSettings(allSettings);
+    await settingsClient.addEnvironmentSettings(allSettings);
     fetchEnvironments();
   };
 
   const handleSettingChange = async (settingName, environment, newValue) => {
     // Update the API with the new setting value
-    await settingsClient.updateEnvironmentSettings2(settingName, environment, newValue);
+    await settingsClient.updateEnvironmentSettings(settingName, environment, newValue);
     fetchEnvironments();
   };
 
@@ -104,23 +114,42 @@ const EnvironmentSettings = () => {
       <div>
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem', marginTop: '1rem', marginRight: '1rem' }}>
-          <Button variant="contained" color="primary" onClick={() => setDialogOpen(true)}>
-            Add New Environment
+          <Button variant="contained" color="primary" onClick={() => setEnvironmentSetDialogOpen(true)}>
+            Add New Environment Set
           </Button>
         </div>
 
         <h1>
-          Environments
+          Environment Sets
         </h1>
         <p>
-          TODO: Ability to set order of environments<br />
-          TODO: Edit/Delete settings<br />
-          TODO: Secret values<br />
-          TODO: Edit Environment dialog sucks<br />
+          Allows you to create different environments for different use cases.
+
+          e.g. if we have a set of applications that run through Test-PreProd-Prod we could have one environment set<br/>
+          if we had another set of applications that run through Dev-Test-PreProd-Prod-Training we could have another environment set <br />
         </p>
       </div>
 
-      <AddEnvironmentDialog key={dialogOpen ? 'open' : 'closed'} open={dialogOpen} onClose={handleDialogClose} onEnvironmentAdded={fetchEnvironments} />
+      <AddEnvironmentDialog key={environmentDialogOpen ? 'open' : 'closed'} open={environmentDialogOpen} onClose={handleAddEnvironmentSetDialogClose} onAdded={fetchEnvironments} environmentSet={selectedEnvironmentSet} />
+      <AddEnvironmentSetDialog key={environmentSetDialogOpen ? 'open' : 'closed'} open={environmentSetDialogOpen} onClose={handleAddEnvironmentSetDialogClose} onAdded={fetchEnvironments} />
+
+      {environments.map((env) => (
+        <>
+          <h2>{env.name}</h2>
+          <Button variant="contained" color="primary"   onClick={() => {
+    setSelectedEnvironmentSet(env);
+    setEnvironmentDialogOpen(true);
+  }}>
+            Add Environment
+          </Button>
+          TODO: grid here of setting name + environments (e.g. dev/stage/preprod/prod)
+          {/* {environments.map((env) => (
+            <>
+              {env.name}
+            </>
+          ))} */}
+        </>
+      ))}
 
       {transformedSettings.environments && (
         <SettingsGrid
@@ -185,4 +214,4 @@ const EnvironmentSettings = () => {
   );
 };
 
-export default EnvironmentSettings;
+export default EnvironmentSets;

@@ -18,7 +18,7 @@ public class Application
     public Dictionary<string, string> GetAppliedSettings(DeploymentEnvironment environment)
     {
         var appliedSettings = new Dictionary<string, string>();
-        foreach (var setting in environment.Settings) appliedSettings.Add(setting.Name, setting.Value);
+        //foreach (var setting in environment.Settings) appliedSettings.Add(setting.Name, setting.Value);
         foreach (var setting in ApplicationDefaults) appliedSettings[setting.Name] = setting.Value;
 
         if (EnvironmentSettings.ContainsKey(environment.Name))

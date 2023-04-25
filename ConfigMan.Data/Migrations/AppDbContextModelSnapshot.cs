@@ -45,15 +45,27 @@ namespace ConfigMan.Data.Migrations
                     b.ToTable("Applications");
                 });
 
-            modelBuilder.Entity("ConfigMan.Data.Models.DeploymentEnvironment", b =>
+            modelBuilder.Entity("ConfigMan.Data.Models.EnvironmentGroup", b =>
                 {
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
-                    b.Property<int>("Order")
-                        .HasColumnType("integer");
+                    b.Property<Dictionary<string, List<Setting>>>("EnvironmentSettings")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
 
-                    b.Property<List<Setting>>("Settings")
+                    b.HasKey("Name");
+
+                    b.ToTable("EnvironmentGroups");
+                });
+
+            modelBuilder.Entity("ConfigMan.Data.Models.EnvironmentSet", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<List<DeploymentEnvironment>>("DeploymentEnvironments")
+                        .IsRequired()
                         .HasColumnType("jsonb");
 
                     b.HasKey("Name");
@@ -82,6 +94,20 @@ namespace ConfigMan.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("ConfigMan.Data.Models.VariableGroup", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<List<Setting>>("Settings")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("VariableGroups");
                 });
 #pragma warning restore 612, 618
         }

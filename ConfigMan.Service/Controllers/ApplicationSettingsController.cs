@@ -35,9 +35,9 @@ public class ApplicationSettingsController : ControllerBase
             return NotFound("Claim not found");
         }
 
-        var env = await _environmentService.GetEnvironmentByIdAsync("Dev");
+        var env = await _environmentService.GetOneAsync("Dev");
         var application = await _applicationService.GetApplicationByIdAsync(claim.Value);
-        return Ok(application.GetAppliedSettings(env));
+        return Ok(); // application.GetAppliedSettings(env));
 
     }
 

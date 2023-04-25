@@ -8,12 +8,12 @@ import DialogTitle from '@mui/material/DialogTitle';
 import SettingsClient from '../settingsClient';
 
 
-const AddEnvironmentDialog = ({ open, onClose, onAdded, environmentSet }) => {
+const AddEnvironmentSetDialog = ({ open, onClose, onAdded }) => {
   const [environmentName, setEnvironmentName] = useState('');
   const settingsClient = new SettingsClient();
-  console.log("Env set", environmentSet);
+
   const handleAddEnvironment = async () => {
-    await settingsClient.updateEnvironmentSettings(environmentName);
+    await settingsClient.addEnvironmentSet(environmentName);
     onClose();
     if (onAdded) {
       onAdded();
@@ -23,7 +23,7 @@ const AddEnvironmentDialog = ({ open, onClose, onAdded, environmentSet }) => {
     return (
       <div>
         <Dialog open={open} onClose={onClose} aria-labelledby="form-dialog-title">
-          <DialogTitle id="form-dialog-title">Add Environment</DialogTitle>
+          <DialogTitle id="form-dialog-title">Add Environment Set</DialogTitle>
           <DialogContent>
             <TextField
               autoFocus
@@ -49,4 +49,4 @@ const AddEnvironmentDialog = ({ open, onClose, onAdded, environmentSet }) => {
     );
   };
 
-  export default AddEnvironmentDialog;
+  export default AddEnvironmentSetDialog;

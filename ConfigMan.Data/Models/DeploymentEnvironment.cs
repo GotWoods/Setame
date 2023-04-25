@@ -9,9 +9,6 @@ public class DeploymentEnvironment
     public string Name { get; set; } = string.Empty;
 
     public int Order { get; set; }
-
-    [Column(TypeName = "jsonb")]
-    public List<Setting>? Settings { get; set; }
-    
+  
 }
 

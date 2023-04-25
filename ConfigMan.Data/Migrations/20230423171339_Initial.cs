@@ -17,27 +17,38 @@ namespace ConfigMan.Data.Migrations
                 name: "Applications",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Token = table.Column<string>(type: "text", nullable: false),
+                    ApplicationDefaults = table.Column<List<Setting>>(type: "jsonb", nullable: true),
                     EnvironmentSettings = table.Column<Dictionary<string, List<Setting>>>(type: "jsonb", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Applications", x => x.Id);
+                    table.PrimaryKey("PK_Applications", x => x.Name);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EnvironmentGroups",
+                columns: table => new
+                {
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    EnvironmentSettings = table.Column<Dictionary<string, List<Setting>>>(type: "jsonb", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EnvironmentGroups", x => x.Name);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Environments",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    Settings = table.Column<List<Setting>>(type: "jsonb", nullable: true)
+                    DeploymentEnvironments = table.Column<List<DeploymentEnvironment>>(type: "jsonb", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Environments", x => x.Id);
+                    table.PrimaryKey("PK_Environments", x => x.Name);
                 });
 
             migrationBuilder.CreateTable(
@@ -55,44 +66,35 @@ namespace ConfigMan.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Setting",
+                name: "VariableGroups",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    Value = table.Column<string>(type: "text", nullable: false),
-                    ApplicationId = table.Column<Guid>(type: "uuid", nullable: true)
+                    Settings = table.Column<List<Setting>>(type: "jsonb", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Setting", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Setting_Applications_ApplicationId",
-                        column: x => x.ApplicationId,
-                        principalTable: "Applications",
-                        principalColumn: "Id");
+                    table.PrimaryKey("PK_VariableGroups", x => x.Name);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Setting_ApplicationId",
-                table: "Setting",
-                column: "ApplicationId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Environments");
+                name: "Applications");
 
             migrationBuilder.DropTable(
-                name: "Setting");
+                name: "EnvironmentGroups");
+
+            migrationBuilder.DropTable(
+                name: "Environments");
 
             migrationBuilder.DropTable(
                 name: "Users");
 
             migrationBuilder.DropTable(
-                name: "Applications");
+                name: "VariableGroups");
         }
     }
 }
