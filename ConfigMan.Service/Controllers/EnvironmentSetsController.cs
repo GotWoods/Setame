@@ -10,54 +10,40 @@ namespace ConfigMan.Service.Controllers;
 [Authorize(Roles = "Administrator")]
 public class EnvironmentSetsController : ControllerBase
 {
-    private readonly IEnvironmentService _environmentService;
+    private readonly IEnvironmentSetService _environmentSetService;
 
-    public EnvironmentSetsController(IEnvironmentService environmentService)
+    public EnvironmentSetsController(IEnvironmentSetService environmentSetService)
     {
-        _environmentService = environmentService;
+        _environmentSetService = environmentSetService;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<EnvironmentSet>>> GetEnvironments()
+    public async Task<ActionResult<IEnumerable<EnvironmentSet>>> GetAll()
     {
-        var deploymentEnvironments = await _environmentService.GetAllAsync();
+        var deploymentEnvironments = await _environmentSetService.GetAllAsync();
         var sorted = deploymentEnvironments.ToList().OrderBy(x => x.Name);
         return Ok(sorted);
     }
 
     [HttpPost]
-    public async Task<ActionResult<EnvironmentSet>> CreateEnvironment(EnvironmentSet environment)
+    public async Task<ActionResult<EnvironmentSet>> Create(EnvironmentSet environmentSet)
     {
-        await _environmentService.Create(environment);
-        return CreatedAtAction(nameof(CreateEnvironment), new { id = environment.Name }, environment);
+        await _environmentSetService.Create(environmentSet);
+        return CreatedAtAction(nameof(Create), new { id = environmentSet.Name }, environmentSet);
     }
 
-    // // GET: api/environments/guid
-    // [HttpGet("{id}")]
-    // public async Task<ActionResult<DeploymentEnvironment>> GetEnvironment(Guid id)
-    // {
-    //     var environment = await _environmentService.GetEnvironmentByIdAsync(id);
-    //
-    //     if (environment == null)
-    //     {
-    //         return NotFound();
-    //     }
-    //
-    //     return Ok(environment);
-    // }
-
     [HttpPut("{name}")]
-    public async Task<IActionResult> UpdateEnvironment(EnvironmentSet environment)
+    public async Task<IActionResult> Update(EnvironmentSet environmentSet)
     {
-        await _environmentService.UpdateAsync(environment);
+        await _environmentSetService.Update(environmentSet);
         return NoContent();
     }
 
-    // DELETE: api/environments/guid
-    // [HttpDelete("{name}")]
-    // public async Task<IActionResult> DeleteEnvironment(string name)
-    // {
-    //     await _environmentService.DeleteEnvironmentAsync(name);
-    //     return NoContent();
-    // }
+    //DELETE: api/environments/guid
+    [HttpDelete("{name}")]
+    public async Task<IActionResult> Delete(string name)
+    {
+        await _environmentSetService.Delete(name);
+        return NoContent();
+    }
 }

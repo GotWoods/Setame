@@ -77,7 +77,7 @@ class SettingsClient {
         return this.handleResponse(response);
     }
 
-    async getEnvironments() {
+    async getEnvironmentSets() {
         const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets`, {
             headers: this.getAuthHeaders(),
         });
@@ -87,7 +87,7 @@ class SettingsClient {
 
     
 
-    async deleteEnvironment(environment) {
+    async deleteEnvironmentSet(environment) {
         const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environment}`, {
             method: 'DELETE',
             headers: this.getAuthHeaders(),
@@ -105,7 +105,7 @@ class SettingsClient {
         return this.handleResponse(response);
     }
 
-    async updateEnvironmentSettings(env) {
+    async updateEnvironmentSet(env) {
         const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets`, {
             method: 'PUT',
             headers: this.getAuthHeaders(),
@@ -143,7 +143,7 @@ class SettingsClient {
         return this.handleResponse(response);
     }
 
-    async updateEnvironmentSettings(settingName, environment, newValue) {
+    async updateEnvironmentSet(settingName, environment, newValue) {
         const response = await this.apiRequest(`${this.apiUrl}/api/environmentsettings`, {
             method: 'PUT',
             headers: this.getAuthHeaders(),

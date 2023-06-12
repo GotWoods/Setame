@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate, BrowserRouter } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
-import EnvironmentSets from './components/EnvironmentSets';
+import EnvironmentSets from './components/EnvironmentSetComponents/EnvironmentSets';
 import NavigationBar from './components/NavigationBar';
 import Applications from './components/Applications';
 import ApplicationDetail from './components/ApplicationDetail';

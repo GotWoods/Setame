@@ -33,7 +33,7 @@ const ApplicationDetail = () => {
     }, []);
 
     const fetchEnvironments = async () => {
-        const environments = await settingsClient.getEnvironments()
+        const environments = await settingsClient.getEnvironmentSets()
         setEnvironments(environments);
         fetchApplication(environments);
     };

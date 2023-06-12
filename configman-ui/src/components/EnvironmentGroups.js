@@ -30,7 +30,7 @@ const EnvironmentGroups = () => {
   }, []);
 
   const fetchEnvironmentGroups = async () => {
-    const envData = await settingsClient.getEnvironments();
+    const envData = await settingsClient.getEnvironmentSets();
     const data = await settingsClient.getEnvironmentGroups();
     setEnvironmentGroups(data);
     setEnvironments(envData);
@@ -54,7 +54,7 @@ const EnvironmentGroups = () => {
   const handleConfirmDeleteEnvironment = async () => {
     setDeleteConfirmationOpen(false);
     setEnvironmentDetailsDialogOpen(false);
-    await settingsClient.deleteEnvironment(currentEnvironment);
+    await settingsClient.deleteEnvironmentSet(currentEnvironment);
     await fetchEnvironmentGroups();
   };
 
@@ -103,7 +103,7 @@ const EnvironmentGroups = () => {
 
   const handleSettingChange = async (settingName, environment, newValue) => {
     // Update the API with the new setting value
-    await settingsClient.updateEnvironmentSettings(settingName, environment, newValue);
+    await settingsClient.updateEnvironmentSet(settingName, environment, newValue);
     fetchEnvironmentGroups();
   };
 

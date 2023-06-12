@@ -31,3 +31,24 @@ namespace ConfigMan.Service.Controllers;
 //         return CreatedAtAction(nameof(CreateEnvironmentSetting), null);
 //     }
 // }
+
+[Route("api/[controller]")]
+[ApiController]
+[Authorize(Roles = "Administrator")]
+public class EnvironmentController
+{
+    private readonly IEnvironmentSetService _environmentService;
+
+    public EnvironmentController(IEnvironmentSetService environmentService)
+    {
+        _environmentService = environmentService;
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<DeploymentEnvironment>> Create()
+    {
+        // var env = await _environmentService.GetOneAsync("");
+        // env.DeploymentEnvironments[0].Name = "JS"
+        return new OkResult();
+    }
+}

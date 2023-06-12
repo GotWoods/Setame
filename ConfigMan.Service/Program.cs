@@ -20,7 +20,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), x => x.MigrationsAssembly("ConfigMan.Data")));
 
 builder.Services.AddScoped<IApplicationService, ApplicationService>();
-builder.Services.AddScoped<IEnvironmentService, EnvironmentSetService>();
+builder.Services.AddScoped<IEnvironmentSetService, EnvironmentSetService>();
 builder.Services.AddScoped<IEnvironmentGroupService, EnvironmentGroupService>();
 builder.Services.AddScoped<IVariableGroupService, VariableGroupService>();
 builder.Services.AddScoped<AuthService>();

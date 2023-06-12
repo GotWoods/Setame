@@ -19,7 +19,7 @@ const NavigationBar = () => {
         {token && (
           <>
         <Button color="inherit" href="/environments">
-          Environments
+          Environment Sets
         </Button>
         <Button color="inherit" href="/applications">
           Applications
