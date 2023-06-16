@@ -13,6 +13,7 @@ const AddEnvironmentSetDialog = ({ open, onClose, onAdded }) => {
   const settingsClient = new SettingsClient();
 
   const handleAddEnvironment = async () => {
+    console.log("Handling add env set");
     await settingsClient.addEnvironmentSet(environmentName);
     onClose();
     if (onAdded) {

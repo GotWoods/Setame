@@ -25,6 +25,13 @@ public class EnvironmentSetsController : ControllerBase
         return Ok(sorted);
     }
 
+    [HttpGet("{name}")]
+    public async Task<ActionResult<EnvironmentSet>> GetOne(string name)
+    {
+        var deploymentEnvironment = await _environmentSetService.GetOneAsync(name);
+        return Ok(deploymentEnvironment);
+    }
+
     [HttpPost]
     public async Task<ActionResult<EnvironmentSet>> Create(EnvironmentSet environmentSet)
     {
@@ -33,7 +40,7 @@ public class EnvironmentSetsController : ControllerBase
     }
 
     [HttpPut("{name}")]
-    public async Task<IActionResult> Update(EnvironmentSet environmentSet)
+    public async Task<IActionResult> Update(string name, EnvironmentSet environmentSet)
     {
         await _environmentSetService.Update(environmentSet);
         return NoContent();

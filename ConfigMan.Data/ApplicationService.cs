@@ -14,8 +14,8 @@ public interface IApplicationService
     Task<IEnumerable<Setting>> GetApplicationSettingsAsync(Guid applicationId);
     Task CreateApplicationSettingAsync(int applicationId, Setting setting);
     Task UpdateApplicationSettingAsync(int applicationId, Setting setting);
-    Task AddApplicationSetting(Guid applicationId, Setting setting);
-    Task AddEnvironmentSetting(Guid applicationId, string environment, Setting setting);
+    Task AddApplicationSetting(string applicationId, Setting setting);
+    Task AddEnvironmentSetting(string applicationId, string environment, Setting setting);
 }
 
 public class ApplicationService : IApplicationService
@@ -98,7 +98,7 @@ public class ApplicationService : IApplicationService
         //return Task.CompletedTask;
     }
 
-    public async Task AddApplicationSetting(Guid applicationId, Setting setting)
+    public async Task AddApplicationSetting(string applicationId, Setting setting)
     {
         var application = await _dbContext.Applications.FindAsync(applicationId);
         if (application == null) throw new InvalidOperationException("Application not found.");
@@ -110,7 +110,7 @@ public class ApplicationService : IApplicationService
         await _dbContext.SaveChangesAsync();
     }
 
-    public async Task AddEnvironmentSetting(Guid applicationId, string environment, Setting setting)
+    public async Task AddEnvironmentSetting(string applicationId, string environment, Setting setting)
     {
         var application = await _dbContext.Applications.FindAsync(applicationId);
         if (application == null) throw new InvalidOperationException("Application not found.");

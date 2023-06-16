@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import AddEnvironmentSetDialog from './AddEnvironmentSetDialog';
-
 import '../../App.css';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-
 import SettingsClient from '../../settingsClient';
 import EnvironmentSetDetail from './EnvironmentSetDetail';
 
@@ -16,12 +14,7 @@ const EnvironmentSets = () => {
   const [error, setError] = useState('');
   const [environments, setEnvironmentSets] = useState([]);
   const [environmentSetDialogOpen, setEnvironmentSetDialogOpen] = useState(false);
-  
-  
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
-  //const [currentEnvironment, setCurrentEnvironment] = useState(null);
-  //const [environmentDetailsDialogOpen, setEnvironmentDetailsDialogOpen] = useState(false);
-  //const [selectedEnvironment, setSelectedEnvironment] = useState(null);
   const settingsClient = new SettingsClient();
 
   useEffect(() => {
@@ -53,9 +46,9 @@ const EnvironmentSets = () => {
     await fetchEnvironmentSets();
   };
 
+
   return (
     <div className="environment-settings">
-
       <div>
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem', marginTop: '1rem', marginRight: '1rem' }}>
@@ -68,7 +61,10 @@ const EnvironmentSets = () => {
           Environment Sets
         </h1>
         <p>
-          Used to create a completely segregated set of environments. Applications are bound to an Environment Set. 
+          Create an environment set for each distinct set of environments your application could move through. For example if you have one set of applications that moves through Dev,Test,Prod and another that moved through Dev,Test,UAT,Prod, you would create two different Environment Sets.
+</p><p>
+        Variables applied to an Environment Set are inherited by any application tied to that Environment Set. This is a good spot to put global variables used by ALL applications (e.g. the URL of a central logging server)
+          {/* TODO: Refresh on adding an env */}
         </p>
       </div>
 

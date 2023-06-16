@@ -77,6 +77,14 @@ class SettingsClient {
         return this.handleResponse(response);
     }
 
+
+    async getEnvironmentSet(name) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${name}`, {
+            headers: this.getAuthHeaders(),
+        });
+        return this.handleResponse(response);
+    }
+
     async getEnvironmentSets() {
         const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets`, {
             headers: this.getAuthHeaders(),
@@ -105,11 +113,12 @@ class SettingsClient {
         return this.handleResponse(response);
     }
 
-    async updateEnvironmentSet(env) {
-        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets`, {
+    async updateEnvironmentSet(environmentSet) {
+        console.log("In the right spot", environmentSet)
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSet.name}`, {
             method: 'PUT',
             headers: this.getAuthHeaders(),
-            body: JSON.stringify({ env }),
+            body: JSON.stringify(environmentSet),
         });
 
         return this.handleResponse(response);
@@ -143,15 +152,7 @@ class SettingsClient {
         return this.handleResponse(response);
     }
 
-    async updateEnvironmentSet(settingName, environment, newValue) {
-        const response = await this.apiRequest(`${this.apiUrl}/api/environmentsettings`, {
-            method: 'PUT',
-            headers: this.getAuthHeaders(),
-            body: JSON.stringify({ settingName, environment, value: newValue }),
-        });
-
-        return this.handleResponse(response);
-    }
+    
 
 
     async getAllApplications() {
@@ -181,14 +182,14 @@ class SettingsClient {
         return this.handleResponse(response);
     }
 
-    async addApplicationSetting(applicationName, allSettings) {
-        const response = await this.apiRequest(`${this.apiUrl}/api/ApplicationSettings`, {
+    async addApplicationSetting(applicationName, environment, variable) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/ApplicationSettings/${applicationName}/${environment}/${variable}`, {
             method: 'POST',
             headers: this.getAuthHeaders(),
-            body: JSON.stringify({
-                applicationId: applicationName,
-                settings: allSettings
-            }),
+            // body: JSON.stringify({
+            //     applicationId: applicationName,
+            //     settings: allSettings
+            // }),
         });
 
         return this.handleResponse(response);
@@ -213,11 +214,11 @@ class SettingsClient {
         return this.handleResponse(response);
     }
 
-    async addApplication(applicationName, token) {
+    async addApplication(applicationName, environmentSet, token) {
         const response = await this.apiRequest(`${this.apiUrl}/api/applications`, {
             method: 'POST',
             headers: this.getAuthHeaders(),
-            body: JSON.stringify({ name: applicationName, token }),
+            body: JSON.stringify({ name: applicationName, environmentSet, token }),
         });
 
         return this.handleResponse(response);

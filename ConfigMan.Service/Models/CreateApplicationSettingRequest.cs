@@ -2,6 +2,6 @@
 
 public class CreateApplicationSettingRequest
 {
-    public Guid ApplicationId { get; set; }
+    public string ApplicationName{ get; set; }
     public List<EnvironmentSetting> Settings { get; set; }
 }

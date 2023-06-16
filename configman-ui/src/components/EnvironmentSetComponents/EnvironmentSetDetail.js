@@ -3,12 +3,16 @@ import Button from '@mui/material/Button';
 import AddEnvironmentDialog from './AddEnvironmentDialog';
 import { SettingGridData, SettingGridItem } from '../SettingGrid/SettingGridData';
 import SettingsGrid from '../SettingGrid/SettingGrid';
+import Box from '@mui/material/Box';
+import SettingsClient from '../../settingsClient';
+
 
 const EnvironmentSetDetail = ({ enviornmentSet }) => {
 
 
     const [transformedSettings, setTransformedSettings] = useState([]);
     const [environmentDialogOpen, setEnvironmentDialogOpen] = useState(false);
+    const settingsClient = new SettingsClient();
 
     const handleAddEnvironmentSetDialogClose = () => {
         setEnvironmentDialogOpen(false);
@@ -16,26 +20,27 @@ const EnvironmentSetDetail = ({ enviornmentSet }) => {
 
     useEffect(() => {
         const transformedSettings = loadGrid(enviornmentSet.deploymentEnvironments);
-         setTransformedSettings(transformedSettings);
-    });  // The function will run whenever environmentSet changes
-    
+        setTransformedSettings(transformedSettings);
+    }, [enviornmentSet]);  // The function will run whenever environmentSet changes
+
     const loadGrid = (environments) => {
+        console.log("loading grid", environments);
         var result = new SettingGridData();
         environments.forEach((env) => {
             result.environments.push(env.name);
-            if (env.settings == undefined)
+            if (env.environmentSettings == undefined)
                 return;
-            env.settings.forEach((setting) => {
-                if (!result.settings[setting.name]) {
-                    result.settings[setting.name] = [];
+            for (let setting in env.environmentSettings) {
+                if (!result.settings[setting]) {
+                    result.settings[setting] = [];
                 }
 
-                if (!result.settings[setting.name][env.name]) {
-                    result.settings[setting.name][env.name] = "";
+                if (!result.settings[setting][env.name]) {
+                    result.settings[setting][env.name] = env.environmentSettings[setting];
                 }
-                result.settings[setting.name][env.name] = setting.value;
-            });
 
+                result.settings[setting][env.name] = env.environmentSettings[setting];
+            }
             console.log("final", result);
         });
         return result;
@@ -46,42 +51,39 @@ const EnvironmentSetDetail = ({ enviornmentSet }) => {
         // setEnvironmentDetailsDialogOpen(true);
     };
 
-    const handleAddEnvironmentSetting = async (newEnvironmentSettingName, newEnvironmentSettings) => {
-        // let keys = Object.keys(newEnvironmentSettings);
-        // let allSettings = keys.map(env => {
-        //   return {
-        //     environment: env,
-        //     name: newEnvironmentSettingName,
-        //     value: newEnvironmentSettings[env] || '',
-        //   }
-        // });
+    const handleAddEnvironmentSetting = async (newValue) => {
+        if (newValue == "")
+            return;
+        enviornmentSet.deploymentEnvironments.forEach(env => {
+            let obj = {};
+            obj[newValue] = "";
+            env.environmentSettings[newValue] = "";
 
-        // await settingsClient.addEnvironmentSettings(allSettings);
-        // fetchEnvironmentSets();
+        });
+        await settingsClient.updateEnvironmentSet(enviornmentSet);
     };
 
-    const handleSettingChange = async (settingName, environment, newValue) => {
-        // Update the API with the new setting value
-        //await settingsClient.updateEnvironmentSet(settingName, environment, newValue);
-        //fetchEnvironmentSets();
+    const handleSettingChange = async (settingName, environment, newValue, updatedSettings) => {
+        setTransformedSettings(updatedSettings); // assuming setTransformedSettings is the function to update the state
+        var foundEnvironment = enviornmentSet.deploymentEnvironments.find(x=>x.name === environment);
+        foundEnvironment.environmentSettings[settingName] = newValue;
+        console.log("Settings change", settingName, environment, newValue);
+        await settingsClient.updateEnvironmentSet(enviornmentSet);
     };
 
     return (
         <div>
-            <AddEnvironmentDialog key={environmentDialogOpen ? 'open' : 'closed'}
+            <AddEnvironmentDialog
                 open={environmentDialogOpen}
                 onClose={handleAddEnvironmentSetDialogClose}
                 //onAdded={fetchEnvironments}
                 environmentSet={enviornmentSet} />
-            <h2>{enviornmentSet.name}&nbsp;<i className="fa-regular fa-pen-to-square"></i>&nbsp;<i className="fa-solid fa-trash-can"></i></h2>
-            <Button variant="contained" color="primary"  onClick={() => setEnvironmentDialogOpen(true)}>Add Environment</Button> 
-            TODO: grid here of setting name + environments (e.g. dev/stage/preprod/prod)
-            {/* {environments.map((env) => (
-      <>
-        {env.name}
-      </>
-    ))} */}
-
+            <h2>{enviornmentSet.name}&nbsp;
+            {/* <i className="fa-regular fa-pen-to-square"></i>&nbsp;<i className="fa-solid fa-trash-can"></i> */}
+            </h2>
+            <Box display="flex" justifyContent="flex-end">
+                <Button variant="contained" color="primary" onClick={() => setEnvironmentDialogOpen(true)}>Add Environment</Button>
+            </Box>
 
             {transformedSettings.environments && (
                 <SettingsGrid
@@ -91,7 +93,7 @@ const EnvironmentSetDetail = ({ enviornmentSet }) => {
                     onSettingChange={handleSettingChange}
                 />
             )}
-
+            {/* <Button variant="contained" color="primary"  onClick={() => setEnvironmentDialogOpen(true)}>Add Variable</Button>  */}
         </div>
     );
 };

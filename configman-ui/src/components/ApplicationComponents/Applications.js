@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import { useNavigate } from 'react-router-dom';
 import AddApplicationDialog from './AddApplicationDialog';
-import SettingsClient from '../settingsClient';
+import SettingsClient from '../../settingsClient';
 
 const Applications = () => {
     const [openAddApplicationDialog, setOpenAddApplicationDialog] = useState(false);
@@ -33,7 +33,8 @@ const Applications = () => {
         setOpenAddApplicationDialog(false);
     };
 
-    const handleApplicationAdded = () => {
+    const handleApplicationAdded = async (applicationName, token) => {
+      //  await settingsClient.addApplication(applicationName, token)
         fetchApplications();
     };
 
@@ -50,8 +51,8 @@ const Applications = () => {
             </div>
 
             <h1>Applications</h1>
-            <p>Applications are the core of ConfigMan. Create an application and security token then wire your application up.</p>
-
+            <p>Allow your application to connect and get its own configuration by creating an Application and a Token for authentication. This will need to be provided by your client</p>
+            <p>Applications will inherit values from their Environment Set. Setting a variable with the same name as the Environment Set will override it</p>
 
             <AddApplicationDialog key={openAddApplicationDialog ? 'open' : 'closed'}
                 open={openAddApplicationDialog}

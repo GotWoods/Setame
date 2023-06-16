@@ -66,6 +66,8 @@ public class EnvironmentSetService : IEnvironmentSetService
         _dbContext.Environments.Remove(environment);
         await _dbContext.SaveChangesAsync();
     }
+
+    
     //
     // public async Task AddSettingToEnvironment(string environmentName, Setting setting)
     // {

@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Route, Routes, Navigate, BrowserRouter } from 
 import LoginPage from './components/LoginPage';
 import EnvironmentSets from './components/EnvironmentSetComponents/EnvironmentSets';
 import NavigationBar from './components/NavigationBar';
-import Applications from './components/Applications';
-import ApplicationDetail from './components/ApplicationDetail';
+import Applications from './components/ApplicationComponents/Applications';
+import ApplicationDetail from './components/ApplicationComponents/ApplicationDetail';
 import Users from './components/Users';
 import './App.css';
 import VariableGroups from './components/VariableGroups';

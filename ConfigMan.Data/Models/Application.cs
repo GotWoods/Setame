@@ -8,9 +8,10 @@ public class Application
 {
     public string Name { get; set; } = string.Empty;
     public string Token { get; set; } = string.Empty;
+    public string EnvironmentSet { get; set; } = string.Empty;
 
     [Column(TypeName = "jsonb")]
-    public List<Setting>? ApplicationDefaults { get; set; } = new();
+    public List<Setting> ApplicationDefaults { get; set; } = new();
 
     [Column(TypeName = "jsonb")]
     public Dictionary<string, List<Setting>> EnvironmentSettings { get; set; } = new();

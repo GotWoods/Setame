@@ -12,20 +12,13 @@ import Button from '@mui/material/Button';
 const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onHeaderClick }) => {
     const [newEnvironmentSettingName, setNewEnvironmentSettingName] = useState('');
     const [newEnvironmentSettings, setNewEnvironmentSettings] = useState({});
-    const [duplicateSettingError, setDuplicateSettingError] = useState('');
+//    const [duplicateSettingError, setDuplicateSettingError] = useState('');
 
-    const handleAddEnvironmentSetting = () => {
-        if (transformedSettings.settings[newEnvironmentSettingName]) {
-            setDuplicateSettingError('A setting with this name already exists.');
-            return;
-        } else {
-            setDuplicateSettingError('');
-        }
-
-        onAddSetting(newEnvironmentSettingName, newEnvironmentSettings);
-        setNewEnvironmentSettingName('');
-        setNewEnvironmentSettings({});
-    };
+    // const handleNewSettingChange = (e) => {
+    //     let updatedSettings = { ...newEnvironmentSettings }; // Create a copy of the state
+    //     //set(updatedSettings, env, e.target.value); // Set the value
+    //     setNewEnvironmentSettings(updatedSettings); // Update the state
+    // }
 
     return (
         <TableContainer component={Paper}>
@@ -54,15 +47,39 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onHe
                                 <TableCell key={settingName + env}>
                                     <TextField
                                         label={env}
-                                        value={transformedSettings.settings[settingName][env]}
+                                        defaultValue={transformedSettings.settings[settingName][env]}
                                         onBlur={(e) => {
-                                            onSettingChange(settingName, env, e.target.value);
+                                            let updatedSettings = { ...transformedSettings }; // make a copy of the state
+                                            updatedSettings.settings[settingName][env] = e.target.value; // update the specific field
+                                            onSettingChange(settingName, env, e.target.value, updatedSettings); // pass the entire updated object to parent component
                                         }}
                                     />
                                 </TableCell>
                             ))}
                         </TableRow>
                     ))}
+
+                    <TableRow key="new">
+                        <TableCell>
+                            <TextField
+                                label="Name"
+                                defaultValue={newEnvironmentSettingName || ''}
+                                onBlur={(e) => { onAddSetting(e.target.value) }}
+                            // onChange={e => setNewEnvironmentSettingName(e.target.value)}
+                            /></TableCell>
+                        {transformedSettings.environments.map((env) => (
+                            <TableCell key={"new" + env}>
+                                <TextField
+                                    label={env}
+                                    value=""
+                                // onBlur={(e) => {
+                                //     onSettingChange("new", env, e.target.value);
+                                // }}
+                                />
+                            </TableCell>
+                        ))}
+                    </TableRow>
+
                 </TableBody>
             </Table>
         </TableContainer>

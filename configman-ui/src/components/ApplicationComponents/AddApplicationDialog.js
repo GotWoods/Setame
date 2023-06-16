@@ -1,24 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import SettingsClient from '../settingsClient';
+import SettingsClient from '../../settingsClient';
 
 const AddApplicationDialog = ({ open, onClose, onApplicationAdded }) => {
   const [applicationName, setApplicationName] = useState('');
   const [token, setToken] = useState('');
   const settingsClient = new SettingsClient;
+  const [environmentSets, setEnvironmentSets] = useState([]);
+  const [selectedEnvironmentSet, setSelectedEnvironmentSet] = useState('');
 
   const handleAddApplication = async () => {
-    await settingsClient.addApplicaiton(applicationName, token);
+    console.log("Adding?");
+    await settingsClient.addApplication(applicationName, selectedEnvironmentSet, token);
     onClose();
     if (onApplicationAdded) {
       onApplicationAdded();
     }
   };
+  const fetchEnvironmentSets = async () => {
+    const result = await settingsClient.getEnvironmentSets(); // replace this with your function
+    setEnvironmentSets(result);
+  };
+
+  useEffect(() => {
+    if (open) {
+      fetchEnvironmentSets();
+    }
+  }, [open]);
 
   const generateToken = () => {
     // Generate a random token (change this according to your requirements)
@@ -41,6 +56,11 @@ const AddApplicationDialog = ({ open, onClose, onApplicationAdded }) => {
             value={applicationName}
             onChange={(e) => setApplicationName(e.target.value)}
           />
+          <Select fullWidth value={selectedEnvironmentSet} onChange={(e) => setSelectedEnvironmentSet(e.target.value)}>
+            {environmentSets.map((set) => (
+              <MenuItem key={set.name} value={set.name}>{set.name}</MenuItem>
+            ))}
+          </Select>
           <TextField
             margin="dense"
             id="token"
