@@ -11,6 +11,7 @@ import VariableGroups from './components/VariableGroups';
 import Main from './components/Main';
 import ProtectedOutlet from './components/ProtectedOutlet';
 import EnvironmentGroups from './components/EnvironmentGroups';
+import Settings from './components/Settings';
 
 function App() {
   return (
@@ -34,6 +35,9 @@ function App() {
             </Route>
             <Route path="/environmentGroups" element={<ProtectedOutlet />}>
               <Route index element={<EnvironmentGroups />} />
+            </Route>
+            <Route path="/settings" element={<ProtectedOutlet />}>
+              <Route index element={<Settings />} />
             </Route>
             <Route path="/users" element={<ProtectedOutlet />}>
               <Route index element={<Users />} />

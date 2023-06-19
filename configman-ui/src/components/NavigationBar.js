@@ -24,14 +24,17 @@ const NavigationBar = () => {
         <Button color="inherit" href="/applications">
           Applications
         </Button>
-        <Button color="inherit" href="/environmentGroups">
+        {/* <Button color="inherit" href="/environmentGroups">
           Environment Groups
         </Button>
         <Button color="inherit" href="/variableGroups">
           Variable Groups
-        </Button>
+        </Button> */}
         <Button color="inherit" href="/users">
           Users
+        </Button>
+        <Button color="inherit" href="/settings">
+          Settings
         </Button>
         </>
         )}
