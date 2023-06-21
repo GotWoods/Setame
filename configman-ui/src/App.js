@@ -21,8 +21,8 @@ function App() {
         <div className="main-content">
           <Routes>
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/" element={<Main />}>
-              <Route element={<Main />} />
+            <Route path="/" element={<ProtectedOutlet />}>
+              <Route index element={<Main />} />
             </Route>
             <Route path="/environments" element={<ProtectedOutlet />}>
               <Route index element={<EnvironmentSets />} />

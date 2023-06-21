@@ -34,7 +34,7 @@ const Applications = () => {
     };
 
     const handleApplicationAdded = async (applicationName, token) => {
-      //  await settingsClient.addApplication(applicationName, token)
+        //  await settingsClient.addApplication(applicationName, token)
         fetchApplications();
     };
 
@@ -44,13 +44,15 @@ const Applications = () => {
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem', marginTop: '1rem', marginRight: '1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', marginTop: '1rem', marginRight: '1rem' }}>
+                <h1>Applications</h1>
                 <Button variant="contained" color="primary" onClick={handleOpenAddApplicationDialog}>
                     Add Application
                 </Button>
             </div>
 
-            <h1>Applications</h1>
+
+
             <p>Allow your application to connect and get its own configuration by creating an Application and a Token for authentication. This will need to be provided by your client</p>
             <p>Applications will inherit values from their Environment Set. Setting a variable with the same name as the Environment Set will override it</p>
 
@@ -59,19 +61,19 @@ const Applications = () => {
                 onClose={handleCloseAddApplicationDialog}
                 onApplicationAdded={handleApplicationAdded}
             />
-          
-                <Grid container spacing={2}>
-                    {applications.map((app) => (
-                        <Grid item xs={12} key={app.name}>
-                            <div style={{ display: 'inline-block', width: '150px' }}>
-                                <Button onClick={() => handleApplicationClick(app.name)}>{app.name}</Button>
-                            </div>
-                            <div style={{ display: 'inline-block', width: '100px' }}>
-                                <Button color="secondary" variant="contained" onClick={() => handleDeleteApplication(app.name)}>Delete</Button>
-                            </div>
-                        </Grid>
-                    ))}
-                </Grid>
+
+            <Grid container spacing={2}>
+                {applications.map((app) => (
+                    <Grid item xs={12} key={app.name}>
+                        <div style={{ display: 'inline-block', width: '150px' }}>
+                            <Button onClick={() => handleApplicationClick(app.name)}>{app.name}</Button>
+                        </div>
+                        <div style={{ display: 'inline-block', width: '100px' }}>
+                            <Button color="secondary" variant="contained" onClick={() => handleDeleteApplication(app.name)}>Delete</Button>
+                        </div>
+                    </Grid>
+                ))}
+            </Grid>
         </div>
     );
 };

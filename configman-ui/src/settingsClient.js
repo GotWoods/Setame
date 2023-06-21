@@ -94,6 +94,14 @@ class SettingsClient {
     }
 
     
+    async renameEnvironmentSet(oldName, newName) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${oldName}/rename`, {
+            method: 'POST',
+            headers: this.getAuthHeaders(),
+            body: JSON.stringify(newName),
+        });
+        return this.handleResponse(response);
+    }
 
     async deleteEnvironmentSet(environment) {
         const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environment}`, {

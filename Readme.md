@@ -9,13 +9,41 @@ on startup and be changed without requiring an application to be redeployed for 
 - Create variables at the application level that are inherited by each environment
 - .NET Configuration Provider
 
-
-- Shows computed config for any given application ?
 - Case Sensitive Config?
 - History of changes to variables?
-- Application authentication?
+- Per Application Access (read/write/Whatever people want)?
 - Secret storage?
 - Variable version pinning?
 - Live variables changes?
 - Permission per application can be granted?
 - Tracking of variable usages (may be .NET only)
+
+
+
+## TODO
+- Setup Screen
+- Forgot Password
+
+Environment Sets
+- Delete Environment (will cascase to all children apps?)
+- Rename Environment (will cascade to all children apps?)
+- New Variable -> Ability to add values to it
+- Rename Variable on set
+- Duplicate Prevention
+- History
+- Copy Environment Set
+
+Applications
+- Detach from Environment Set
+- Add custom environment above environment set
+- Applied Config
+- Globals not working
+- Duplicate Prevention
+- History
+- Copy Application
+
+Users
+- All of it
+
+Settings
+- All of it

@@ -11,10 +11,12 @@ namespace ConfigMan.Service.Controllers;
 public class EnvironmentSetsController : ControllerBase
 {
     private readonly IEnvironmentSetService _environmentSetService;
+    private readonly IApplicationService _applicationService;
 
-    public EnvironmentSetsController(IEnvironmentSetService environmentSetService)
+    public EnvironmentSetsController(IEnvironmentSetService environmentSetService, IApplicationService applicationService)
     {
         _environmentSetService = environmentSetService;
+        _applicationService = applicationService;
     }
 
     [HttpGet]
@@ -35,22 +37,30 @@ public class EnvironmentSetsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<EnvironmentSet>> Create(EnvironmentSet environmentSet)
     {
-        await _environmentSetService.Create(environmentSet);
+        await _environmentSetService.CreateAsync(environmentSet);
         return CreatedAtAction(nameof(Create), new { id = environmentSet.Name }, environmentSet);
     }
 
     [HttpPut("{name}")]
     public async Task<IActionResult> Update(string name, EnvironmentSet environmentSet)
     {
-        await _environmentSetService.Update(environmentSet);
+        await _environmentSetService.UpdateAsync(environmentSet);
         return NoContent();
     }
 
-    //DELETE: api/environments/guid
     [HttpDelete("{name}")]
     public async Task<IActionResult> Delete(string name)
     {
-        await _environmentSetService.Delete(name);
+    
+        await _environmentSetService.DeleteAsync(name);
+        return NoContent();
+    }
+
+
+    [HttpPost("{name}/rename")]
+    public async Task<IActionResult> RenameVariable(string name, [FromBody] string newName)
+    {
+        await _environmentSetService.RenameAsync(name,  newName);
         return NoContent();
     }
 }

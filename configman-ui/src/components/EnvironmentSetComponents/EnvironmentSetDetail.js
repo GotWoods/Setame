@@ -1,27 +1,70 @@
 import React, { useState, useEffect } from 'react';
-import Button from '@mui/material/Button';
 import AddEnvironmentDialog from './AddEnvironmentDialog';
 import { SettingGridData, SettingGridItem } from '../SettingGrid/SettingGridData';
 import SettingsGrid from '../SettingGrid/SettingGrid';
 import Box from '@mui/material/Box';
 import SettingsClient from '../../settingsClient';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import {  
+    TextField,
+    Button,
+} from '@mui/material';
 
 
-const EnvironmentSetDetail = ({ enviornmentSet }) => {
-
-
+const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
+    const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+    const [renameDialogOpen, setRenameDialogOpen] = useState(false);
     const [transformedSettings, setTransformedSettings] = useState([]);
     const [environmentDialogOpen, setEnvironmentDialogOpen] = useState(false);
+    const [newName, setNewName] = useState('');  
+    const [environmentSetName, setEnvironmentSetName] = useState(environmentSet.name);  
     const settingsClient = new SettingsClient();
 
     const handleAddEnvironmentSetDialogClose = () => {
         setEnvironmentDialogOpen(false);
+        
+        if (refreshRequested!=undefined)
+            refreshRequested();
+    };
+
+    const handleRenameEnvironmentClick = () => {
+        setRenameDialogOpen(true);
+    }
+
+    const handleRenameEnvironment = async () => {
+        setRenameDialogOpen(false);
+        await settingsClient.renameEnvironmentSet(environmentSet.name, newName);
+        setNewName('');  // Reset newName after use
+        setEnvironmentSetName(newName); 
+    }
+
+    const handleCloseRenameEnvironment = () => {
+        setRenameDialogOpen(false);
+    }
+
+    const handleDeleteEnvironmentClick = () => {
+        setDeleteConfirmationOpen(true);
+    };
+
+    const handleCloseDeleteConfirmation = () => {
+        setDeleteConfirmationOpen(false);
+    };
+
+    const handleConfirmDeleteEnvironment = async () => {
+        setDeleteConfirmationOpen(false);
+        await settingsClient.deleteEnvironmentSet(environmentSet.name);
+        if (refreshRequested!=undefined)
+            refreshRequested();
     };
 
     useEffect(() => {
-        const transformedSettings = loadGrid(enviornmentSet.deploymentEnvironments);
+        const transformedSettings = loadGrid(environmentSet.deploymentEnvironments);
         setTransformedSettings(transformedSettings);
-    }, [enviornmentSet]);  // The function will run whenever environmentSet changes
+    }, [environmentSet]);  // The function will run whenever environmentSet changes
 
     const loadGrid = (environments) => {
         console.log("loading grid", environments);
@@ -54,20 +97,20 @@ const EnvironmentSetDetail = ({ enviornmentSet }) => {
     const handleAddEnvironmentSetting = async (newValue) => {
         if (newValue == "")
             return;
-        enviornmentSet.deploymentEnvironments.forEach(env => {
+        environmentSet.deploymentEnvironments.forEach(env => {
             let obj = {};
             obj[newValue] = "";
             env.environmentSettings[newValue] = "";
 
         });
-        await settingsClient.updateEnvironmentSet(enviornmentSet);
+        await settingsClient.updateEnvironmentSet(environmentSet);
     };
 
     const handleSettingChange = async (settingName, environment, newValue) => {
-        var foundEnvironment = enviornmentSet.deploymentEnvironments.find(x=>x.name === environment);
+        var foundEnvironment = environmentSet.deploymentEnvironments.find(x => x.name === environment);
         foundEnvironment.environmentSettings[settingName] = newValue;
         console.log("Settings change", settingName, environment, newValue);
-        await settingsClient.updateEnvironmentSet(enviornmentSet);
+        await settingsClient.updateEnvironmentSet(environmentSet);
     };
 
     return (
@@ -76,9 +119,16 @@ const EnvironmentSetDetail = ({ enviornmentSet }) => {
                 open={environmentDialogOpen}
                 onClose={handleAddEnvironmentSetDialogClose}
                 //onAdded={fetchEnvironments}
-                environmentSet={enviornmentSet} />
-            <h2>{enviornmentSet.name}&nbsp;
-            {/* <i className="fa-regular fa-pen-to-square"></i>&nbsp;<i className="fa-solid fa-trash-can"></i> */}
+                environmentSet={environmentSet} />
+            <h2>{environmentSetName}
+                <Button onClick={() => handleRenameEnvironmentClick()} color="secondary">
+                    <i className="fa-regular fa-pen-to-square"></i>&nbsp;
+                </Button>
+                <Button onClick={() => handleDeleteEnvironmentClick()} color="secondary">
+                    <i className="fa-solid fa-trash-can"></i>
+                </Button>
+
+
             </h2>
             <Box display="flex" justifyContent="flex-end">
                 <Button variant="contained" color="primary" onClick={() => setEnvironmentDialogOpen(true)}>Add Environment</Button>
@@ -93,7 +143,65 @@ const EnvironmentSetDetail = ({ enviornmentSet }) => {
                 />
             )}
             {/* <Button variant="contained" color="primary"  onClick={() => setEnvironmentDialogOpen(true)}>Add Variable</Button>  */}
+
+            {/* Other components */}
+            <Dialog
+                open={deleteConfirmationOpen}
+                onClose={handleCloseDeleteConfirmation}
+                aria-labelledby="delete-confirmation-dialog-title"
+                aria-describedby="delete-confirmation-dialog-description"
+            >
+                <DialogTitle id="delete-confirmation-dialog-title">
+                    {'Delete Environment'}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="delete-confirmation-dialog-description">
+                        Are you sure you want to delete this environment? This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDeleteConfirmation} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleConfirmDeleteEnvironment} color="secondary">
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+
+            <Dialog
+                open={renameDialogOpen}
+            >
+                <DialogTitle>
+                    {'Rename Environment'}
+                </DialogTitle>
+                <DialogContent>
+                <DialogContentText>
+                        Please enter the new name for the environment:
+                    </DialogContentText>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="newName"
+                        label="New Name"
+                        type="text"
+                        fullWidth
+                        value={newName}
+                        onChange={(e) => setNewName(e.target.value)}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseRenameEnvironment} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleRenameEnvironment} color="secondary">
+                        Ok
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
+
     );
 };
 

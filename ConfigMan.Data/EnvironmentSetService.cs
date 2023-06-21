@@ -1,6 +1,4 @@
 ﻿using System.Data;
-using System.Runtime.InteropServices;
-using System.Xml.Linq;
 using ConfigMan.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,20 +8,22 @@ public interface IEnvironmentSetService
 {
     Task<IEnumerable<EnvironmentSet>> GetAllAsync();
     Task<EnvironmentSet> GetOneAsync(string name);
-    Task<EnvironmentSet> Create(EnvironmentSet environment);
-    Task Update(EnvironmentSet environment);
-    // Task DeleteEnvironmentAsync(string name);
-    // Task AddSettingToEnvironment(string environmentName, Setting settings);
-    Task Delete(string name);
+    Task<EnvironmentSet> CreateAsync(EnvironmentSet environment);
+    Task UpdateAsync(EnvironmentSet environment);
+
+    Task DeleteAsync(string name);
+    Task RenameAsync(string oldName, string newName);
 }
 
 public class EnvironmentSetService : IEnvironmentSetService
 {
+    private readonly IApplicationService _applicationService;
     private readonly AppDbContext _dbContext;
 
-    public EnvironmentSetService(AppDbContext dbContext)
+    public EnvironmentSetService(AppDbContext dbContext, IApplicationService applicationService)
     {
         _dbContext = dbContext;
+        _applicationService = applicationService;
     }
 
     public async Task<IEnumerable<EnvironmentSet>> GetAllAsync()
@@ -36,12 +36,12 @@ public class EnvironmentSetService : IEnvironmentSetService
         return await _dbContext.Environments.FindAsync(name);
     }
 
-    public async Task<EnvironmentSet> Create(EnvironmentSet environment)
+    public async Task<EnvironmentSet> CreateAsync(EnvironmentSet environment)
     {
         if (environment == null) throw new ArgumentNullException(nameof(environment));
 
         var existing = await _dbContext.Environments.FirstOrDefaultAsync(x => x.Name == environment.Name);
-        if (existing!= null)
+        if (existing != null)
             throw new DuplicateNameException("Can not have two Environment Sets of the same name");
 
         await _dbContext.Environments.AddAsync(environment);
@@ -50,34 +50,51 @@ public class EnvironmentSetService : IEnvironmentSetService
         return environment;
     }
 
-    public async Task Update(EnvironmentSet environment)
+    public async Task UpdateAsync(EnvironmentSet environment)
     {
         if (environment == null) throw new ArgumentNullException(nameof(environment));
-    
+
         _dbContext.Environments.Update(environment);
         await _dbContext.SaveChangesAsync();
     }
-    
-    public async Task Delete(string name)
+
+    public async Task DeleteAsync(string name)
     {
-        var environment = await _dbContext.Environments.FirstAsync(x=>x.Name == name);
+        var environment = await _dbContext.Environments.FirstAsync(x => x.Name == name);
         if (environment == null) throw new InvalidOperationException("Environment Set not found.");
-    
+
+        var applications = await _applicationService.GetApplicationsAsync();
+        foreach (var application in applications)
+            if (application.EnvironmentSet == name)
+                throw new InvalidOperationException("Can not delete an Environment Set when an application is associated to the environment set");
+
         _dbContext.Environments.Remove(environment);
         await _dbContext.SaveChangesAsync();
     }
 
-    
-    //
-    // public async Task AddSettingToEnvironment(string environmentName, Setting setting)
-    // {
-    //     var environment = _dbContext.Environments.First(x=>x.Name == environmentName);
-    //     if (environment.Settings == null)
-    //         environment.Settings  = new List<Setting>();
-    //
-    //     environment.Settings.Add(setting);
-    //
-    //     _dbContext.Entry(environment).Property(x => x.Settings).IsModified = true; //EF does not do change detection on jsonb objects
-    //     await _dbContext.SaveChangesAsync();
-    // }
+    public async Task RenameAsync(string oldName, string newName)
+    {
+        var environmentSet = await GetOneAsync(oldName);
+
+        if (environmentSet == null)
+            throw new NullReferenceException("Could not find environment set by name " + oldName);
+
+
+        //environmentSet.Name = newName;
+
+        var newSet = environmentSet.Copy(); //have to copy as we can not change the key of an object 
+        newSet.Name = newName;
+
+        var allApps = await _applicationService.GetApplicationsAsync();
+        foreach (var application in allApps)
+            if (application.EnvironmentSet == oldName)
+            {
+                application.EnvironmentSet = newName;
+                await _applicationService.UpdateApplicationAsync(application);
+            }
+
+        _dbContext.Environments.Remove(environmentSet); //delete the original
+        await _dbContext.Environments.AddAsync(newSet);
+        await _dbContext.SaveChangesAsync();
+    }
 }
