@@ -121,8 +121,24 @@ const ApplicationDetail = () => {
         //  fetchApplication();
     }
 
-    const handleSettingChange = async (settingName, environment, newValue, updatedSettings) => {
-        setTransformedSettings(updatedSettings);
+    const handleSettingChange = async (settingName, environment, newValue) => {
+        console.log("change setting", settingName, environment, newValue);
+        await settingsClient.updateApplicationSetting(applicationName, environment, settingName, newValue);
+        //setTransformedSettings(updatedSettings);
+        //var foundEnvironment = enviornmentSet.deploymentEnvironments.find(x=>x.name === environment);
+        //foundEnvironment.environmentSettings[settingName] = newValue;
+        //console.log("Settings change", settingName, environment, newValue);
+        //await settingsClient.updateEnvironmentSet(enviornmentSet);
+    };
+
+    const handleSettingRename = async (oldSettingName, newSettingName) => {
+
+        console.log("rename setting", oldSettingName, newSettingName);
+        await settingsClient.renameApplicationSetting(applicationName, oldSettingName,newSettingName);
+
+        //console.log("change setting", settingName, environment, newValue);
+        //await settingsClient.updateApplicationSetting(applicationName, environment, settingName, newValue);
+        //setTransformedSettings(updatedSettings);
         //var foundEnvironment = enviornmentSet.deploymentEnvironments.find(x=>x.name === environment);
         //foundEnvironment.environmentSettings[settingName] = newValue;
         //console.log("Settings change", settingName, environment, newValue);
@@ -130,6 +146,7 @@ const ApplicationDetail = () => {
     };
 
     const handleAddSetting = async () => {
+        console.log("new setting");
         await settingsClient.addGlobalApplicationSetting(applicationName, newSettingName, newSettingValue);
         setNewSettingName('');
         setNewSettingValue('');
@@ -226,12 +243,13 @@ const ApplicationDetail = () => {
             </TableContainer>
 
             <h2>Environment Specific Settings</h2>
-            <div>TODO: ability to use your own environments just for this application and ignore the global environments</div>
+            {/* <div>TODO: ability to use your own environments just for this application and ignore the global environments</div> */}
             {transformedSettings.environments && (
                 <SettingsGrid
                     transformedSettings={transformedSettings}
                     onAddSetting={handleAddEnvironmentSetting}
                     onSettingChange={handleSettingChange}
+                    onSettingRename={handleSettingRename}
                 />
             )}
 

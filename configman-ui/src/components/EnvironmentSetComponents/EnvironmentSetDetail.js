@@ -63,8 +63,7 @@ const EnvironmentSetDetail = ({ enviornmentSet }) => {
         await settingsClient.updateEnvironmentSet(enviornmentSet);
     };
 
-    const handleSettingChange = async (settingName, environment, newValue, updatedSettings) => {
-        setTransformedSettings(updatedSettings); // assuming setTransformedSettings is the function to update the state
+    const handleSettingChange = async (settingName, environment, newValue) => {
         var foundEnvironment = enviornmentSet.deploymentEnvironments.find(x=>x.name === environment);
         foundEnvironment.environmentSettings[settingName] = newValue;
         console.log("Settings change", settingName, environment, newValue);

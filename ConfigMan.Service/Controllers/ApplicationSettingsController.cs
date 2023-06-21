@@ -1,9 +1,9 @@
-﻿using ConfigMan.Data;
+﻿using System.Security.Claims;
+using ConfigMan.Data;
 using ConfigMan.Data.Models;
-using ConfigMan.Service.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ConfigMan.Service.Controllers;
 
@@ -25,9 +25,8 @@ public class ApplicationSettingsController : ControllerBase
 
     [HttpGet]
     [Authorize(Roles = "Application")]
-    public async Task<ActionResult> Get() 
+    public async Task<ActionResult> Get()
     {
-        
         var claim = User.FindFirst(ClaimTypes.NameIdentifier);
         if (claim == null)
         {
@@ -38,34 +37,15 @@ public class ApplicationSettingsController : ControllerBase
         var env = await _environmentService.GetOneAsync("Dev");
         var application = await _applicationService.GetApplicationByIdAsync(claim.Value);
         return Ok(); // application.GetAppliedSettings(env));
-
     }
 
-    // POST: api/environments
-    // [HttpPost]
-    // public async Task<ActionResult> CreateApplicationSetting(CreateApplicationSettingRequest request)
-    // {
-    //     foreach (var environmentSetting in request.Settings)
-    //     {
-    //         var setting = new Setting();
-    //         setting.Name = environmentSetting.Name;
-    //         setting.Value = environmentSetting.Value;
-    //
-    //         if (environmentSetting.Environment == "Default")
-    //             await _applicationService.AddApplicationSetting(request.ApplicationName, setting);
-    //         else
-    //             await _applicationService.AddEnvironmentSetting(request.ApplicationName, environmentSetting.Environment, setting);
-    //     }
-    //     return CreatedAtAction(nameof(CreateApplicationSetting), null);
-    // }
-
-    [HttpPost("{application}/{environment}/{variable}")] 
+    [HttpPost("{application}/{environment}/{variable}")]
     public async Task<ActionResult> CreateNew(string application, string environment, string variable)
     {
         var app = await _applicationService.GetApplicationByIdAsync(application);
         var environmentSet = await _environmentService.GetOneAsync(app.EnvironmentSet);
 
-        if (app==null)
+        if (app == null)
             throw new NullReferenceException("Could not find application by name " + application);
 
         if (environment == "Default")
@@ -80,14 +60,61 @@ public class ApplicationSettingsController : ControllerBase
             {
                 var setting = new Setting();
                 setting.Name = variable;
-                if (!app.EnvironmentSettings.ContainsKey((environmentSetting.Name)))
+                if (!app.EnvironmentSettings.ContainsKey(environmentSetting.Name))
                     app.EnvironmentSettings.Add(environmentSetting.Name, new List<Setting>());
                 app.EnvironmentSettings[environmentSetting.Name].Add(setting);
             }
         }
-        
+
         await _applicationService.UpdateApplicationAsync(app);
 
         return CreatedAtAction(nameof(CreateNew), null);
+    }
+
+
+    [HttpPut("{application}/{environment}/{variable}")]
+    public async Task<ActionResult> Update(string application, string environment, string variable, [FromBody] string value)
+    {
+        var app = await _applicationService.GetApplicationByIdAsync(application);
+
+        if (app == null)
+            throw new NullReferenceException("Could not find application by name " + application);
+
+        if (environment == "Default")
+            app.ApplicationDefaults.First(x => x.Name == variable).Value = value;
+        else
+        {
+            //in case we have duplicates, we clean them up here
+            var firstMatch = app.EnvironmentSettings[environment].First(x => x.Name == variable);
+            app.EnvironmentSettings[environment].RemoveAll(x => x.Name == variable && x != firstMatch);
+
+            firstMatch.Value = value;
+        }
+
+        await _applicationService.UpdateApplicationAsync(app);
+
+        return Ok();
+    }
+
+    [HttpPost("{application}/{variable}/rename")]
+    public async Task<IActionResult> RenameVariable(string application, string variable, [FromBody] string newName)
+    {
+        var app = await _applicationService.GetApplicationByIdAsync(application);
+
+        if (app == null)
+            throw new NullReferenceException("Could not find application by name " + application);
+
+        foreach (var environmentSetting in app.EnvironmentSettings)
+        {
+            foreach (var item in environmentSetting.Value)
+            {
+                if (item.Name == variable)
+                    item.Name = newName;
+            }
+        }
+
+        await _applicationService.UpdateApplicationAsync(app);
+
+        return Ok();
     }
 }

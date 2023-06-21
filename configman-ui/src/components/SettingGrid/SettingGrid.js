@@ -9,10 +9,11 @@ import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 
-const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onHeaderClick }) => {
+const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSettingRename, onHeaderClick }) => {
+    const [settings, setSettings] = useState(transformedSettings);
     const [newEnvironmentSettingName, setNewEnvironmentSettingName] = useState('');
-    const [newEnvironmentSettings, setNewEnvironmentSettings] = useState({});
-//    const [duplicateSettingError, setDuplicateSettingError] = useState('');
+    //  const [newEnvironmentSettings, setNewEnvironmentSettings] = useState({});
+    //    const [duplicateSettingError, setDuplicateSettingError] = useState('');
 
     // const handleNewSettingChange = (e) => {
     //     let updatedSettings = { ...newEnvironmentSettings }; // Create a copy of the state
@@ -26,7 +27,7 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onHe
                 <TableHead>
                     <TableRow>
                         <TableCell></TableCell>
-                        {transformedSettings.environments.map((env) => (
+                        {settings.environments.map((env) => (
                             <TableCell key={env}>
                                 {onHeaderClick ? (
                                     <a href="#" onClick={() => onHeaderClick(env)}>
@@ -40,18 +41,33 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onHe
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {Object.keys(transformedSettings.settings).map((settingName) => (
+                    {Object.keys(settings.settings).map((settingName) => (
                         <TableRow key={settingName}>
-                            <TableCell>{settingName}</TableCell>
-                            {transformedSettings.environments.map((env) => (
+                            <TableCell>
+                                <TextField
+                                        defaultValue={settingName}
+                                        onBlur={(e) => {
+                                            const newValue = e.target.value;
+                                            const originalValue = settingName;
+                                            if (newValue !== originalValue) {
+                                                onSettingRename(originalValue, newValue);
+                                            }
+                                        }}
+                                    />
+                            </TableCell>
+                            {settings.environments.map((env) => (
                                 <TableCell key={settingName + env}>
                                     <TextField
                                         label={env}
-                                        defaultValue={transformedSettings.settings[settingName][env]}
+                                        defaultValue={settings.settings[settingName][env]}
                                         onBlur={(e) => {
-                                            let updatedSettings = { ...transformedSettings }; // make a copy of the state
-                                            updatedSettings.settings[settingName][env] = e.target.value; // update the specific field
-                                            onSettingChange(settingName, env, e.target.value, updatedSettings); // pass the entire updated object to parent component
+                                            const newValue = e.target.value;
+                                            const originalValue = settings.settings[settingName][env];
+                                            if (newValue !== originalValue) {
+                                                //let updatedSettings = { ...transformedSettings }; // make a copy of the state
+                                                //updatedSettings.settings[settingName][env] = e.target.value; // update the specific field
+                                                onSettingChange(settingName, env, e.target.value); // pass the entire updated object to parent component
+                                            }
                                         }}
                                     />
                                 </TableCell>
@@ -67,7 +83,7 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onHe
                                 onBlur={(e) => { onAddSetting(e.target.value) }}
                             // onChange={e => setNewEnvironmentSettingName(e.target.value)}
                             /></TableCell>
-                        {transformedSettings.environments.map((env) => (
+                        {settings.environments.map((env) => (
                             <TableCell key={"new" + env}>
                                 <TextField
                                     label={env}

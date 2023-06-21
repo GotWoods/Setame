@@ -195,6 +195,26 @@ class SettingsClient {
         return this.handleResponse(response);
     }
 
+    async updateApplicationSetting(applicationName, environment, variable, value) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/ApplicationSettings/${applicationName}/${environment}/${variable}`, {
+            method: 'PUT',
+            headers: this.getAuthHeaders(),
+            body: JSON.stringify(value),
+        });
+
+        return this.handleResponse(response);
+    }
+
+    async renameApplicationSetting(applicationName, oldName, newName) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/ApplicationSettings/${applicationName}/${oldName}/rename`, {
+            method: 'POST',
+            headers: this.getAuthHeaders(),
+            body: JSON.stringify(newName),
+        });
+
+        return this.handleResponse(response);
+    }
+
     async addGlobalApplicationSetting(applicationName, newSettingName, newSettingValue) {
         const response = await this.apiRequest(`${this.apiUrl}/api/ApplicationSettings`, {
             method: 'POST',
