@@ -29,12 +29,6 @@ public class ApplicationsController : ControllerBase
     public async Task<ActionResult<Application>> GetApplication(string name)
     {
         var application = await _applicationService.GetApplicationByIdAsync(name);
-
-        if (application == null)
-        {
-            return NotFound();
-        }
-
         return Ok(application);
     }
 
@@ -43,8 +37,7 @@ public class ApplicationsController : ControllerBase
     public async Task<ActionResult<Application>> CreateApplication(Application application)
     {
         await _applicationService.CreateApplicationAsync(application);
-
-        return CreatedAtAction(nameof(GetApplication), new { id = application.Name }, application);
+        return NoContent();
     }
 
     // DELETE: api/Applications/5

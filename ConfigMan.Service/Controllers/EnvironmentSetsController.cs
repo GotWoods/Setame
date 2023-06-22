@@ -11,12 +11,10 @@ namespace ConfigMan.Service.Controllers;
 public class EnvironmentSetsController : ControllerBase
 {
     private readonly IEnvironmentSetService _environmentSetService;
-    private readonly IApplicationService _applicationService;
 
-    public EnvironmentSetsController(IEnvironmentSetService environmentSetService, IApplicationService applicationService)
+    public EnvironmentSetsController(IEnvironmentSetService environmentSetService)
     {
         _environmentSetService = environmentSetService;
-        _applicationService = applicationService;
     }
 
     [HttpGet]
@@ -38,7 +36,7 @@ public class EnvironmentSetsController : ControllerBase
     public async Task<ActionResult<EnvironmentSet>> Create(EnvironmentSet environmentSet)
     {
         await _environmentSetService.CreateAsync(environmentSet);
-        return CreatedAtAction(nameof(Create), new { id = environmentSet.Name }, environmentSet);
+        return NoContent();
     }
 
     [HttpPut("{name}")]

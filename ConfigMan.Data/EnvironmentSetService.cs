@@ -10,7 +10,6 @@ public interface IEnvironmentSetService
     Task<EnvironmentSet> GetOneAsync(string name);
     Task<EnvironmentSet> CreateAsync(EnvironmentSet environment);
     Task UpdateAsync(EnvironmentSet environment);
-
     Task DeleteAsync(string name);
     Task RenameAsync(string oldName, string newName);
 }
@@ -33,7 +32,10 @@ public class EnvironmentSetService : IEnvironmentSetService
 
     public async Task<EnvironmentSet> GetOneAsync(string name)
     {
-        return await _dbContext.Environments.FindAsync(name);
+        var environmentSet = await _dbContext.Environments.FindAsync(name);
+        if (environmentSet == null)
+            throw new NullReferenceException("Could not find environment set by name " + name);
+        return environmentSet;
     }
 
     public async Task<EnvironmentSet> CreateAsync(EnvironmentSet environment)
@@ -60,8 +62,7 @@ public class EnvironmentSetService : IEnvironmentSetService
 
     public async Task DeleteAsync(string name)
     {
-        var environment = await _dbContext.Environments.FirstAsync(x => x.Name == name);
-        if (environment == null) throw new InvalidOperationException("Environment Set not found.");
+        var environment = await GetOneAsync(name);
 
         var applications = await _applicationService.GetApplicationsAsync();
         foreach (var application in applications)
@@ -75,13 +76,6 @@ public class EnvironmentSetService : IEnvironmentSetService
     public async Task RenameAsync(string oldName, string newName)
     {
         var environmentSet = await GetOneAsync(oldName);
-
-        if (environmentSet == null)
-            throw new NullReferenceException("Could not find environment set by name " + oldName);
-
-
-        //environmentSet.Name = newName;
-
         var newSet = environmentSet.Copy(); //have to copy as we can not change the key of an object 
         newSet.Name = newName;
 

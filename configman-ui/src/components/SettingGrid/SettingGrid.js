@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -7,19 +7,49 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
+import Tooltip from '@mui/material/Tooltip';
 
 const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSettingRename, onHeaderClick }) => {
     const [settings, setSettings] = useState(transformedSettings);
     const [newEnvironmentSettingName, setNewEnvironmentSettingName] = useState('');
-    //  const [newEnvironmentSettings, setNewEnvironmentSettings] = useState({});
-    //    const [duplicateSettingError, setDuplicateSettingError] = useState('');
+    const [errors, setErrors] = useState({}); // a map of error states
+    const [newSettingError, setNewSettingError] = useState(false); // new state for the new setting error
+ 
 
-    // const handleNewSettingChange = (e) => {
-    //     let updatedSettings = { ...newEnvironmentSettings }; // Create a copy of the state
-    //     //set(updatedSettings, env, e.target.value); // Set the value
-    //     setNewEnvironmentSettings(updatedSettings); // Update the state
-    // }
+    const handleNewSetting = (newSettingName) => {
+        if (newEnvironmentSettingName in settings.settings) {
+            const updatedErrors = Object.keys(settings.settings).reduce((errorsMap, settingName) => ({
+                ...errorsMap,
+                [settingName]: settingName === newEnvironmentSettingName, // set error for all settings with the same name
+            }), {});
+            setErrors(updatedErrors);
+            setNewSettingError(true);
+        } else {
+            if (onAddSetting != undefined)
+                onAddSetting(newEnvironmentSettingName);
+            setErrors({}); // Reset errors state when new valid setting is added
+            setNewSettingError(false);
+        }
+    }
+
+    const handleSettingRename = (originalValue, newValue) => {
+        if (newValue in settings.settings && newValue !== originalValue) {
+            const updatedErrors = Object.keys(settings.settings).reduce((errorsMap, settingName) => ({
+                ...errorsMap,
+                [settingName]: settingName === newValue || settingName === originalValue,
+            }), {});
+            setErrors(updatedErrors);
+        } else {
+            const { [originalValue]: _, ...rest } = errors; // remove the originalValue from the errors object
+            setErrors(rest); // otherwise, set its error state to false
+            if (onSettingRename != undefined)
+                onSettingRename(originalValue, newValue);
+        }
+    }
+
+    useEffect(() => {
+        setErrors({});
+    }, [settings]);
 
     return (
         <TableContainer component={Paper}>
@@ -44,19 +74,23 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
                     {Object.keys(settings.settings).map((settingName) => (
                         <TableRow key={settingName}>
                             <TableCell>
-                                <TextField
+                                <Tooltip title={errors[settingName] ? "Variable name already exists" : ""}>
+                                    <TextField
+                                         error={errors[settingName]}
                                         defaultValue={settingName}
                                         onBlur={(e) => {
                                             const newValue = e.target.value;
                                             const originalValue = settingName;
                                             if (newValue !== originalValue) {
-                                                onSettingRename(originalValue, newValue);
+                                                handleSettingRename(originalValue, newValue);
                                             }
                                         }}
                                     />
+                                </Tooltip>
                             </TableCell>
                             {settings.environments.map((env) => (
                                 <TableCell key={settingName + env}>
+
                                     <TextField
                                         label={env}
                                         defaultValue={settings.settings[settingName][env]}
@@ -64,9 +98,7 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
                                             const newValue = e.target.value;
                                             const originalValue = settings.settings[settingName][env];
                                             if (newValue !== originalValue) {
-                                                //let updatedSettings = { ...transformedSettings }; // make a copy of the state
-                                                //updatedSettings.settings[settingName][env] = e.target.value; // update the specific field
-                                                onSettingChange(settingName, env, e.target.value); // pass the entire updated object to parent component
+                                                onSettingChange(settingName, env, e.target.value);
                                             }
                                         }}
                                     />
@@ -76,21 +108,21 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
                     ))}
 
                     <TableRow key="new">
-                        <TableCell>
-                            <TextField
-                                label="Name"
-                                defaultValue={newEnvironmentSettingName || ''}
-                                onBlur={(e) => { onAddSetting(e.target.value) }}
-                            // onChange={e => setNewEnvironmentSettingName(e.target.value)}
-                            /></TableCell>
+                    <TableCell>
+                            <Tooltip title={errors[newEnvironmentSettingName] ? "Variable name already exists" : ""}>
+                                <TextField
+                                    error={errors[newEnvironmentSettingName]}
+                                    label="Name"
+                                    defaultValue={newEnvironmentSettingName || ''}
+                                    onBlur={(e) => { handleNewSetting(e.target.value) }}
+                                />
+                            </Tooltip>
+                        </TableCell>
                         {settings.environments.map((env) => (
                             <TableCell key={"new" + env}>
                                 <TextField
                                     label={env}
                                     value=""
-                                // onBlur={(e) => {
-                                //     onSettingChange("new", env, e.target.value);
-                                // }}
                                 />
                             </TableCell>
                         ))}

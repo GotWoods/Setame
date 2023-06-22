@@ -3,7 +3,6 @@ using ConfigMan.Data;
 using ConfigMan.Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ConfigMan.Service.Controllers;
 
@@ -34,8 +33,8 @@ public class ApplicationSettingsController : ControllerBase
             return NotFound("Claim not found");
         }
 
-        var env = await _environmentService.GetOneAsync("Dev");
-        var application = await _applicationService.GetApplicationByIdAsync(claim.Value);
+        // var env = await _environmentService.GetOneAsync("Dev");
+        // var application = await _applicationService.GetApplicationByIdAsync(claim.Value);
         return Ok(); // application.GetAppliedSettings(env));
     }
 
@@ -44,9 +43,6 @@ public class ApplicationSettingsController : ControllerBase
     {
         var app = await _applicationService.GetApplicationByIdAsync(application);
         var environmentSet = await _environmentService.GetOneAsync(app.EnvironmentSet);
-
-        if (app == null)
-            throw new NullReferenceException("Could not find application by name " + application);
 
         if (environment == "Default")
         {
@@ -77,11 +73,10 @@ public class ApplicationSettingsController : ControllerBase
     {
         var app = await _applicationService.GetApplicationByIdAsync(application);
 
-        if (app == null)
-            throw new NullReferenceException("Could not find application by name " + application);
-
         if (environment == "Default")
+        {
             app.ApplicationDefaults.First(x => x.Name == variable).Value = value;
+        }
         else
         {
             //in case we have duplicates, we clean them up here
@@ -101,17 +96,10 @@ public class ApplicationSettingsController : ControllerBase
     {
         var app = await _applicationService.GetApplicationByIdAsync(application);
 
-        if (app == null)
-            throw new NullReferenceException("Could not find application by name " + application);
-
         foreach (var environmentSetting in app.EnvironmentSettings)
-        {
-            foreach (var item in environmentSetting.Value)
-            {
-                if (item.Name == variable)
-                    item.Name = newName;
-            }
-        }
+        foreach (var item in environmentSetting.Value)
+            if (item.Name == variable)
+                item.Name = newName;
 
         await _applicationService.UpdateApplicationAsync(app);
 

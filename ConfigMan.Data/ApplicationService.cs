@@ -1,6 +1,8 @@
 ﻿using ConfigMan.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
+using static System.Net.Mime.MediaTypeNames;
+using Application = ConfigMan.Data.Models.Application;
 
 namespace ConfigMan.Data;
 
@@ -11,11 +13,7 @@ public interface IApplicationService
     Task<Application> CreateApplicationAsync(Application application);
     Task UpdateApplicationAsync(Application application);
     Task DeleteApplicationAsync(string name);
-    Task<IEnumerable<Setting>> GetApplicationSettingsAsync(Guid applicationId);
-    Task CreateApplicationSettingAsync(int applicationId, Setting setting);
-    Task UpdateApplicationSettingAsync(int applicationId, Setting setting);
-    Task AddApplicationSetting(string applicationId, Setting setting);
-    Task AddEnvironmentSetting(string applicationId, string environment, Setting setting);
+
 }
 
 public class ApplicationService : IApplicationService
@@ -34,7 +32,10 @@ public class ApplicationService : IApplicationService
 
     public async Task<Application?> GetApplicationByIdAsync(string name)
     {
-        return await _dbContext.Applications.FirstOrDefaultAsync(x => x.Name == name);
+        var app = await _dbContext.Applications.FirstOrDefaultAsync(x => x.Name == name);
+        if (app == null)
+            throw new NullReferenceException("Could not find application by name " + name);
+        return app;
     }
 
     public async Task<Application> CreateApplicationAsync(Application application)
@@ -61,68 +62,6 @@ public class ApplicationService : IApplicationService
         if (application == null) throw new InvalidOperationException("Application not found.");
 
         _dbContext.Applications.Remove(application);
-        await _dbContext.SaveChangesAsync();
-    }
-
-    public async Task<IEnumerable<Setting>> GetApplicationSettingsAsync(Guid applicationId)
-    {
-        var application = await _dbContext.Applications.FindAsync(applicationId);
-        if (application == null) throw new InvalidOperationException("Application not found.");
-
-        return application.ApplicationDefaults;
-
-        // return await _dbContext.Settings
-        //     .Where(s => s.Id == applicationId)
-        //     .ToListAsync();
-    }
-
-    public async Task CreateApplicationSettingAsync(int applicationId, Setting setting)
-    {
-        var application = await _dbContext.Applications.FindAsync(applicationId);
-        // if (setting == null) throw new ArgumentNullException(nameof(setting));
-        //
-        // await _dbContext.Settings.AddAsync(setting);
-        // await _dbContext.SaveChangesAsync();
-        //
-        // return setting;
-      //  return Task.CompletedTask;
-    }
-
-    public async Task UpdateApplicationSettingAsync(int applicationId, Setting setting)
-    {
-        var application = await _dbContext.Applications.FindAsync(applicationId);
-        // if (setting == null) throw new ArgumentNullException(nameof(setting));
-        //
-        // _dbContext.Settings.Update(setting);
-        // await _dbContext.SaveChangesAsync();
-        //return Task.CompletedTask;
-    }
-
-    public async Task AddApplicationSetting(string applicationId, Setting setting)
-    {
-        var application = await _dbContext.Applications.FindAsync(applicationId);
-        if (application == null) throw new InvalidOperationException("Application not found.");
-
-        application.ApplicationDefaults ??= new List<Setting>();
-        application.ApplicationDefaults.Add(setting);
-
-        _dbContext.Entry(application).Property(x => x.ApplicationDefaults).IsModified = true; //EF does not do change detection on jsonb objects
-        await _dbContext.SaveChangesAsync();
-    }
-
-    public async Task AddEnvironmentSetting(string applicationId, string environment, Setting setting)
-    {
-        var application = await _dbContext.Applications.FindAsync(applicationId);
-        if (application == null) throw new InvalidOperationException("Application not found.");
-
-        if (!application.EnvironmentSettings.ContainsKey(environment))
-            application.EnvironmentSettings.Add(environment, new List<Setting>());
-
-
-        var env = application.EnvironmentSettings[environment];
-        env.Add(setting);
-
-        _dbContext.Entry(application).Property(x => x.EnvironmentSettings).IsModified = true; //EF does not do change detection on jsonb objects
         await _dbContext.SaveChangesAsync();
     }
 }
