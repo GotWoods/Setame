@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import AddEnvironmentSetDialog from './AddEnvironmentSetDialog';
 import '../../App.css';
-import SettingsClient from '../../settingsClient';
+import EnvironmentSetSettingsClient from '../../environmentSetSettingsClient';
 import EnvironmentSetDetail from './EnvironmentSetDetail';
 
 const EnvironmentSets = () => {
   const [environments, setEnvironmentSets] = useState([]);
   const [environmentSetDialogOpen, setEnvironmentSetDialogOpen] = useState(false);
   
-  const settingsClient = new SettingsClient();
+  const settingsClient = new EnvironmentSetSettingsClient();
 
   useEffect(() => {
     fetchEnvironmentSets();

@@ -3,12 +3,14 @@ using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 
 namespace ConfigMan.Data.Models;
 
+public record EnvironmentSetCreated(Guid Id, string Name);
 public record EnvironmentSetRenamed(string NewName);
 public record EnvironmentAdded(string Name);
 public record EnvironmentRemoved(string Name);
-public record EnvironmentSetCreated(Guid Id, string Name);
 public record EnvironmentSetDeleted();
 public record EnvironmentSetVariableAdded(string Name);
+public record EnvironmentSetVariableChanged(string Environment, string VariableName, string NewValue);
+public record EnvironmentSetVariableRenamed(string VariableName, string NewName);
 
 public class EnvironmentSet
 {
@@ -45,6 +47,22 @@ public class EnvironmentSet
     public void Apply(EnvironmentSetRenamed e)
     {
         this.Name = e.NewName;
+    }
+
+    public void Apply(EnvironmentSetVariableChanged e)
+    {
+        var environment = this.DeploymentEnvironments.First(x=>x.Name == e.Environment);
+        environment.EnvironmentSettings[e.VariableName] = e.NewValue;
+    }
+
+    public void Apply(EnvironmentSetVariableRenamed e)
+    {
+        foreach (var environment in DeploymentEnvironments)
+        {
+            var value = environment.EnvironmentSettings[e.VariableName];
+            environment.EnvironmentSettings.Remove(e.VariableName);
+            environment.EnvironmentSettings.Add(e.NewName, value);
+        }
     }
 
     public EnvironmentSet Copy()

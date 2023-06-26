@@ -25,12 +25,13 @@ on startup and be changed without requiring an application to be redeployed for 
 - Forgot Password
 
 Environment Sets
+- Delete Environment Set not working (I think because we are getting live events)
 - Delete Environment (will cascase to all children apps?)
 - Rename Environment (will cascade to all children apps?)
 - New Variable -> Ability to add values to it
 - Rename Variable on set
 - Duplicate Prevention
-- History
+- History (in progress)
 - Copy Environment Set
 
 Applications

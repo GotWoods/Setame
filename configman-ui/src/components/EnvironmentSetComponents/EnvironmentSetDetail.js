@@ -3,7 +3,7 @@ import AddEnvironmentDialog from './AddEnvironmentDialog';
 import { SettingGridData, SettingGridItem } from '../SettingGrid/SettingGridData';
 import SettingsGrid from '../SettingGrid/SettingGrid';
 import Box from '@mui/material/Box';
-import SettingsClient from '../../settingsClient';
+import EnvironmentSetSettingsClient from '../../environmentSetSettingsClient';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -22,7 +22,7 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
     const [environmentDialogOpen, setEnvironmentDialogOpen] = useState(false);
     const [newName, setNewName] = useState('');  
     const [environmentSetName, setEnvironmentSetName] = useState(environmentSet.name);  
-    const settingsClient = new SettingsClient();
+    const settingsClient = new EnvironmentSetSettingsClient();
 
     const handleAddEnvironmentSetDialogClose = () => {
         setEnvironmentDialogOpen(false);
@@ -106,11 +106,26 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
         await settingsClient.addVariableToEnvironmentSet(newValue, environmentSet.id);
     };
 
+
+    const handleSettingRename = async (originalName, newName) => {
+        console.log("setting rename", newName)
+        if (newName == "")
+            return;
+        // environmentSet.deploymentEnvironments.forEach(env => {
+        //     let obj = {};
+        //     obj[newValue] = "";
+        //     env.environmentSettings[newValue] = "";
+        // });
+        console.log("renaming");
+        await settingsClient.renameVariableOnEnvironmentSet(originalName, newName, environmentSet.id);
+    };
+
+
     const handleSettingChange = async (settingName, environment, newValue) => {
         var foundEnvironment = environmentSet.deploymentEnvironments.find(x => x.name === environment);
         foundEnvironment.environmentSettings[settingName] = newValue;
         console.log("Settings change", settingName, environment, newValue);
-        await settingsClient.updateEnvironmentSet(environmentSet);
+        await settingsClient.updateVariableOnEnvironmentSet(environment, settingName, newValue, environmentSet.id);
     };
 
     return (
@@ -139,6 +154,7 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
                     transformedSettings={transformedSettings}
                     onAddSetting={handleAddEnvironmentSetting}
                     onHeaderClick={handleEnvironmentDetailsClick}
+                    onSettingRename={handleSettingRename}
                     onSettingChange={handleSettingChange}
                 />
             )}
