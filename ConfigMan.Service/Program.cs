@@ -1,7 +1,10 @@
 using System.Security.Claims;
 using System.Text;
 using ConfigMan.Data;
+using ConfigMan.Data.Models;
 using ConfigMan.Service;
+using Marten;
+using Marten.Events.Daemon.Resiliency;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -13,11 +16,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), x => x.MigrationsAssembly("ConfigMan.Data")));
+
 
 builder.Services.AddScoped<IApplicationService, ApplicationService>();
 builder.Services.AddScoped<IEnvironmentSetService, EnvironmentSetService>();
@@ -51,6 +54,12 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddMarten(opts =>
+{
+    opts.Connection(builder.Configuration.GetConnectionString("DefaultConnection"));
+   // opts.Projections.LiveStreamAggregation<EnvironmentSet>();
+}).AddAsyncDaemon(DaemonMode.Solo); //TODO: adjust this for prod?
+
 
 // Add Prometheus
 //builder.Services.AddHttpMetrics();
@@ -81,30 +90,13 @@ app.UseAuthorization();
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.MapControllers();
-//app.UseStaticFiles();
 app.UseRouting();
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseCors("ReactAppPolicy");
-// app.UseStaticFiles(new StaticFileOptions
-// {
-//     FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, "configman-ui", "build")),
-//     RequestPath = ""
-// });
 
-// app.UseEndpoints(endpoints =>
-// {
-//     endpoints.MapControllers();
-//     endpoints.MapFallbackToFile("configman-ui/build/index.html");
-// });
-
-// app.MapFallback(context =>
-// {
-//     //context.Response.Redirect("index.html");
-//     return Task.CompletedTask;
-// });
 
 using (var scope = app.Services.CreateScope())
 {

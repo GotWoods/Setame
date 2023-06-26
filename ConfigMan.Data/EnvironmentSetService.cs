@@ -14,6 +14,9 @@ public interface IEnvironmentSetService
     Task RenameAsync(string oldName, string newName);
 }
 
+public record CreateEnvironmentSet(Guid Id, string Name);
+public record RenameEnvironmentSet(string OldName, string NewName);
+
 public class EnvironmentSetService : IEnvironmentSetService
 {
     private readonly IApplicationService _applicationService;
@@ -25,14 +28,27 @@ public class EnvironmentSetService : IEnvironmentSetService
         _applicationService = applicationService;
     }
 
+    // public static EnvironmentSetCreated Handle(CreateEnvironmentSet command)
+    // {
+    //     return new EnvironmentSetCreated(command.Id, command.Name);
+    // }
+
+    public static EnvironmentSetRenamed Handle(EnvironmentSet current, RenameEnvironmentSet command)
+    {
+        //TODO: make sure no naming conflicts
+        return new EnvironmentSetRenamed(command.OldName, command.NewName);
+    }
+
+
     public async Task<IEnumerable<EnvironmentSet>> GetAllAsync()
     {
-        return await _dbContext.Environments.ToListAsync();
+
+        return await _dbContext.EnvironmentSets.ToListAsync();
     }
 
     public async Task<EnvironmentSet> GetOneAsync(string name)
     {
-        var environmentSet = await _dbContext.Environments.FindAsync(name);
+        var environmentSet = await _dbContext.EnvironmentSets.FindAsync(name);
         if (environmentSet == null)
             throw new NullReferenceException("Could not find environment set by name " + name);
         return environmentSet;
@@ -40,13 +56,14 @@ public class EnvironmentSetService : IEnvironmentSetService
 
     public async Task<EnvironmentSet> CreateAsync(EnvironmentSet environment)
     {
+
         if (environment == null) throw new ArgumentNullException(nameof(environment));
 
-        var existing = await _dbContext.Environments.FirstOrDefaultAsync(x => x.Name == environment.Name);
+        var existing = await _dbContext.EnvironmentSets.FirstOrDefaultAsync(x => x.Name == environment.Name);
         if (existing != null)
             throw new DuplicateNameException("Can not have two Environment Sets of the same name");
 
-        await _dbContext.Environments.AddAsync(environment);
+        await _dbContext.EnvironmentSets.AddAsync(environment);
         await _dbContext.SaveChangesAsync();
 
         return environment;
@@ -56,7 +73,7 @@ public class EnvironmentSetService : IEnvironmentSetService
     {
         if (environment == null) throw new ArgumentNullException(nameof(environment));
 
-        _dbContext.Environments.Update(environment);
+        _dbContext.EnvironmentSets.Update(environment);
         await _dbContext.SaveChangesAsync();
     }
 
@@ -69,7 +86,7 @@ public class EnvironmentSetService : IEnvironmentSetService
             if (application.EnvironmentSet == name)
                 throw new InvalidOperationException("Can not delete an Environment Set when an application is associated to the environment set");
 
-        _dbContext.Environments.Remove(environment);
+        _dbContext.EnvironmentSets.Remove(environment);
         await _dbContext.SaveChangesAsync();
     }
 
@@ -87,8 +104,8 @@ public class EnvironmentSetService : IEnvironmentSetService
                 await _applicationService.UpdateApplicationAsync(application);
             }
 
-        _dbContext.Environments.Remove(environmentSet); //delete the original
-        await _dbContext.Environments.AddAsync(newSet);
+        _dbContext.EnvironmentSets.Remove(environmentSet); //delete the original
+        await _dbContext.EnvironmentSets.AddAsync(newSet);
         await _dbContext.SaveChangesAsync();
     }
 }

@@ -27,7 +27,7 @@ namespace ConfigMan.Service.Controllers
 
             if (user == null || !_userService.VerifyPassword(user, request.Password))
             {
-                if (request.Username == "admin" && request.Password == "admin")
+                if (request.Username == "admin" && request.Password == "admin") //this is an initial login to the system (as the previous check found the user was null)
                 {
                     var newAdminUser = new User();
                     newAdminUser.Username = request.Username;

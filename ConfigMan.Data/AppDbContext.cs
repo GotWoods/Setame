@@ -10,7 +10,7 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<User> Users { get; set; }
-    public DbSet<EnvironmentSet> Environments { get; set; }
+    public DbSet<EnvironmentSet> EnvironmentSets { get; set; }
     public DbSet<Application> Applications { get; set; }
     public DbSet<EnvironmentGroup> EnvironmentGroups { get; set; }
 

@@ -32,10 +32,7 @@ public class ApplicationSettingsController : ControllerBase
             _logger.LogWarning("Can not find application @{Claims}", User.Claims);
             return NotFound("Claim not found");
         }
-
-        // var env = await _environmentService.GetOneAsync("Dev");
-        // var application = await _applicationService.GetApplicationByIdAsync(claim.Value);
-        return Ok(); // application.GetAppliedSettings(env));
+        return Ok(); 
     }
 
     [HttpPost("{application}/{environment}/{variable}")]
@@ -61,7 +58,7 @@ public class ApplicationSettingsController : ControllerBase
                 app.EnvironmentSettings[environmentSetting.Name].Add(setting);
             }
         }
-
+        
         await _applicationService.UpdateApplicationAsync(app);
 
         return CreatedAtAction(nameof(CreateNew), null);
