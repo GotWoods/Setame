@@ -37,7 +37,7 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
 
     const handleRenameEnvironment = async () => {
         setRenameDialogOpen(false);
-        await settingsClient.renameEnvironmentSet(environmentSet.name, newName);
+        await settingsClient.renameEnvironmentSet(environmentSet.id, newName);
         setNewName('');  // Reset newName after use
         setEnvironmentSetName(newName); 
     }
@@ -56,7 +56,7 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
 
     const handleConfirmDeleteEnvironment = async () => {
         setDeleteConfirmationOpen(false);
-        await settingsClient.deleteEnvironmentSet(environmentSet.name);
+        await settingsClient.deleteEnvironmentSet(environmentSet.id);
         if (refreshRequested!=undefined)
             refreshRequested();
     };
@@ -67,7 +67,6 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
     }, [environmentSet]);  // The function will run whenever environmentSet changes
 
     const loadGrid = (environments) => {
-        console.log("loading grid", environments);
         var result = new SettingGridData();
         environments.forEach((env) => {
             result.environments.push(env.name);
@@ -84,7 +83,6 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
 
                 result.settings[setting][env.name] = env.environmentSettings[setting];
             }
-            console.log("final", result);
         });
         return result;
     }
@@ -95,6 +93,7 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
     };
 
     const handleAddEnvironmentSetting = async (newValue) => {
+        console.log("new variable", newValue)
         if (newValue == "")
             return;
         environmentSet.deploymentEnvironments.forEach(env => {
@@ -103,7 +102,8 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
             env.environmentSettings[newValue] = "";
 
         });
-        await settingsClient.updateEnvironmentSet(environmentSet);
+        console.log("Adding environment to set");
+        await settingsClient.addVariableToEnvironmentSet(newValue, environmentSet.id);
     };
 
     const handleSettingChange = async (settingName, environment, newValue) => {

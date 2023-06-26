@@ -14,8 +14,8 @@ public interface IEnvironmentSetService
     Task RenameAsync(string oldName, string newName);
 }
 
-public record CreateEnvironmentSet(Guid Id, string Name);
-public record RenameEnvironmentSet(string OldName, string NewName);
+//public record CreateEnvironmentSet(Guid Id, string Name);
+//public record RenameEnvironmentSet(string OldName, string NewName);
 
 public class EnvironmentSetService : IEnvironmentSetService
 {
@@ -33,11 +33,11 @@ public class EnvironmentSetService : IEnvironmentSetService
     //     return new EnvironmentSetCreated(command.Id, command.Name);
     // }
 
-    public static EnvironmentSetRenamed Handle(EnvironmentSet current, RenameEnvironmentSet command)
-    {
-        //TODO: make sure no naming conflicts
-        return new EnvironmentSetRenamed(command.OldName, command.NewName);
-    }
+    // public static EnvironmentSetRenamed Handle(EnvironmentSet current, RenameEnvironmentSet command)
+    // {
+    //     //TODO: make sure no naming conflicts
+    //     return new EnvironmentSetRenamed(command.OldName, command.NewName);
+    // }
 
 
     public async Task<IEnumerable<EnvironmentSet>> GetAllAsync()

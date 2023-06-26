@@ -16,7 +16,6 @@ const EnvironmentSets = () => {
   }, []);
 
   const fetchEnvironmentSets = async () => {
-    console.log("I am getting data!");
     const data = await settingsClient.getEnvironmentSets();
     setEnvironmentSets(data);
   };

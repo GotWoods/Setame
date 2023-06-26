@@ -94,8 +94,8 @@ class SettingsClient {
     }
 
     
-    async renameEnvironmentSet(oldName, newName) {
-        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${oldName}/rename`, {
+    async renameEnvironmentSet(environmentSetId, newName) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSetId}/rename`, {
             method: 'POST',
             headers: this.getAuthHeaders(),
             body: JSON.stringify(newName),
@@ -117,6 +117,24 @@ class SettingsClient {
             method: 'POST',
             headers: this.getAuthHeaders(),
             body: JSON.stringify({ name: environmentName }),
+        });
+        return this.handleResponse(response);
+    }
+
+    async addEnvironmentToEnvironmentSet(environmentName, environmentSetId) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSetId}/environment`, {
+            method: 'POST',
+            headers: this.getAuthHeaders(),
+            body: JSON.stringify(environmentName),
+        });
+        return this.handleResponse(response);
+    }
+
+    async addVariableToEnvironmentSet(variableName, environmentSetId) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSetId}/variable`, {
+            method: 'POST',
+            headers: this.getAuthHeaders(),
+            body: JSON.stringify(variableName),
         });
         return this.handleResponse(response);
     }

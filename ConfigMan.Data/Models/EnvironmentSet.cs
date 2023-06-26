@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 
 namespace ConfigMan.Data.Models;
 
-public record EnvironmentSetRenamed(string OldName, string NewName);
+public record EnvironmentSetRenamed(string NewName);
 public record EnvironmentAdded(string Name);
 public record EnvironmentRemoved(string Name);
 public record EnvironmentSetCreated(Guid Id, string Name);
+public record EnvironmentSetDeleted();
+public record EnvironmentSetVariableAdded(string Name);
 
 public class EnvironmentSet
 {
@@ -23,6 +25,7 @@ public class EnvironmentSet
 
     public void Apply(EnvironmentAdded e)
     {
+        //TODO: Would this need to clone all variables into the environment then?
         this.DeploymentEnvironments.Add(new DeploymentEnvironment() { Name=e.Name });
     }
 
@@ -31,6 +34,18 @@ public class EnvironmentSet
         this.DeploymentEnvironments.RemoveAll(x => x.Name == e.Name);
     }
 
+    public void Apply(EnvironmentSetVariableAdded e)
+    {
+        foreach (var env in this.DeploymentEnvironments)
+        {
+            env.EnvironmentSettings.Add(e.Name, "");
+        }
+    }
+
+    public void Apply(EnvironmentSetRenamed e)
+    {
+        this.Name = e.NewName;
+    }
 
     public EnvironmentSet Copy()
     {

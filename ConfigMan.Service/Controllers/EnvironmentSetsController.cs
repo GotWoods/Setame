@@ -6,7 +6,6 @@ using Marten.Schema.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Xml.Linq;
-using CreateEnvironmentSet = ConfigMan.Data.CreateEnvironmentSet;
 
 namespace ConfigMan.Service.Controllers;
 
@@ -30,29 +29,31 @@ public class EnvironmentSetsController : ControllerBase
     public async Task<ActionResult<IEnumerable<EnvironmentSet>>> GetAll(CancellationToken ct)
     {
         //TODO: there has to be a better way of doing this
+        //This is missing deleted items
         var allIds = _querySession.Events.QueryAllRawEvents().Where(x => x.EventTypeName=="environment_set_created").Select(x=>x.StreamId).Distinct().ToList();
 
         var items = new List<EnvironmentSet>();
         foreach (var id in allIds)
         {
-            items.Add(await _querySession.Events.AggregateStreamAsync<EnvironmentSet>(id, token: ct));
+            var aggregateStreamAsync = await _querySession.Events.AggregateStreamAsync<EnvironmentSet>(id, token: ct);
+            items.Add(aggregateStreamAsync);
         }
         
         var sorted = items.OrderBy(x => x.Name);
         return Ok(sorted);
     }
 
-    [HttpGet("{name}")]
-    public async Task<ActionResult<EnvironmentSet>> GetOne(string name)
-    {
-        var deploymentEnvironment = await _environmentSetService.GetOneAsync(name);
-        return Ok(deploymentEnvironment);
-    }
+    // [HttpGet("{environmentId}")]
+    // public async Task<ActionResult<EnvironmentSet>> GetOne(Guid environmentId)
+    // {
+    //     var deploymentEnvironment = await _environmentSetService.GetOneAsync(name);
+    //     return Ok(deploymentEnvironment);
+    // }
 
     [HttpPost]
     public async Task<ActionResult<EnvironmentSet>> Create(EnvironmentSet environmentSet, CancellationToken ct)
     {
-        // var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+        //var claim = User.FindFirst(ClaimTypes.NameIdentifier);
         // if (claim == null)
         // {
         //     _logger.LogWarning("Can not find application @{Claims}", User.Claims);
@@ -60,47 +61,57 @@ public class EnvironmentSetsController : ControllerBase
         // }
         //User.Identity.Name
         var id = CombGuidIdGeneration.NewGuid();
-        await _documentSession.Add<EnvironmentSet>(id, new CreateEnvironmentSet(id, environmentSet.Name), ct);
+        await _documentSession.Add<EnvironmentSet>(id, new EnvironmentSetCreated(id, environmentSet.Name), User, ct);
         //await _environmentSetService.CreateAsync(environmentSet);
         return NoContent();
     }
     
-    [HttpPut("{name}")]
-    public async Task<IActionResult> Update(string name, EnvironmentSet environmentSet)
-    {
-        await _environmentSetService.UpdateAsync(environmentSet);
-        return NoContent();
-    }
+    // [HttpPut("{name}")]
+    // public async Task<IActionResult> Update(string name, EnvironmentSet environmentSet)
+    // {
+    //     await _environmentSetService.UpdateAsync(environmentSet);
+    //     return NoContent();
+    // }
 
-    [HttpDelete("{name}")]
-    public async Task<IActionResult> Delete(string name)
+    [HttpDelete("{environmentId}")]
+    public async Task<IActionResult> Delete(Guid environmentId, CancellationToken ct)
     {
-        await _environmentSetService.DeleteAsync(name);
+        await _documentSession.GetAndUpdate<EnvironmentSet>(environmentId, -1, x => new EnvironmentSetDeleted(), User, ct);
+        _documentSession.Delete<EnvironmentSet>(environmentId);
+        await _documentSession.SaveChangesAsync(ct);
+        //await _environmentSetService.DeleteAsync(name);
         return NoContent();
     }
     
-    [HttpPost("{name}/rename")]
-    public async Task<IActionResult> RenameVariable(Guid Id, string name, [FromBody] string newName, CancellationToken ct)
+    [HttpPost("{environmentId}/rename")]
+    public async Task<IActionResult> RenameVariable(Guid environmentId, [FromBody] string newName, CancellationToken ct)
     {
         //var version = HttpContext.GetIfMatchRequestHeader().GetSanitizedValue();
-        var version = -1;
-        await _documentSession.GetAndUpdate<EnvironmentSet>(Id, version, current => EnvironmentSetService.Handle(current, new RenameEnvironmentSet(name, newName)), ct);
-        await _environmentSetService.RenameAsync(name, newName);
+        await _documentSession.GetAndUpdate<EnvironmentSet>(environmentId, -1, z => new EnvironmentSetRenamed(newName), User, ct);
+        //await _environmentSetService.RenameAsync(name, newName);
         return NoContent();
     }
     
-
-    [HttpPost("{environmentId}/environment/{environmentName")]
-    public async Task<IActionResult> AddEnvironment(Guid environmentId, string environmentName, CancellationToken ct)
+    [HttpPost("{environmentId}/environment")]
+    public async Task<IActionResult> AddEnvironment(Guid environmentId, [FromBody] string environmentName, CancellationToken ct)
     {
-        await _documentSession.Add<EnvironmentSet>(environmentId, new EnvironmentAdded(environmentName), ct);
+        await _documentSession.GetAndUpdate<EnvironmentSet>(environmentId, -1,  x=> new EnvironmentAdded(environmentName), User,ct);
+        await _documentSession.SaveChangesAsync(ct);
         return NoContent();
     }
 
-    [HttpDelete("{environmentId}/environment/{environmentName")]
+    [HttpDelete("{environmentId}/environment/{environmentName}")]
     public async Task<IActionResult> DeleteEnvironment(Guid environmentId, string environmentName, CancellationToken ct)
     {
-        await _documentSession.Add<EnvironmentSet>(environmentId, new EnvironmentRemoved(environmentName), ct);
+        await _documentSession.GetAndUpdate<EnvironmentSet>(environmentId, -1, x=>new EnvironmentRemoved(environmentName), User, ct);
+        return NoContent();
+    }
+    
+    [HttpPost("{environmentId}/variable")]
+    public async Task<IActionResult> AddVariable(Guid environmentId, [FromBody] string variableName, CancellationToken ct)
+    {
+        await _documentSession.GetAndUpdate<EnvironmentSet>(environmentId, -1, x => new EnvironmentSetVariableAdded(variableName), User, ct);
+        await _documentSession.SaveChangesAsync(ct);
         return NoContent();
     }
 }

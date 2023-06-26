@@ -26,7 +26,7 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
             setNewSettingError(true);
         } else {
             if (onAddSetting != undefined)
-                onAddSetting(newEnvironmentSettingName);
+                onAddSetting(newSettingName);
             setErrors({}); // Reset errors state when new valid setting is added
             setNewSettingError(false);
         }

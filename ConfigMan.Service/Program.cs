@@ -57,6 +57,9 @@ builder.Services.AddCors(options =>
 builder.Services.AddMarten(opts =>
 {
     opts.Connection(builder.Configuration.GetConnectionString("DefaultConnection"));
+    opts.Events.MetadataConfig.HeadersEnabled = true;
+    opts.Schema.For<EnvironmentSet>().SoftDeleted();
+
    // opts.Projections.LiveStreamAggregation<EnvironmentSet>();
 }).AddAsyncDaemon(DaemonMode.Solo); //TODO: adjust this for prod?
 
