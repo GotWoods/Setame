@@ -12,6 +12,9 @@ public record ApplicationVariableAdded(string Name);
 
 public record ApplicationVariableChanged(string Environment, string VariableName, string NewValue);
 
+public record ApplicationDefaultVariableAdded(string VariableName);
+public record ApplicationDefaultVariableChanged(string VariableName, string NewValue);
+
 public record ApplicationVariableRenamed(string VariableName, string NewName);
 
 public class Application
@@ -56,6 +59,16 @@ public class Application
         EnvironmentSettings.Add(e.Name, new List<Setting>());
     }
 
+
+    public void Apply(ApplicationDefaultVariableAdded e)
+    {
+        ApplicationDefaults.Add(new Setting() { Name=e.VariableName });
+    }
+
+    public void Apply(ApplicationDefaultVariableChanged e)
+    {
+        ApplicationDefaults.First(x => x.Name == e.VariableName).Value = e.NewValue;
+    }
 
     public Dictionary<string, string> GetAppliedSettings(DeploymentEnvironment environment)
     {

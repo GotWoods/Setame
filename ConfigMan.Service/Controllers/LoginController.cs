@@ -1,6 +1,8 @@
 ﻿using ConfigMan.Data;
 using ConfigMan.Data.Models;
 using ConfigMan.Service.Models;
+using JasperFx.Core;
+using Marten;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ConfigMan.Service.Controllers
@@ -12,18 +14,20 @@ namespace ConfigMan.Service.Controllers
         private readonly IUserService _userService;
         private readonly AuthService _authService;
         private readonly IApplicationService _applicationService;
+        private readonly IDocumentSession _documentSession;
 
-        public AuthenticationController(IUserService userService, AuthService authService, IApplicationService applicationService)
+        public AuthenticationController(IUserService userService, AuthService authService, IApplicationService applicationService, IDocumentSession documentSession)
         {
             _userService = userService;
             _authService = authService;
             _applicationService = applicationService;
+            _documentSession = documentSession;
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            var user = await _userService.GetUserByUsernameAsync(request.Username);
+            var user = _userService.GetUserByUsernameAsync(request.Username);
 
             if (user == null || !_userService.VerifyPassword(user, request.Password))
             {

@@ -39,7 +39,15 @@ public class ApplicationSettingsController : ControllerBase
         return Ok(); 
     }
 
-    [HttpPost("{applicationId}/{environment}/{variable}")]
+    [HttpPost("{applicationId}/default/{variable}")]
+    public async Task<ActionResult> CreateNewDefault(Guid applicationId,string variable, CancellationToken ct)
+    {
+        await _documentSession.GetAndUpdate<Application>(applicationId, -1, x => new ApplicationDefaultVariableAdded(variable), User, ct);
+        await _documentSession.SaveChangesAsync(ct);
+        return CreatedAtAction(nameof(CreateNewDefault), null);
+    }
+
+        [HttpPost("{applicationId}/{environment}/{variable}")]
     public async Task<ActionResult> CreateNew(Guid applicationId, string environment, string variable, CancellationToken ct)
     {
         await _documentSession.GetAndUpdate<Application>(applicationId, -1, x => new ApplicationVariableAdded(variable), User, ct);

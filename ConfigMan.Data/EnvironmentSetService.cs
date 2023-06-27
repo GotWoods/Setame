@@ -19,14 +19,12 @@ public interface IEnvironmentSetService
 
 public class EnvironmentSetService : IEnvironmentSetService
 {
-    private readonly IApplicationService _applicationService;
-    private readonly AppDbContext _dbContext;
-
-    public EnvironmentSetService(AppDbContext dbContext, IApplicationService applicationService)
-    {
-        _dbContext = dbContext;
-        _applicationService = applicationService;
-    }
+    // private readonly IApplicationService _applicationService;
+    //
+    // public EnvironmentSetService(IApplicationService applicationService)
+    // {
+    //     _applicationService = applicationService;
+    // }
 
     // public static EnvironmentSetCreated Handle(CreateEnvironmentSet command)
     // {

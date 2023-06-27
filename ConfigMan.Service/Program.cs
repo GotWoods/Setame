@@ -62,7 +62,8 @@ builder.Services.AddMarten(opts =>
     opts.Events.MetadataConfig.HeadersEnabled = true;
     opts.Schema.For<EnvironmentSet>().SoftDeleted();
     opts.Projections.Add<EnvironmentSetSummaryProjection>(ProjectionLifecycle.Inline);
-
+    opts.Projections.Add<UsersProjection>(ProjectionLifecycle.Async);
+    
     //var agent = await StartDaemon();
     //opts.Projections.Snapshot<EnvironmentSet>(SnapshotLifecycle.Async, asyncConfiguration => {asyncConfiguration.}) //snapshot will create an actual document
     //opts.Projections.LiveStreamAggregation<EnvironmentSet>(); //live can only be used with AggregateStream

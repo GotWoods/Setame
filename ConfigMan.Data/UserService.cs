@@ -1,5 +1,8 @@
 ﻿using System.Security.Cryptography;
 using ConfigMan.Data.Models;
+using ConfigMan.Data.Models.Projections;
+using JasperFx.Core;
+using Marten;
 using Microsoft.EntityFrameworkCore;
 
 namespace ConfigMan.Data;
@@ -7,17 +10,19 @@ namespace ConfigMan.Data;
 public interface IUserService
 {
     Task CreateUserAsync(User user, string password);
-    Task<User?> GetUserByUsernameAsync(string username);
-    bool VerifyPassword(User user, string password);
+    UserSummary? GetUserByUsernameAsync(string username);
+    bool VerifyPassword(UserSummary user, string password);
 }
 
 public class UserService : IUserService
 {
-    private readonly AppDbContext _dbContext;
+    private readonly IDocumentSession _documentSession;
+    private readonly IQuerySession _querySession;
 
-    public UserService(AppDbContext dbContext)
+    public UserService(IDocumentSession documentSession, IQuerySession querySession)
     {
-        _dbContext = dbContext;
+        _documentSession = documentSession;
+        _querySession = querySession;
     }
 
     public async Task CreateUserAsync(User user, string password)
@@ -27,14 +32,14 @@ public class UserService : IUserService
         // Hash the password with the salt
         user.PasswordHash = HashPassword(password, user.Salt);
 
-        // Save the user to the database
-        _dbContext.Users.Add(user);
-        await _dbContext.SaveChangesAsync();
+        var id = CombGuidIdGeneration.NewGuid();
+        _documentSession.Events.StartStream<User>(id, new UserCreated(id, user.Username, user.PasswordHash, user.Salt));
+        await _documentSession.SaveChangesAsync();
     }
 
-    public async Task<User?> GetUserByUsernameAsync(string username)
+    public UserSummary? GetUserByUsernameAsync(string username)
     {
-        return await _dbContext.Users.FirstOrDefaultAsync(u => u.Username == username);
+        return _querySession.Query<UserSummary>().FirstOrDefault(x => x.Username == username);
     }
 
     private string GenerateSalt()
@@ -52,7 +57,7 @@ public class UserService : IUserService
         return Convert.ToBase64String(hash);
     }
 
-    public bool VerifyPassword(User user, string password)
+    public bool VerifyPassword(UserSummary user, string password)
     {
         // Hash the provided password with the user's salt
         var hashedPassword = HashPassword(password, user.Salt);

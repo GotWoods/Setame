@@ -18,12 +18,12 @@ public interface IApplicationService
 
 public class ApplicationService : IApplicationService
 {
-    private readonly AppDbContext _dbContext;
-
-    public ApplicationService(AppDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    // private readonly AppDbContext _dbContext;
+    //
+    // public ApplicationService(AppDbContext dbContext)
+    // {
+    //     _dbContext = dbContext;
+    // }
 
     // public async Task<IEnumerable<Application>> GetApplicationsAsync()
     // {
