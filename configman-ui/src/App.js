@@ -30,7 +30,7 @@ function App() {
             <Route path="/applications" element={<ProtectedOutlet />}>
               <Route index element={<Applications />} />
             </Route>
-            <Route path="/applicationDetail/:applicationName" element={<ProtectedOutlet />}>
+            <Route path="/applicationDetail/:applicationId" element={<ProtectedOutlet />}>
               <Route index element={<ApplicationDetail />} />
             </Route>
             <Route path="/environmentGroups" element={<ProtectedOutlet />}>

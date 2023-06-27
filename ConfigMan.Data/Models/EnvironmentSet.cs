@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 namespace ConfigMan.Data.Models;
 
 public record EnvironmentSetCreated(Guid Id, string Name);
-public record EnvironmentSetRenamed(string NewName);
+public record EnvironmentSetRenamed(Guid Id, string NewName);
 public record EnvironmentAdded(string Name);
 public record EnvironmentRemoved(string Name);
-public record EnvironmentSetDeleted();
+public record EnvironmentSetDeleted(Guid Id);
 public record EnvironmentSetVariableAdded(string Name);
 public record EnvironmentSetVariableChanged(string Environment, string VariableName, string NewValue);
 public record EnvironmentSetVariableRenamed(string VariableName, string NewName);

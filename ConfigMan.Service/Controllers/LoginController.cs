@@ -48,15 +48,16 @@ namespace ConfigMan.Service.Controllers
         public async Task<IActionResult> AppLogin([FromBody] AppLoginRequest request)
         {
             //TODO: hash this token with the secret key? Then the calling app needs the key too though
-            var application = await _applicationService.GetApplicationByIdAsync(request.ApplicaitonName);
-
-            if (application == null || application.Token != request.Token)
-            {
-                return Unauthorized();
-            }
-
-            var token = _authService.GenerateJwtToken(application.Name, "Application");
-            return Ok(new { token });
+            // var application = await _applicationService.GetApplicationByIdAsync(request.ApplicaitonName);
+            //
+            // if (application == null || application.Token != request.Token)
+            // {
+            //     return Unauthorized();
+            // }
+            //
+            // var token = _authService.GenerateJwtToken(application.Name, "Application");
+            //return Ok(new { token });
+            return Ok();
         }
     }
 }

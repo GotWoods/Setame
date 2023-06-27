@@ -10,11 +10,11 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<User> Users { get; set; }
-    public DbSet<EnvironmentSet> EnvironmentSets { get; set; }
-    public DbSet<Application> Applications { get; set; }
-    public DbSet<EnvironmentGroup> EnvironmentGroups { get; set; }
+   // public DbSet<EnvironmentSet> EnvironmentSets { get; set; }
+   // public DbSet<Application> Applications { get; set; }
+    //public DbSet<EnvironmentGroup> EnvironmentGroups { get; set; }
 
-    public DbSet<VariableGroup> VariableGroups { get; set; }
+    //public DbSet<VariableGroup> VariableGroups { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -30,23 +30,23 @@ public class AppDbContext : DbContext
         //     entity.Property(x => x.Settings);
         // });
 
-        modelBuilder.Entity<Application>(entity =>
-        {
-            entity.HasKey(a => a.Name);
-            entity.Property(a => a.ApplicationDefaults);
-            entity.Property(a => a.EnvironmentSettings);
-        });
+        // modelBuilder.Entity<Application>(entity =>
+        // {
+        //     entity.HasKey(a => a.Name);
+        //     entity.Property(a => a.ApplicationDefaults);
+        //     entity.Property(a => a.EnvironmentSettings);
+        // });
 
-        modelBuilder.Entity<EnvironmentGroup>(entity =>
-        {
-            entity.HasKey(a => a.Name);
-            entity.Property(a => a.EnvironmentSettings);
-        });
-
-        modelBuilder.Entity<VariableGroup>(entity =>
-        {
-            entity.HasKey(a => a.Name);
-            entity.Property(a => a.Settings);
-        });
+        // modelBuilder.Entity<EnvironmentGroup>(entity =>
+        // {
+        //     entity.HasKey(a => a.Name);
+        //     entity.Property(a => a.EnvironmentSettings);
+        // });
+        //
+        // modelBuilder.Entity<VariableGroup>(entity =>
+        // {
+        //     entity.HasKey(a => a.Name);
+        //     entity.Property(a => a.Settings);
+        // });
     }
 }

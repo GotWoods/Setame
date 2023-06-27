@@ -16,9 +16,10 @@ import {
 import { SettingGridData, SettingGridItem } from '../SettingGrid/SettingGridData';
 import SettingsGrid from '../SettingGrid/SettingGrid';
 import SettingsClient from '../../settingsClient';
+import EnvironmentSetSettingsClient from '../../environmentSetSettingsClient';
 
 const ApplicationDetail = () => {
-    const { applicationName } = useParams();
+    const { applicationId } = useParams();
     const [application, setApplication] = useState(null);
     const [newSettingName, setNewSettingName] = useState('');
     const [newSettingValue, setNewSettingValue] = useState('');
@@ -27,18 +28,17 @@ const ApplicationDetail = () => {
     const [newEnvironmentSettings, setNewEnvironmentSettings] = useState({});
     const [transformedSettings, setTransformedSettings] = useState([]);
     const settingsClient = new SettingsClient();
+    const environmentSetSettingsClient = new EnvironmentSetSettingsClient();
 
     useEffect(() => {
         fetchEnvironments();
     }, []);
 
     const fetchEnvironments = async () => {
-        const application = await settingsClient.getApplication(applicationName);
+        const application = await settingsClient.getApplication(applicationId);
         setApplication(application);
-        //console.log("Got the app", application);
-        const environments = await settingsClient.getEnvironmentSet(application.environmentSet);
+        const environments = await environmentSetSettingsClient.getEnvironmentSet(application.environmentSetId);
         setEnvironments(environments);
-        //console.log("Got the envs", environments);
 
         const transformedSettings = loadGrid(application.environmentSettings, environments.deploymentEnvironments);
         setTransformedSettings(transformedSettings);
@@ -47,7 +47,7 @@ const ApplicationDetail = () => {
 
     const fetchApplication = async (environments) => {
         try {
-            const data = await settingsClient.getApplication(applicationName);
+            const data = await settingsClient.getApplication(applicationId);
             setApplication(data);
             const transformedSettings = loadGrid(data.environmentSettings, environments);
             setTransformedSettings(transformedSettings);
@@ -57,7 +57,6 @@ const ApplicationDetail = () => {
     };
 
     const loadGrid = (environmentSettings, environments) => {
-        console.log("Se", environmentSettings);
         var result = new SettingGridData();
 
         environments.forEach((env) => {
@@ -67,7 +66,6 @@ const ApplicationDetail = () => {
         let keys = Object.keys(environmentSettings);
         keys.forEach((env) => {
             environmentSettings[env].forEach((setting) => {
-                console.log("Setting", setting)
                 if (!result.settings[setting.name]) {
                     result.settings[setting.name] = [];
                 }
@@ -78,7 +76,6 @@ const ApplicationDetail = () => {
                 result.settings[setting.name][env] = setting.value;
             });
 
-            console.log("final", result);
         });
         return result;
     }
@@ -88,7 +85,6 @@ const ApplicationDetail = () => {
 
         let environments = Object.keys(environmentSettings);
         environments.forEach((env) => {
-            console.log("transforming for", env)
             const settings = environmentSettings[env] || [];
             settings.forEach((setting) => {
                 if (!transformedSettings[setting.name]) {
@@ -99,12 +95,10 @@ const ApplicationDetail = () => {
                     transformedSettings[setting.name][env] = [];
                 }
 
-                console.log("Pushing", setting.name);
                 transformedSettings[setting.name][env] = setting.value;
             });
         });
 
-        console.log("trans", transformedSettings)
         return transformedSettings;
     };
 
@@ -122,8 +116,7 @@ const ApplicationDetail = () => {
     }
 
     const handleSettingChange = async (settingName, environment, newValue) => {
-        console.log("change setting", settingName, environment, newValue);
-        await settingsClient.updateApplicationSetting(applicationName, environment, settingName, newValue);
+        await settingsClient.updateApplicationSetting(applicationId, environment, settingName, newValue);
         //setTransformedSettings(updatedSettings);
         //var foundEnvironment = enviornmentSet.deploymentEnvironments.find(x=>x.name === environment);
         //foundEnvironment.environmentSettings[settingName] = newValue;
@@ -132,22 +125,17 @@ const ApplicationDetail = () => {
     };
 
     const handleSettingRename = async (oldSettingName, newSettingName) => {
-
-        console.log("rename setting", oldSettingName, newSettingName);
-        await settingsClient.renameApplicationSetting(applicationName, oldSettingName,newSettingName);
-
-        //console.log("change setting", settingName, environment, newValue);
+        await settingsClient.renameApplicationSetting(applicationId, oldSettingName, newSettingName);
         //await settingsClient.updateApplicationSetting(applicationName, environment, settingName, newValue);
         //setTransformedSettings(updatedSettings);
         //var foundEnvironment = enviornmentSet.deploymentEnvironments.find(x=>x.name === environment);
         //foundEnvironment.environmentSettings[settingName] = newValue;
-        //console.log("Settings change", settingName, environment, newValue);
         //await settingsClient.updateEnvironmentSet(enviornmentSet);
     };
 
     const handleAddSetting = async () => {
         console.log("new setting");
-        await settingsClient.addGlobalApplicationSetting(applicationName, newSettingName, newSettingValue);
+        await settingsClient.addGlobalApplicationSetting(applicationId, newSettingName, newSettingValue);
         setNewSettingName('');
         setNewSettingValue('');
         fetchApplication();
@@ -157,10 +145,10 @@ const ApplicationDetail = () => {
         if (newValue.trim() == "")
             return;
 
-            await settingsClient.addApplicationSetting(applicationName, "ALL", newValue);
+        await settingsClient.addApplicationSetting(applicationId, "ALL", newValue);
         // environments.deploymentEnvironments.forEach(async (env) => {
 
-        
+
         //     // if (application.environmentSettings[env.name] == null) {
         //     //     let newEnv = {};
         //     //     newEnv[env.name] = {};
@@ -171,8 +159,6 @@ const ApplicationDetail = () => {
         //     // obj[newValue] = "";
         //     // application.environmentSettings[env.name] = obj;
         // });
-
-        // console.log("app state", application);
 
 
         //await settingsClient.updateEnvironmentSet(enviornmentSet);
@@ -194,7 +180,7 @@ const ApplicationDetail = () => {
             <h2>Settings</h2>
             <div>These settings to the entire application no matter the environment. A setting here can be overriden by an explicit value being set in the environment settings<br /><br />
                 {/* TODO: have a way to see applied settings an application would have that merges in environment, app global settings, variable groups, and then environment specific settings */}
-                </div>
+            </div>
 
 
 

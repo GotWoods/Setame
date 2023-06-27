@@ -6,14 +6,13 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import SettingsClient from '../../settingsClient';
-
+import EnvironmentSetSettingsClient from '../../environmentSetSettingsClient';
 
 const AddEnvironmentDialog = ({ open, onClose, onAdded, environmentSet }) => {
   const [environmentName, setEnvironmentName] = useState('');
-  const settingsClient = new SettingsClient();
+  const settingsClient = new EnvironmentSetSettingsClient();
 
   const handleAddEnvironment = async () => {
-    console.log("Handling add env");
     try {
       environmentSet.deploymentEnvironments.push({ name: environmentName });
       await settingsClient.addEnvironmentToEnvironmentSet(environmentName, environmentSet.id);

@@ -5,15 +5,14 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import SettingsClient from '../../settingsClient';
+import EnvironmentSetSettingsClient from '../../environmentSetSettingsClient';
 
 
 const AddEnvironmentSetDialog = ({ open, onClose, onAdded }) => {
   const [environmentName, setEnvironmentName] = useState('');
-  const settingsClient = new SettingsClient();
+  const settingsClient = new EnvironmentSetSettingsClient();
 
   const handleAddEnvironment = async () => {
-    console.log("Handling add env set");
     await settingsClient.addEnvironmentSet(environmentName);
     onClose();
     if (onAdded) {

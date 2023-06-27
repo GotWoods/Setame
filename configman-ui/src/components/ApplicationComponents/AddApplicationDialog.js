@@ -8,11 +8,13 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import SettingsClient from '../../settingsClient';
+import EnvironmentSetSettingsClient from '../../environmentSetSettingsClient';
 
 const AddApplicationDialog = ({ open, onClose, onApplicationAdded }) => {
   const [applicationName, setApplicationName] = useState('');
   const [token, setToken] = useState('');
   const settingsClient = new SettingsClient;
+  const environmentSetSettingsClient = new EnvironmentSetSettingsClient;
   const [environmentSets, setEnvironmentSets] = useState([]);
   const [selectedEnvironmentSet, setSelectedEnvironmentSet] = useState('');
 
@@ -25,7 +27,7 @@ const AddApplicationDialog = ({ open, onClose, onApplicationAdded }) => {
     }
   };
   const fetchEnvironmentSets = async () => {
-    const result = await settingsClient.getEnvironmentSets(); // replace this with your function
+    const result = await environmentSetSettingsClient.getEnvironmentSets(); // replace this with your function
     setEnvironmentSets(result);
   };
 
@@ -58,7 +60,7 @@ const AddApplicationDialog = ({ open, onClose, onApplicationAdded }) => {
           />
           <Select fullWidth value={selectedEnvironmentSet} onChange={(e) => setSelectedEnvironmentSet(e.target.value)}>
             {environmentSets.map((set) => (
-              <MenuItem key={set.name} value={set.name}>{set.name}</MenuItem>
+              <MenuItem key={set.id} value={set.id}>{set.name}</MenuItem>
             ))}
           </Select>
           <TextField

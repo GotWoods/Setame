@@ -93,7 +93,6 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
     };
 
     const handleAddEnvironmentSetting = async (newValue) => {
-        console.log("new variable", newValue)
         if (newValue == "")
             return;
         environmentSet.deploymentEnvironments.forEach(env => {
@@ -102,13 +101,11 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
             env.environmentSettings[newValue] = "";
 
         });
-        console.log("Adding environment to set");
         await settingsClient.addVariableToEnvironmentSet(newValue, environmentSet.id);
     };
 
 
     const handleSettingRename = async (originalName, newName) => {
-        console.log("setting rename", newName)
         if (newName == "")
             return;
         // environmentSet.deploymentEnvironments.forEach(env => {

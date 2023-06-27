@@ -14,7 +14,6 @@ class SettingsClient {
 
     async handleResponse(response) {
         if (response.status===200) {
-            console.log("resp", response);
             return await response.json();
         }
 
@@ -120,8 +119,9 @@ class SettingsClient {
         return this.handleResponse(response);
     }
 
-    async deleteApplication(applicationName) {
-        const response = await this.apiRequest(`${this.apiUrl}/api/applications/${applicationName}`, {
+    async deleteApplication(applicationId) {
+        console.log("Deleting app", applicationId);
+        const response = await this.apiRequest(`${this.apiUrl}/api/applications/${applicationId}`, {
             method: 'DELETE',
             headers: this.getAuthHeaders(),
         });
@@ -129,8 +129,8 @@ class SettingsClient {
         return this.handleResponse(response);
     }
 
-    async getApplication(applicationName) {
-        const response = await this.apiRequest(`${this.apiUrl}/api/applications/${applicationName}`, {
+    async getApplication(applicationId) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/applications/${applicationId}`, {
             method: 'GET',
             headers: this.getAuthHeaders(),
         });
@@ -138,8 +138,8 @@ class SettingsClient {
         return this.handleResponse(response);
     }
 
-    async addApplicationSetting(applicationName, environment, variable) {
-        const response = await this.apiRequest(`${this.apiUrl}/api/ApplicationSettings/${applicationName}/${environment}/${variable}`, {
+    async addApplicationSetting(applicationId, environment, variable) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/ApplicationSettings/${applicationId}/${environment}/${variable}`, {
             method: 'POST',
             headers: this.getAuthHeaders(),
             // body: JSON.stringify({
@@ -190,11 +190,11 @@ class SettingsClient {
         return this.handleResponse(response);
     }
 
-    async addApplication(applicationName, environmentSet, token) {
+    async addApplication(applicationName, environmentSetId, token) {
         const response = await this.apiRequest(`${this.apiUrl}/api/applications`, {
             method: 'POST',
             headers: this.getAuthHeaders(),
-            body: JSON.stringify({ name: applicationName, environmentSet, token }),
+            body: JSON.stringify({ name: applicationName, environmentSetId, token }),
         });
 
         return this.handleResponse(response);

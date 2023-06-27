@@ -40,30 +40,31 @@ namespace ConfigMan.Service
 
         public async Task<string> GenerateApplicationTokenAsync(string applicationName)
         {
-            // Retrieve the token associated with the application
-            var application = await _applicationService.GetApplicationByIdAsync(applicationName);
-            if (application == null)
-            {
-                throw new ArgumentException("Invalid application ID");
-            }
-
-            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(application.Token));
-            var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
-
-            var claims = new Claim[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, applicationName),
-                new Claim("ApplicationName", applicationName) 
-            };
-
-            var tokenOptions = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(6),
-                signingCredentials: signingCredentials
-            );
-
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-            return tokenString;
+            // // Retrieve the token associated with the application
+            // var application = await _applicationService.GetApplicationByIdAsync(applicationName);
+            // if (application == null)
+            // {
+            //     throw new ArgumentException("Invalid application ID");
+            // }
+            //
+            // var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(application.Token));
+            // var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+            //
+            // var claims = new Claim[]
+            // {
+            //     new Claim(ClaimTypes.NameIdentifier, applicationName),
+            //     new Claim("ApplicationName", applicationName) 
+            // };
+            //
+            // var tokenOptions = new JwtSecurityToken(
+            //     claims: claims,
+            //     expires: DateTime.UtcNow.AddHours(6),
+            //     signingCredentials: signingCredentials
+            // );
+            //
+            // var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+            // return tokenString;
+            return "";
         }
     }
 }

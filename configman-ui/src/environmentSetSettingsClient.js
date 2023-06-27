@@ -83,7 +83,6 @@ class EnvironmentSetSettingsClient extends SettingsClient {
 
 
     async updateEnvironmentSet(environmentSet) {
-        console.log("In the right spot", environmentSet)
         const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSet.name}`, {
             method: 'PUT',
             headers: this.getAuthHeaders(),

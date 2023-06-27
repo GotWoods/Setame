@@ -1,7 +1,11 @@
 ﻿using ConfigMan.Data;
 using ConfigMan.Data.Models;
+using JasperFx.Core;
+using Marten;
+using Marten.Internal.Sessions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 
 namespace ConfigMan.Service.Controllers.MyApplication.Controllers;
 
@@ -11,40 +15,65 @@ namespace ConfigMan.Service.Controllers.MyApplication.Controllers;
 public class ApplicationsController : ControllerBase
 {
     private readonly IApplicationService _applicationService;
+    private readonly IDocumentSession _documentSession;
+    private readonly IQuerySession _querySession;
 
-    public ApplicationsController(IApplicationService applicationService)
+    public ApplicationsController(IApplicationService applicationService, IDocumentSession documentSession, IQuerySession querySession)
     {
         _applicationService = applicationService;
+        _documentSession = documentSession;
+        _querySession = querySession;
     }
 
     // GET: api/Applications
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Application>>> GetApplications()
+    public async Task<ActionResult<IEnumerable<Application>>> GetApplications(CancellationToken ct)
     {
-        return Ok(await _applicationService.GetApplicationsAsync());
+        var allIds = _querySession.Events.QueryAllRawEvents().Where(x => x.EventTypeName == "application_created").Select(x => x.StreamId).Distinct().ToList();
+
+        var items = new List<Application>();
+        foreach (var id in allIds)
+        {
+            var aggregateStreamAsync = await _querySession.Events.AggregateStreamAsync<Application>(id, token: ct);
+            items.Add(aggregateStreamAsync);
+        }
+
+        var sorted = items.OrderBy(x => x.Name);
+        return Ok(sorted);
     }
 
-    // GET: api/Applications/5
-    [HttpGet("{name}")]
-    public async Task<ActionResult<Application>> GetApplication(string name)
+    
+    [HttpGet("{applicationId}")]
+    public async Task<ActionResult<Application>> GetApplication(Guid applicationId)
     {
-        var application = await _applicationService.GetApplicationByIdAsync(name);
-        return Ok(application);
+        var app = await _querySession.Events.AggregateStreamAsync<Application>(applicationId);
+        //var application = await _applicationService.GetApplicationByIdAsync(name);
+        return Ok(app);
     }
 
     // POST: api/Applications
     [HttpPost]
-    public async Task<ActionResult<Application>> CreateApplication(Application application)
+    public async Task<ActionResult<Application>> CreateApplication(Application application, CancellationToken ct)
     {
-        await _applicationService.CreateApplicationAsync(application);
+        var environment = await _querySession.Events.AggregateStreamAsync<EnvironmentSet>(application.EnvironmentSetId);
+
+        var id = CombGuidIdGeneration.NewGuid();
+        await _documentSession.Add<Application>(id, new ApplicationCreated(id, application.Name, application.Token, application.EnvironmentSetId), User, ct);
+        foreach (var deploymentEnvironment in environment.DeploymentEnvironments)
+        {
+            await _documentSession.GetAndUpdate<Application>(id, -1, x=>new ApplicationEnvironmentAdded(deploymentEnvironment.Name), User, ct);
+        }
+        await _documentSession.SaveChangesAsync(ct);
         return NoContent();
     }
 
     // DELETE: api/Applications/5
-    [HttpDelete("{name}")]
-    public async Task<IActionResult> DeleteApplication(string name)
+    [HttpDelete("{applicationId}")]
+    public async Task<IActionResult> DeleteApplication(Guid applicationId)
     {
-        await _applicationService.DeleteApplicationAsync(name);
+        _documentSession.Delete<Application>(applicationId);
+        await _documentSession.SaveChangesAsync();
+        //await _applicationService.DeleteApplicationAsync(name);
         return NoContent();
     }
 }

@@ -2,9 +2,11 @@ using System.Security.Claims;
 using System.Text;
 using ConfigMan.Data;
 using ConfigMan.Data.Models;
+using ConfigMan.Data.Models.Projections;
 using ConfigMan.Service;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
+using Marten.Events.Projections;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -24,8 +26,8 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder
 
 builder.Services.AddScoped<IApplicationService, ApplicationService>();
 builder.Services.AddScoped<IEnvironmentSetService, EnvironmentSetService>();
-builder.Services.AddScoped<IEnvironmentGroupService, EnvironmentGroupService>();
-builder.Services.AddScoped<IVariableGroupService, VariableGroupService>();
+//builder.Services.AddScoped<IEnvironmentGroupService, EnvironmentGroupService>();
+//builder.Services.AddScoped<IVariableGroupService, VariableGroupService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
@@ -59,8 +61,13 @@ builder.Services.AddMarten(opts =>
     opts.Connection(builder.Configuration.GetConnectionString("DefaultConnection"));
     opts.Events.MetadataConfig.HeadersEnabled = true;
     opts.Schema.For<EnvironmentSet>().SoftDeleted();
+    opts.Projections.Add<EnvironmentSetSummaryProjection>(ProjectionLifecycle.Inline);
 
-   // opts.Projections.LiveStreamAggregation<EnvironmentSet>();
+    //var agent = await StartDaemon();
+    //opts.Projections.Snapshot<EnvironmentSet>(SnapshotLifecycle.Async, asyncConfiguration => {asyncConfiguration.}) //snapshot will create an actual document
+    //opts.Projections.LiveStreamAggregation<EnvironmentSet>(); //live can only be used with AggregateStream
+
+    //LoadAsync will actually load the document from the table
 }).AddAsyncDaemon(DaemonMode.Solo); //TODO: adjust this for prod?
 
 

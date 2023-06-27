@@ -38,8 +38,8 @@ const Applications = () => {
         fetchApplications();
     };
 
-    const handleApplicationClick = (applicationName) => {
-        navigate(`/applicationDetail/${applicationName}`);
+    const handleApplicationClick = (applicationId) => {
+        navigate(`/applicationDetail/${applicationId}`);
     };
 
     return (
@@ -64,12 +64,12 @@ const Applications = () => {
 
             <Grid container spacing={2}>
                 {applications.map((app) => (
-                    <Grid item xs={12} key={app.name}>
+                    <Grid item xs={12} key={app.id}>
                         <div style={{ display: 'inline-block', width: '150px' }}>
-                            <Button onClick={() => handleApplicationClick(app.name)}>{app.name}</Button>
+                            <Button onClick={() => handleApplicationClick(app.id)}>{app.name}</Button>
                         </div>
                         <div style={{ display: 'inline-block', width: '100px' }}>
-                            <Button color="secondary" variant="contained" onClick={() => handleDeleteApplication(app.name)}>Delete</Button>
+                            <Button color="secondary" variant="contained" onClick={() => handleDeleteApplication(app.id)}>Delete</Button>
                         </div>
                     </Grid>
                 ))}

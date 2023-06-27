@@ -81,7 +81,6 @@ const EnvironmentGroups = () => {
   }
 
   const handleEnvironmentDetailsClick = (env) => {
-    console.log("Env", env);
     setSelectedEnvironment(env);
     setCurrentEnvironment(env);
     setEnvironmentDetailsDialogOpen(true);
