@@ -8,7 +8,6 @@ using Marten;
 using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Prometheus;
 using Serilog;
@@ -21,11 +20,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
-builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), x => x.MigrationsAssembly("ConfigMan.Data")));
+//builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), x => x.MigrationsAssembly("ConfigMan.Data")));
 
 
 builder.Services.AddScoped<IApplicationService, ApplicationService>();
-builder.Services.AddScoped<IEnvironmentSetService, EnvironmentSetService>();
+//builder.Services.AddScoped<IEnvironmentSetService, EnvironmentSetService>();
 //builder.Services.AddScoped<IEnvironmentGroupService, EnvironmentGroupService>();
 //builder.Services.AddScoped<IVariableGroupService, VariableGroupService>();
 builder.Services.AddScoped<AuthService>();
@@ -109,12 +108,12 @@ app.UseAuthorization();
 app.UseCors("ReactAppPolicy");
 
 
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-
-    var context = services.GetRequiredService<AppDbContext>();
-    context.Database.Migrate();
-}
+// using (var scope = app.Services.CreateScope())
+// {
+//     var services = scope.ServiceProvider;
+//
+//     var context = services.GetRequiredService<AppDbContext>();
+//     context.Database.Migrate();
+// }
 
 app.Run();

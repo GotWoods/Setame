@@ -3,7 +3,6 @@ using ConfigMan.Data.Models;
 using ConfigMan.Data.Models.Projections;
 using JasperFx.Core;
 using Marten;
-using Microsoft.EntityFrameworkCore;
 
 namespace ConfigMan.Data;
 

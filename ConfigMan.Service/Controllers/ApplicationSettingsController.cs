@@ -14,14 +14,12 @@ namespace ConfigMan.Service.Controllers;
 public class ApplicationSettingsController : ControllerBase
 {
     private readonly IApplicationService _applicationService;
-    private readonly IEnvironmentSetService _environmentService;
     private readonly ILogger<ApplicationSettingsController> _logger;
     private readonly IDocumentSession _documentSession;
 
-    public ApplicationSettingsController(IApplicationService applicationService, IEnvironmentSetService environmentService, ILogger<ApplicationSettingsController> logger, IDocumentSession documentSession)
+    public ApplicationSettingsController(IApplicationService applicationService, ILogger<ApplicationSettingsController> logger, IDocumentSession documentSession)
     {
         _applicationService = applicationService;
-        _environmentService = environmentService;
         _logger = logger;
         _documentSession = documentSession;
     }

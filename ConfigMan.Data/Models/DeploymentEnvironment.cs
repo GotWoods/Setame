@@ -1,8 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace ConfigMan.Data.Models;
+﻿namespace ConfigMan.Data.Models;
 
 public class DeploymentEnvironment
 {

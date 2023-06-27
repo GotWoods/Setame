@@ -1,5 +1,4 @@
 ﻿using Marten.Linq.SoftDeletes;
-using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 
 namespace ConfigMan.Data.Models;
 

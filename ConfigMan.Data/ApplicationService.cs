@@ -1,5 +1,4 @@
 ﻿using ConfigMan.Data.Models;
-using Microsoft.EntityFrameworkCore;
 using System;
 using static System.Net.Mime.MediaTypeNames;
 using Application = ConfigMan.Data.Models.Application;
