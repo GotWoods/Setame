@@ -94,6 +94,7 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
                                     <TextField
                                         label={env}
                                         defaultValue={settings.settings[settingName][env]}
+                                      
                                         onBlur={(e) => {
                                             const newValue = e.target.value;
                                             const originalValue = settings.settings[settingName][env];
@@ -114,6 +115,7 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
                                     error={errors[newEnvironmentSettingName]}
                                     label="Name"
                                     defaultValue={newEnvironmentSettingName || ''}
+                                    onChange={(e) => setNewEnvironmentSettingName(e.target.value)}
                                     onBlur={(e) => { handleNewSetting(e.target.value) }}
                                 />
                             </Tooltip>
@@ -122,7 +124,8 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
                             <TableCell key={"new" + env}>
                                 <TextField
                                     label={env}
-                                    value=""
+                                    defaultValue=""
+                                    onBlur={(e) => { onSettingChange(newEnvironmentSettingName, env, e.target.value) }}
                                 />
                             </TableCell>
                         ))}

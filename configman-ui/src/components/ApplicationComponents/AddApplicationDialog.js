@@ -7,14 +7,14 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import SettingsClient from '../../settingsClient';
+import ApplicationSettingsClient from '../../applicationSettingsClient';
 import EnvironmentSetSettingsClient from '../../environmentSetSettingsClient';
 
 const AddApplicationDialog = ({ open, onClose, onApplicationAdded }) => {
   const [applicationName, setApplicationName] = useState('');
   const [token, setToken] = useState('');
-  const settingsClient = new SettingsClient;
-  const environmentSetSettingsClient = new EnvironmentSetSettingsClient;
+  const settingsClient = new ApplicationSettingsClient();
+  const environmentSetSettingsClient = new EnvironmentSetSettingsClient();
   const [environmentSets, setEnvironmentSets] = useState([]);
   const [selectedEnvironmentSet, setSelectedEnvironmentSet] = useState('');
 

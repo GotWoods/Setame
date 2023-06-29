@@ -8,17 +8,15 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { SettingGridData, SettingGridItem } from './SettingGrid/SettingGridData';
 import SettingsGrid from './SettingGrid/SettingGrid';
 import SettingsClient from '../settingsClient';
 
 const EnvironmentGroups = () => {
-  const [error, setError] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [environmentGroups, setEnvironmentGroups] = useState([]);
   const [environments, setEnvironments] = useState([]);
 
-  const [transformedSettings, setTransformedSettings] = useState([]);
+  const [transformedSettings] = useState([]);
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [currentEnvironment, setCurrentEnvironment] = useState(null);
   const [environmentDetailsDialogOpen, setEnvironmentDetailsDialogOpen] = useState(false);
@@ -58,27 +56,27 @@ const EnvironmentGroups = () => {
     await fetchEnvironmentGroups();
   };
 
-  const loadGrid = (environments) => {
-    var result = new SettingGridData();
-    environments.forEach((env) => {
-      result.environments.push(env.name);
-      if (env.settings == undefined)
-        return;
-      env.settings.forEach((setting) => {
-        if (!result.settings[setting.name]) {
-          result.settings[setting.name] = [];
-        }
+  // const loadGrid = (environments) => {
+  //   var result = new SettingGridData();
+  //   environments.forEach((env) => {
+  //     result.environments.push(env.name);
+  //     if (env.settings == undefined)
+  //       return;
+  //     env.settings.forEach((setting) => {
+  //       if (!result.settings[setting.name]) {
+  //         result.settings[setting.name] = [];
+  //       }
 
-        if (!result.settings[setting.name][env.name]) {
-          result.settings[setting.name][env.name] = "";
-        }
-        result.settings[setting.name][env.name] = setting.value;
-      });
+  //       if (!result.settings[setting.name][env.name]) {
+  //         result.settings[setting.name][env.name] = "";
+  //       }
+  //       result.settings[setting.name][env.name] = setting.value;
+  //     });
 
-      console.log("final", result);
-    });
-    return result;
-  }
+  //     console.log("final", result);
+  //   });
+  //   return result;
+  // }
 
   const handleEnvironmentDetailsClick = (env) => {
     setSelectedEnvironment(env);

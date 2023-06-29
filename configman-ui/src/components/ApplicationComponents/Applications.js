@@ -3,13 +3,13 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import { useNavigate } from 'react-router-dom';
 import AddApplicationDialog from './AddApplicationDialog';
-import SettingsClient from '../../settingsClient';
+import ApplicationSettingsClient from '../../applicationSettingsClient';
 
 const Applications = () => {
     const [openAddApplicationDialog, setOpenAddApplicationDialog] = useState(false);
     const [applications, setApplications] = useState([]);
     const navigate = useNavigate();
-    const settingsClient = new SettingsClient();
+    const settingsClient = new ApplicationSettingsClient();
 
     useEffect(() => {
         fetchApplications();

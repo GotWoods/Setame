@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
 import {
     Table,
     TableBody,
@@ -13,9 +11,9 @@ import {
     TextField,
     Button,
 } from '@mui/material';
-import { SettingGridData, SettingGridItem } from '../SettingGrid/SettingGridData';
+import { SettingGridData } from '../SettingGrid/SettingGridData';
 import SettingsGrid from '../SettingGrid/SettingGrid';
-import SettingsClient from '../../settingsClient';
+import ApplicationSettingsClient from '../../applicationSettingsClient';
 import EnvironmentSetSettingsClient from '../../environmentSetSettingsClient';
 
 const ApplicationDetail = () => {
@@ -23,11 +21,12 @@ const ApplicationDetail = () => {
     const [application, setApplication] = useState(null);
     const [newSettingName, setNewSettingName] = useState('');
     const [newSettingValue, setNewSettingValue] = useState('');
-    const [environments, setEnvironments] = useState([]);
-    const [newEnvironmentSettingName, setNewEnvironmentSettingName] = useState('');
-    const [newEnvironmentSettings, setNewEnvironmentSettings] = useState({});
+    const [environments, setEnvironmentSet] = useState([]);
+    const [environmentSetVariableNames, setEnvironmentSetVariableNames] = useState([]);
+    // const [newEnvironmentSettingName, setNewEnvironmentSettingName] = useState('');
+    // const [newEnvironmentSettings, setNewEnvironmentSettings] = useState({});
     const [transformedSettings, setTransformedSettings] = useState([]);
-    const settingsClient = new SettingsClient();
+    const settingsClient = new ApplicationSettingsClient();
     const environmentSetSettingsClient = new EnvironmentSetSettingsClient();
 
     useEffect(() => {
@@ -37,24 +36,33 @@ const ApplicationDetail = () => {
     const fetchEnvironments = async () => {
         const application = await settingsClient.getApplication(applicationId);
         setApplication(application);
-        const environments = await environmentSetSettingsClient.getEnvironmentSet(application.environmentSetId);
-        setEnvironments(environments);
+        const environmentSet = await environmentSetSettingsClient.getEnvironmentSet(application.environmentSetId);
+        console.log("EnvironmentSet", environmentSet);
+        setEnvironmentSet(environmentSet);
 
-        const transformedSettings = loadGrid(application.environmentSettings, environments.deploymentEnvironments);
+        const transformedSettings = loadGrid(application.environmentSettings, environmentSet.deploymentEnvironments);
         setTransformedSettings(transformedSettings);
         // fetchApplication(environments);
+
+        let uniqueKeys = new Set();
+        environmentSet.deploymentEnvironments.forEach(env => {
+            Object.keys(env.environmentSettings).forEach(key => {
+                uniqueKeys.add(key);
+            });
+        });
+        setEnvironmentSetVariableNames([...uniqueKeys]);
     };
 
-    const fetchApplication = async (environments) => {
-        try {
-            const data = await settingsClient.getApplication(applicationId);
-            setApplication(data);
-            const transformedSettings = loadGrid(data.environmentSettings, environments);
-            setTransformedSettings(transformedSettings);
-        } catch (error) {
-            console.error('Error fetching application:', error);
-        }
-    };
+    // const fetchApplication = async (environments) => {
+    //     try {
+    //         const data = await settingsClient.getApplication(applicationId);
+    //         setApplication(data);
+    //         const transformedSettings = loadGrid(data.environmentSettings, environments);
+    //         setTransformedSettings(transformedSettings);
+    //     } catch (error) {
+    //         console.error('Error fetching application:', error);
+    //     }
+    // };
 
     const loadGrid = (environmentSettings, environments) => {
         var result = new SettingGridData();
@@ -80,41 +88,55 @@ const ApplicationDetail = () => {
         return result;
     }
 
-    const transformSettings = (environmentSettings) => {
-        const transformedSettings = [];
+    // const transformSettings = (environmentSettings) => {
+    //     const transformedSettings = [];
 
-        let environments = Object.keys(environmentSettings);
-        environments.forEach((env) => {
-            const settings = environmentSettings[env] || [];
-            settings.forEach((setting) => {
-                if (!transformedSettings[setting.name]) {
-                    transformedSettings[setting.name] = [];
-                }
+    //     let environments = Object.keys(environmentSettings);
+    //     environments.forEach((env) => {
+    //         const settings = environmentSettings[env] || [];
+    //         settings.forEach((setting) => {
+    //             if (!transformedSettings[setting.name]) {
+    //                 transformedSettings[setting.name] = [];
+    //             }
 
-                if (!transformedSettings[setting.name][env]) {
-                    transformedSettings[setting.name][env] = [];
-                }
+    //             if (!transformedSettings[setting.name][env]) {
+    //                 transformedSettings[setting.name][env] = [];
+    //             }
 
-                transformedSettings[setting.name][env] = setting.value;
-            });
-        });
+    //             transformedSettings[setting.name][env] = setting.value;
+    //         });
+    //     });
 
-        return transformedSettings;
-    };
+    //     return transformedSettings;
+    // };
 
     const handleAddEnvironmentSettings = async () => {
-        // let keys = Object.keys(newEnvironmentSettings);
-        // let allSettings = keys.map(env => {
-        //     return {
-        //         environment: env,
-        //         name: newEnvironmentSettingName,
-        //         value: newEnvironmentSettings[env] || '',
-        //     }
-        // });
-
-        //  fetchApplication();
+        if (newSettingName.trim() === "") return;
+        await settingsClient.addGlobalApplicationSetting(applicationId, newSettingName, newSettingValue);
+        setApplication(prevApplication => {
+            return {
+                ...prevApplication,
+                applicationDefaults: [...prevApplication.applicationDefaults, { name: newSettingName, value: newSettingValue }]
+            }
+        });
+        setNewSettingName('');
+        setNewSettingValue('');
     }
 
+    const handleUpdateEnvironmentSettings = async (name, value) => {
+        console.log("Updating Glboal ", name, value);
+        await settingsClient.updateGlobalApplicationSetting(applicationId, name, value);
+
+        // update the application state with the updated setting
+        // setApplication(prevApplication => {
+        //     return {
+        //         ...prevApplication,
+        //         applicationDefaults: prevApplication.applicationDefaults.map(s => 
+        //             s.id === id ? {...s, name, value} : s
+        //         )
+        //     }
+        // });
+    }
     const handleSettingChange = async (settingName, environment, newValue) => {
         await settingsClient.updateApplicationSetting(applicationId, environment, settingName, newValue);
         //setTransformedSettings(updatedSettings);
@@ -133,16 +155,16 @@ const ApplicationDetail = () => {
         //await settingsClient.updateEnvironmentSet(enviornmentSet);
     };
 
-    const handleAddSetting = async () => {
-        console.log("new setting");
-        await settingsClient.addGlobalApplicationSetting(applicationId, newSettingName, newSettingValue);
-        setNewSettingName('');
-        setNewSettingValue('');
-        fetchApplication();
-    };
+    // const handleAddSetting = async () => {
+    //     console.log("new setting");
+    //     await settingsClient.addGlobalApplicationSetting(applicationId, newSettingName, newSettingValue);
+    //     setNewSettingName('');
+    //     setNewSettingValue('');
+    //     fetchApplication();
+    // };
 
     const handleAddEnvironmentSetting = async (newValue) => {
-        if (newValue.trim() == "")
+        if (newValue.trim() === "")
             return;
 
         await settingsClient.addApplicationSetting(applicationId, "ALL", newValue);
@@ -176,8 +198,18 @@ const ApplicationDetail = () => {
 
     return (
         <div>
-            <h1>{application.name}</h1>
+
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', marginTop: '1rem', marginRight: '1rem' }}>
+                <h1>{application.name}</h1>
+                <div>
+                    {/* <Button variant="contained" color="primary">View Applied Settings</Button> &nbsp;&nbsp; */}
+                    <Button variant="contained" color="primary">History</Button>
+                </div>
+            </div>
+
             <h2>Settings</h2>
+
             <div>These settings to the entire application no matter the environment. A setting here can be overriden by an explicit value being set in the environment settings<br /><br />
                 {/* TODO: have a way to see applied settings an application would have that merges in environment, app global settings, variable groups, and then environment specific settings */}
             </div>
@@ -198,9 +230,21 @@ const ApplicationDetail = () => {
                     </TableHead>
                     <TableBody>
                         {application.applicationDefaults?.map((setting) => (
-                            <TableRow key={setting.id}>
-                                <TableCell>{setting.name}</TableCell>
-                                <TableCell>{setting.value}</TableCell>
+                            <TableRow key={setting.name}>
+                                <TableCell>
+                                    <TextField
+                                        defaultValue={setting.name}
+                                        fullWidth
+                                        onBlur={(e) => handleUpdateEnvironmentSettings(e.target.value, setting.value)}
+                                    />
+                                </TableCell>
+                                <TableCell>
+                                    <TextField
+                                        defaultValue={setting.value}
+                                        fullWidth
+                                        onBlur={(e) => handleUpdateEnvironmentSettings(setting.name, e.target.value)}
+                                    />
+                                </TableCell>
                             </TableRow>
                         ))}
                         <TableRow>
@@ -208,6 +252,7 @@ const ApplicationDetail = () => {
                                 <TextField
                                     value={newSettingName} fullWidth
                                     onChange={(e) => setNewSettingName(e.target.value)}
+                                    onBlur={handleAddEnvironmentSettings}
                                     placeholder="Setting Name"
                                 />
                             </TableCell>
@@ -218,11 +263,6 @@ const ApplicationDetail = () => {
                                     placeholder="Setting Value"
                                 />
                             </TableCell>
-                            <TableCell>
-                                <Button onClick={handleAddSetting} color="primary">
-                                    Add
-                                </Button>
-                            </TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
@@ -230,6 +270,30 @@ const ApplicationDetail = () => {
 
             <h2>Environment Specific Settings</h2>
             {/* <div>TODO: ability to use your own environments just for this application and ignore the global environments</div> */}
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Setting Name</TableCell>
+                            {environments?.deploymentEnvironments?.map((e, index) => (
+                                <TableCell key={index}>{e.name}</TableCell>
+                            ))}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {environmentSetVariableNames.map((e, index) => (
+                            <TableRow key={index}>
+                                <TableCell>{e}</TableCell>
+                                {environments?.deploymentEnvironments?.map((env, index2) => (
+                                    <TableCell key={index2}>{env.environmentSettings[e]}</TableCell>
+                                ))}
+                            </TableRow>
+                        ))}
+
+                    </TableBody>
+                </Table>
+            </TableContainer>
+
             {transformedSettings.environments && (
                 <SettingsGrid
                     transformedSettings={transformedSettings}

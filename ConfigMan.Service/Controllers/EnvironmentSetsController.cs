@@ -80,6 +80,7 @@ public class EnvironmentSetsController : ControllerBase
     [HttpPost("{environmentId}/environment")]
     public async Task<IActionResult> AddEnvironment(Guid environmentId, [FromBody] string environmentName, CancellationToken ct)
     {
+        //TOOD: when a new environment is added, it should go to the children that use that environment set as well
         await _documentSession.GetAndUpdate<EnvironmentSet>(environmentId, -1, x => new EnvironmentAdded(environmentName), User, ct);
         await _documentSession.SaveChangesAsync(ct);
         return NoContent();

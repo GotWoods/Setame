@@ -17,7 +17,7 @@ on startup and be changed without requiring an application to be redeployed for 
 - Live variables changes?
 - Permission per application can be granted?
 - Tracking of variable usages (may be .NET only)
-
+- Host Based or Percentage Based Config. A certain percentage of clients can get a specific setting (this could be used for A/B testing)
 
 
 ## TODO
@@ -28,20 +28,20 @@ Environment Sets
 - Delete Environment Set not working (I think because we are getting live events)
 - Delete Environment (will cascase to all children apps?)
 - Rename Environment (will cascade to all children apps?)
-- New Variable -> Ability to add values to it
-- Rename Variable on set
-- Duplicate Prevention
+- Duplicate Prevention (in progress)
 - History (in progress)
 - Copy Environment Set
+- Versioning
 
 Applications
 - Detach from Environment Set
 - Add custom environment above environment set
 - Applied Config
-- Globals not working
-- Duplicate Prevention
-- History
+- Duplicate Prevention (in progress)
+- History (in progress)
 - Copy Application
+- Host Based or Percentage Based Config. A certain percentage of clients can get a specific setting (this could be used for A/B testing)
+- Versioning
 
 Users
 - All of it

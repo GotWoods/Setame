@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AddEnvironmentDialog from './AddEnvironmentDialog';
-import { SettingGridData, SettingGridItem } from '../SettingGrid/SettingGridData';
+import { SettingGridData } from '../SettingGrid/SettingGridData';
 import SettingsGrid from '../SettingGrid/SettingGrid';
 import Box from '@mui/material/Box';
 import EnvironmentSetSettingsClient from '../../environmentSetSettingsClient';
@@ -27,7 +27,7 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
     const handleAddEnvironmentSetDialogClose = () => {
         setEnvironmentDialogOpen(false);
         
-        if (refreshRequested!=undefined)
+        if (refreshRequested!==undefined)
             refreshRequested();
     };
 
@@ -57,7 +57,7 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
     const handleConfirmDeleteEnvironment = async () => {
         setDeleteConfirmationOpen(false);
         await settingsClient.deleteEnvironmentSet(environmentSet.id);
-        if (refreshRequested!=undefined)
+        if (refreshRequested!==undefined)
             refreshRequested();
     };
 
@@ -70,7 +70,7 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
         var result = new SettingGridData();
         environments.forEach((env) => {
             result.environments.push(env.name);
-            if (env.environmentSettings == undefined)
+            if (env.environmentSettings === undefined)
                 return;
             for (let setting in env.environmentSettings) {
                 if (!result.settings[setting]) {
@@ -93,7 +93,7 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
     };
 
     const handleAddEnvironmentSetting = async (newValue) => {
-        if (newValue == "")
+        if (newValue === "")
             return;
         environmentSet.deploymentEnvironments.forEach(env => {
             let obj = {};
@@ -106,7 +106,7 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
 
 
     const handleSettingRename = async (originalName, newName) => {
-        if (newName == "")
+        if (newName === "")
             return;
         // environmentSet.deploymentEnvironments.forEach(env => {
         //     let obj = {};

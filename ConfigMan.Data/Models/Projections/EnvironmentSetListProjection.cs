@@ -16,12 +16,19 @@ public class EnvironmentSetSummary
     public Dictionary<Guid, string> Environments { get; set; } = new();
 }
 
-public class EnvironmentSetSummaryProjection : SingleStreamProjection<EnvironmentSetSummary>
+public class EnvironmentSetSummaryProjection : MultiStreamProjection<EnvironmentSetSummary, Guid>
 {
     // public static EnvironmentSetSummary Create()
     // {
     //     return new EnvironmentSetSummary();
     // }
+
+    public EnvironmentSetSummaryProjection()
+    {
+        Identity<EnvironmentSetCreated>(x=> Guid.Empty); //we are aggregating this all into one single document with a blank ID
+        DeleteEvent<EnvironmentSetDeleted>();
+    }
+
 
     public void Apply(EnvironmentSetCreated e, EnvironmentSetSummary current)
     {

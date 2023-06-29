@@ -37,18 +37,21 @@ public class ApplicationSettingsController : ControllerBase
         return Ok(); 
     }
 
-    [HttpPost("{applicationId}/default/{variable}")]
-    public async Task<ActionResult> CreateNewDefault(Guid applicationId,string variable, CancellationToken ct)
-    {
-        await _documentSession.GetAndUpdate<Application>(applicationId, -1, x => new ApplicationDefaultVariableAdded(variable), User, ct);
-        await _documentSession.SaveChangesAsync(ct);
-        return CreatedAtAction(nameof(CreateNewDefault), null);
-    }
+    // [HttpPost("{applicationId}/default/")]
+    // public async Task<ActionResult> CreateNewDefault(Guid applicationId, [FromBody]string variable, CancellationToken ct)
+    // {
+    //     await _documentSession.GetAndUpdate<Application>(applicationId, -1, x => new ApplicationDefaultVariableAdded(variable), User, ct);
+    //     await _documentSession.SaveChangesAsync(ct);
+    //     return CreatedAtAction(nameof(CreateNewDefault), null);
+    // }
 
-        [HttpPost("{applicationId}/{environment}/{variable}")]
-    public async Task<ActionResult> CreateNew(Guid applicationId, string environment, string variable, CancellationToken ct)
+    [HttpPost("{applicationId}/{environment}")]
+    public async Task<ActionResult> CreateNew(Guid applicationId, string environment, [FromBody]string variable, CancellationToken ct)
     {
-        await _documentSession.GetAndUpdate<Application>(applicationId, -1, x => new ApplicationVariableAdded(variable), User, ct);
+        if (environment =="default")
+            await _documentSession.GetAndUpdate<Application>(applicationId, -1, x => new ApplicationDefaultVariableAdded(variable), User, ct);
+        else
+            await _documentSession.GetAndUpdate<Application>(applicationId, -1, x => new ApplicationVariableAdded(variable), User, ct);
         await _documentSession.SaveChangesAsync(ct);
 
         // var app = await _applicationService.GetApplicationByIdAsync(application);
@@ -81,7 +84,24 @@ public class ApplicationSettingsController : ControllerBase
     [HttpPut("{applicationId}/{environment}/{variable}")]
     public async Task<ActionResult> Update(Guid applicationId, string environment, string variable, [FromBody] string value, CancellationToken ct)
     {
-        await _documentSession.GetAndUpdate<Application>(applicationId, -1, x => new ApplicationVariableChanged(environment, variable, value), User, ct);
+        if (applicationId == Guid.Empty)
+            throw new ArgumentNullException("applicationId");
+        if (string.IsNullOrEmpty(environment))
+            throw new ArgumentNullException("environment");
+        if (string.IsNullOrEmpty(variable))
+            throw new ArgumentNullException("variable");
+        if (string.IsNullOrEmpty(value))
+            throw new ArgumentNullException("value");
+
+
+        if (environment == "default")
+        {
+            await _documentSession.GetAndUpdate<Application>(applicationId, -1, x => new ApplicationDefaultVariableChanged(variable, value), User, ct);
+        }
+        else
+        {
+            await _documentSession.GetAndUpdate<Application>(applicationId, -1, x => new ApplicationVariableChanged(environment, variable, value), User, ct);
+        }
         await _documentSession.SaveChangesAsync(ct);
 
         // var app = await _applicationService.GetApplicationByIdAsync(application);

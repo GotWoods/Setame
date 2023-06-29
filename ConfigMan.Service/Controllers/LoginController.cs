@@ -13,20 +13,17 @@ namespace ConfigMan.Service.Controllers
     {
         private readonly IUserService _userService;
         private readonly AuthService _authService;
-        private readonly IApplicationService _applicationService;
-        private readonly IDocumentSession _documentSession;
 
-        public AuthenticationController(IUserService userService, AuthService authService, IApplicationService applicationService, IDocumentSession documentSession)
+        public AuthenticationController(IUserService userService, AuthService authService)
         {
             _userService = userService;
             _authService = authService;
-            _applicationService = applicationService;
-            _documentSession = documentSession;
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
+            
             var user = _userService.GetUserByUsernameAsync(request.Username);
 
             if (user == null || !_userService.VerifyPassword(user, request.Password))
@@ -52,15 +49,15 @@ namespace ConfigMan.Service.Controllers
         public async Task<IActionResult> AppLogin([FromBody] AppLoginRequest request)
         {
             //TODO: hash this token with the secret key? Then the calling app needs the key too though
-            // var application = await _applicationService.GetApplicationByIdAsync(request.ApplicaitonName);
+            //  var application = await _applicationService.GetApplicationByIdAsync(request.ApplicaitonName);
             //
-            // if (application == null || application.Token != request.Token)
-            // {
-            //     return Unauthorized();
-            // }
+            //  if (application == null || application.Token != request.Token)
+            //  {
+            //      return Unauthorized();
+            //  }
             //
-            // var token = _authService.GenerateJwtToken(application.Name, "Application");
-            //return Ok(new { token });
+            //  var token = _authService.GenerateJwtToken(application.Name, "Application");
+            // return Ok(new { token });
             return Ok();
         }
     }
