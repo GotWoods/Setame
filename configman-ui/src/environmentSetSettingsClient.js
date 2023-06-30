@@ -18,6 +18,7 @@ class EnvironmentSetSettingsClient extends SettingsClient {
 
     
     async renameEnvironmentSet(environmentSetId, newName) {
+        console.log("Renaming", newName);
         const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSetId}/rename`, {
             method: 'POST',
             headers: this.getAuthHeaders(),

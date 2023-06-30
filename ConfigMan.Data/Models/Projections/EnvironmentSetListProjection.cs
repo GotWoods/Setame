@@ -1,34 +1,28 @@
-﻿using Marten.Events;
-using Marten;
-using Marten.Events.Aggregation;
+﻿using JasperFx.Core;
+using Marten.Events;
 using Marten.Events.Projections;
-using Marten.Internal.Sessions;
 
 namespace ConfigMan.Data.Models.Projections;
 
-
-
-
-
 public class EnvironmentSetSummary
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } //this will always be Guid.Empty as we only want 1 summary
     public Dictionary<Guid, string> Environments { get; set; } = new();
 }
 
 public class EnvironmentSetSummaryProjection : MultiStreamProjection<EnvironmentSetSummary, Guid>
 {
-    // public static EnvironmentSetSummary Create()
-    // {
-    //     return new EnvironmentSetSummary();
-    // }
-
     public EnvironmentSetSummaryProjection()
     {
-        Identity<EnvironmentSetCreated>(x=> Guid.Empty); //we are aggregating this all into one single document with a blank ID
-        DeleteEvent<EnvironmentSetDeleted>();
+        Identity<EnvironmentSetCreated>(_=>Guid.Empty); //we are aggregating this all into one single document with a blank ID
+        Identity<EnvironmentSetRenamed>(_=>Guid.Empty);
+        Identity<EnvironmentSetDeleted>(_=>Guid.Empty);
     }
 
+    public void Apply(EnvironmentSetDeleted e, EnvironmentSetSummary current)
+    {
+        current.Environments.Remove(e.Id);
+    }
 
     public void Apply(EnvironmentSetCreated e, EnvironmentSetSummary current)
     {
@@ -39,84 +33,35 @@ public class EnvironmentSetSummaryProjection : MultiStreamProjection<Environment
     {
         current.Environments[e.Id] = e.NewName;
     }
-
-    public void Apply(EnvironmentSetDeleted e, EnvironmentSetSummary current)
-    {
-        current.Environments.Remove(e.Id);
-    }
 }
 
-public class CustomerIncidentsSummaryGrouper : IAggregateGrouper<Guid>
+public record ChangeHistory(
+    Guid Id,
+    string Description,
+    Guid User
+);
+
+public class EnvironmentSetHistoryTransformation : EventProjection
 {
-    private readonly Type[] eventTypes =
+    public ChangeHistory Transform(IEvent<EnvironmentSetRenamed> input)
     {
-        typeof(EnvironmentSetCreated), typeof(EnvironmentSetRenamed), typeof(EnvironmentSetDeleted)
-    };
+        //var (incidentId, customerId, contact, description, loggedBy, loggedAt) = input.Data;
 
-    public async Task Group(IQuerySession session, IEnumerable<IEvent> events, ITenantSliceGroup<Guid> grouping)
-    {
-        var filteredEvents = events
-            .Where(ev => eventTypes.Contains(ev.EventType))
-            .ToList();
-
-        if (!filteredEvents.Any())
-            return;
-
-        var documentSetIds = filteredEvents.Select(e => e.StreamId).ToList();
-        
-        // var result = await session.Query<EnvironmentSet>()
-        //     .Where(x => documentSetIds.Contains(x.Id))
-        //     .Select(x => new { x.Id, x.Name })
-        //     .ToListAsync();
-
-        // var streamIds = (IDictionary<Guid, List<Guid>>)result.GroupBy(ks => ks.Id, vs => vs.Id)
-        //     .ToDictionary(ks => ks.Key, vs => vs.ToList());
-
-        //grouping.AddEvents<LicenseFeatureToggled>(e => streamIds[e.LicenseId], licenceFeatureTogglesEvents);
-
-        // var result = await session.Events.QueryRawEventDataOnly<EnvironmentSetCreated>()
-        //     .Where(e => documentSetIds.Contains(e.IncidentId))
-        //     .Select(x => new { x.IncidentId, x.CustomerId })
-        //     .ToListAsync();
-
-        // foreach (var group in result.Select(g => new { g.CustomerId, Events = filteredEvents.Where(ev => ev.StreamId == g.IncidentId) }))
-        // {
-        //     grouping.AddEvents(group.CustomerId, group.Events);
-        // }
+        return new ChangeHistory(
+            CombGuidIdGeneration.NewGuid(),
+            $"['{input.Timestamp}'] Renamed To: '{input.Data.NewName}'",
+            Guid.Parse(input.GetHeader("user-id").ToString())
+        );
     }
 
-
-    public class Custom : CustomProjection<EnvironmentSetSummary, Guid>
+    public ChangeHistory Transform(IEvent<EnvironmentSetCreated> input)
     {
-        public override ValueTask ApplyChangesAsync(DocumentSessionBase session, EventSlice<EnvironmentSetSummary, Guid> slice, CancellationToken cancellation, ProjectionLifecycle lifecycle = ProjectionLifecycle.Inline)
-        {
-            var aggregate = slice.Aggregate;
-            foreach (var data in slice.AllData())
-                switch (data)
-                {
-                    case EnvironmentSetCreated:
-                        {
-                            aggregate = new EnvironmentSetSummary();
-                            //set an ID here
-                            break;
-                        }
-                    case EnvironmentSetRenamed e:
-                        {
-                            //aggregate.Environments[] = e.NewName
-                            break;
-                        }
-                    case EnvironmentSetDeleted:
-                        {
-                            session.Delete(aggregate);
-                            //aggregate.Deleted = true;
-                            break;
-                        }
-                }
+        //var (incidentId, customerId, contact, description, loggedBy, loggedAt) = input.Data;
 
-            // Apply any updates!
-            if (aggregate != null) session.Store(aggregate);
-
-            return new ValueTask();
-        }
+        return new ChangeHistory(
+            CombGuidIdGeneration.NewGuid(),
+            $"['{input.Timestamp}'] Created: '{input.Data.Name}'",
+            Guid.Parse(input.GetHeader("user-id").ToString())
+        );
     }
 }

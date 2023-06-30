@@ -10,7 +10,7 @@ on startup and be changed without requiring an application to be redeployed for 
 - .NET Configuration Provider
 
 - Case Sensitive Config?
-- History of changes to variables?
+- History of changes to variables? yes
 - Per Application Access (read/write/Whatever people want)?
 - Secret storage?
 - Variable version pinning?
@@ -30,18 +30,18 @@ Environment Sets
 - Rename Environment (will cascade to all children apps?)
 - Duplicate Prevention (in progress)
 - History (in progress)
-- Copy Environment Set
-- Versioning
+- Copy Environment Set?
+- Versioning (in progress)
 
 Applications
 - Detach from Environment Set
 - Add custom environment above environment set
-- Applied Config
+- Applied Config 
 - Duplicate Prevention (in progress)
 - History (in progress)
 - Copy Application
 - Host Based or Percentage Based Config. A certain percentage of clients can get a specific setting (this could be used for A/B testing)
-- Versioning
+- Versioning (in progress)
 
 Users
 - All of it

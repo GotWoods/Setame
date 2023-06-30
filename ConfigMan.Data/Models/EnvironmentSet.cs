@@ -63,4 +63,9 @@ public class EnvironmentSet
             environment.EnvironmentSettings.Add(e.NewName, value);
         }
     }
+
+    public void Apply(EnvironmentSetDeleted e)
+    {
+
+    }
 }
