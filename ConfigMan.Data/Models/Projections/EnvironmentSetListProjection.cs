@@ -1,6 +1,4 @@
-﻿using JasperFx.Core;
-using Marten.Events;
-using Marten.Events.Projections;
+﻿using Marten.Events.Projections;
 
 namespace ConfigMan.Data.Models.Projections;
 
@@ -35,33 +33,3 @@ public class EnvironmentSetSummaryProjection : MultiStreamProjection<Environment
     }
 }
 
-public record ChangeHistory(
-    Guid Id,
-    string Description,
-    Guid User
-);
-
-public class EnvironmentSetHistoryTransformation : EventProjection
-{
-    public ChangeHistory Transform(IEvent<EnvironmentSetRenamed> input)
-    {
-        //var (incidentId, customerId, contact, description, loggedBy, loggedAt) = input.Data;
-
-        return new ChangeHistory(
-            CombGuidIdGeneration.NewGuid(),
-            $"['{input.Timestamp}'] Renamed To: '{input.Data.NewName}'",
-            Guid.Parse(input.GetHeader("user-id").ToString())
-        );
-    }
-
-    public ChangeHistory Transform(IEvent<EnvironmentSetCreated> input)
-    {
-        //var (incidentId, customerId, contact, description, loggedBy, loggedAt) = input.Data;
-
-        return new ChangeHistory(
-            CombGuidIdGeneration.NewGuid(),
-            $"['{input.Timestamp}'] Created: '{input.Data.Name}'",
-            Guid.Parse(input.GetHeader("user-id").ToString())
-        );
-    }
-}

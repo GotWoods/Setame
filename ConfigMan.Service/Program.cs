@@ -63,6 +63,7 @@ builder.Services.AddMarten(opts =>
     opts.Projections.Add<EnvironmentSetSummaryProjection>(ProjectionLifecycle.Inline);
     opts.Projections.Add<UsersProjection>(ProjectionLifecycle.Inline);
     opts.Projections.Add<EnvironmentSetHistoryTransformation>(ProjectionLifecycle.Async);
+    opts.Projections.Add<ApplicationChangeHistoryTransformation>(ProjectionLifecycle.Async);
 
 
 

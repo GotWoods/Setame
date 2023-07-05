@@ -47,10 +47,11 @@ public class UnitTest1
         var apiUrl = new Uri("https://localhost:7219/");
 
        var configManConfigurationProvider = new ConfigManConfigurationProvider(applicationId, apiUrl, "fqgfa2msm0");
-
+        
         // Act
         configManConfigurationProvider.Load();
 
+        
         // Assert
         string? configValue;
         var success = configManConfigurationProvider.TryGet("LoggingUri", out configValue);

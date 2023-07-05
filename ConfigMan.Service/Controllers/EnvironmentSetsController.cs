@@ -1,5 +1,4 @@
 ﻿using ConfigMan.Data.Models;
-using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,11 +10,9 @@ namespace ConfigMan.Service.Controllers;
 public class EnvironmentSetsController : ControllerBase
 {
  private readonly IEnvironmentSetService _environmentSetService;
-    private readonly IQuerySession _querySession;
 
-    public EnvironmentSetsController(IQuerySession querySession, IEnvironmentSetService environmentSetService)
+ public EnvironmentSetsController(IEnvironmentSetService environmentSetService)
     {
-        _querySession = querySession;
         _environmentSetService = environmentSetService;
     }
 
@@ -25,12 +22,12 @@ public class EnvironmentSetsController : ControllerBase
         return Ok(await _environmentSetService.GetAll());
     }
 
-    [HttpGet("{environmentSetId}")]
-    public async Task<ActionResult<EnvironmentSet>> GetOne(Guid environmentSetId)
-    {
-        var deploymentEnvironment = await _querySession.Events.AggregateStreamAsync<EnvironmentSet>(environmentSetId);
-        return Ok(deploymentEnvironment);
-    }
+    // [HttpGet("{environmentSetId}")]
+    // public async Task<ActionResult<EnvironmentSet>> GetOne(Guid environmentSetId)
+    // {
+    //     var deploymentEnvironment = await _querySession.Events.AggregateStreamAsync<EnvironmentSet>(environmentSetId);
+    //     return Ok(deploymentEnvironment);
+    // }
 
     [HttpPost]
     public async Task<ActionResult<EnvironmentSet>> Create(EnvironmentSet environmentSet)

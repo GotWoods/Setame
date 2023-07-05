@@ -4,23 +4,24 @@ using ConfigMan.Data.Models.Projections;
 using JasperFx.Core;
 using Marten;
 
-public record CreateEnvironmentSet(string Name, Guid PerformedBy);
+public record CreateEnvironmentSet(string Name, Guid PerformedBy): ApplicationCommand(PerformedBy);
 
-public record RenameEnvironmentSet(Guid EnvironmentSetId, string newName, Guid PerformedBy);
+public record RenameEnvironmentSet(Guid EnvironmentSetId, string newName, Guid PerformedBy) : ApplicationCommand(PerformedBy);
 
-public record DeleteEnvironmentSet(Guid EnvironmentSetId, Guid PerformedBy);
+public record DeleteEnvironmentSet(Guid EnvironmentSetId, Guid PerformedBy) : ApplicationCommand(PerformedBy);
 
-public record AddEnvironmentToEnvironmentSet(Guid EnvironmentSetId, string Name, Guid PerformedBy);
+public record AddEnvironmentToEnvironmentSet(Guid EnvironmentSetId, string Name, Guid PerformedBy) : ApplicationCommand(PerformedBy);
 
-public record RenameEnvironment(Guid EnvironmentSetId, string newName, Guid PerformedBy);
+public record RenameEnvironment(Guid EnvironmentSetId, string newName, Guid PerformedBy) : ApplicationCommand(PerformedBy);
 
-public record DeleteEnvironmentFromEnvironmentSet(Guid EnvironmentSetId, string environmentName, Guid PerformedBy);
+public record DeleteEnvironmentFromEnvironmentSet(Guid EnvironmentSetId, string environmentName, Guid PerformedBy) : ApplicationCommand(PerformedBy);
 
-public record AddVariableToEnvironmentSet(Guid EnvironmentSetId, string VariableName, Guid PerformedBy);
+public record AddVariableToEnvironmentSet(Guid EnvironmentSetId, string VariableName, Guid PerformedBy) : ApplicationCommand(PerformedBy);
 
-public record UpdateEnvironmentSetVariable(Guid EnvironmentSetId, string Environment, string VariableName, string VariableValue, Guid PerformedBy);
+public record UpdateEnvironmentSetVariable(Guid EnvironmentSetId, string Environment, string VariableName, string VariableValue, Guid PerformedBy) : ApplicationCommand(PerformedBy);
 
-public record RenameEnvironmentSetVariable(Guid EnvironmentSetId, string OldName, string NewName, Guid PerformedBy);
+public record RenameEnvironmentSetVariable(Guid EnvironmentSetId, string OldName, string NewName, Guid PerformedBy) : ApplicationCommand(PerformedBy);
+
 
 public interface IEnvironmentSetService
 {
@@ -35,12 +36,12 @@ public interface IEnvironmentSetService
     Task Handle(RenameEnvironmentSetVariable command);
 }
 
-public class EnvironmentSetService : IEnvironmentSetService
+public class EnvironmentSetService : ServiceBase, IEnvironmentSetService
 {
     private readonly IDocumentSession _documentSession;
     private readonly IQuerySession _querySession;
 
-    public EnvironmentSetService(IDocumentSession documentSession, IQuerySession querySession)
+    public EnvironmentSetService(IDocumentSession documentSession, IQuerySession querySession) : base(documentSession)
     {
         _documentSession = documentSession;
         _querySession = querySession;
@@ -92,59 +93,45 @@ public class EnvironmentSetService : IEnvironmentSetService
             if (foundWithSameName) throw new DuplicateNameException($"The name {command.newName} is already in use");
         }
 
+        await AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new EnvironmentSetRenamed(command.EnvironmentSetId, command.newName), command.PerformedBy);
 
-        _documentSession.SetHeader("user-id", command.PerformedBy);
-        await _documentSession.Events.WriteToAggregate<EnvironmentSet>(command.EnvironmentSetId, stream => stream.AppendOne(new EnvironmentSetRenamed(command.EnvironmentSetId, command.newName)));
-        await _documentSession.SaveChangesAsync();
     }
 
     public async Task Handle(DeleteEnvironmentSet command)
     {
         //TODO: query all applications and see if any are using this environmentSet
         //   throw new InvalidOperationException("Can not delete an Environment Set when an application is associated to the environment set");
-        _documentSession.SetHeader("user-id", command.PerformedBy);
-        await _documentSession.Events.WriteToAggregate<EnvironmentSet>(command.EnvironmentSetId, stream => stream.AppendOne(new EnvironmentSetDeleted(command.EnvironmentSetId)));
-        await _documentSession.SaveChangesAsync();
+        await AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new EnvironmentSetDeleted(command.EnvironmentSetId), command.PerformedBy);
     }
 
     public async Task Handle(AddEnvironmentToEnvironmentSet command)
     {
-        //TODO: Add environment to all Children Applications. What should the values be for these items?
-        _documentSession.SetHeader("user-id", command.PerformedBy);
-        await _documentSession.Events.WriteToAggregate<EnvironmentSet>(command.EnvironmentSetId, stream => stream.AppendOne(new EnvironmentAdded(command.Name)));
-        await _documentSession.SaveChangesAsync();
+        //TODO: Add environment to all Children Applications?
+        await AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new EnvironmentAdded(command.Name), command.PerformedBy);
     }
 
     public async Task Handle(DeleteEnvironmentFromEnvironmentSet command)
     {
         //TODO: remove from all children applications?
-        _documentSession.SetHeader("user-id", command.PerformedBy);
-        await _documentSession.Events.WriteToAggregate<EnvironmentSet>(command.EnvironmentSetId, stream => stream.AppendOne(new EnvironmentRemoved(command.environmentName)));
-        await _documentSession.SaveChangesAsync();
-        throw new NotImplementedException();
+        await AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new EnvironmentRemoved(command.environmentName), command.PerformedBy);
     }
 
     public async Task Handle(AddVariableToEnvironmentSet command)
     {
         //TODO: ensure the variable is not already created
-        _documentSession.SetHeader("user-id", command.PerformedBy);
-        await _documentSession.Events.WriteToAggregate<EnvironmentSet>(command.EnvironmentSetId, stream => stream.AppendOne(new EnvironmentSetVariableAdded(command.VariableName)));
-        await _documentSession.SaveChangesAsync();
+        await AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new EnvironmentSetVariableAdded(command.VariableName), command.PerformedBy);
     }
 
     public async Task Handle(UpdateEnvironmentSetVariable command)
     {
-        _documentSession.SetHeader("user-id", command.PerformedBy);
-        await _documentSession.Events.WriteToAggregate<EnvironmentSet>(command.EnvironmentSetId, stream => stream.AppendOne(new EnvironmentSetVariableChanged(command.Environment, command.VariableName, command.VariableValue)));
-        await _documentSession.SaveChangesAsync();
+        //TODO: basic input validation
+        await AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new EnvironmentSetVariableChanged(command.Environment, command.VariableName, command.VariableValue), command.PerformedBy);
     }
 
     public async Task Handle(RenameEnvironmentSetVariable command)
     {
         //TODO: ensure the variable name does not collide
-        _documentSession.SetHeader("user-id", command.PerformedBy);
-        await _documentSession.Events.WriteToAggregate<EnvironmentSet>(command.EnvironmentSetId, stream => stream.AppendOne(new EnvironmentSetVariableRenamed(command.OldName, command.NewName)));
-        await _documentSession.SaveChangesAsync();
+        await AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new EnvironmentSetVariableRenamed(command.OldName, command.NewName), command.PerformedBy);
     }
 
 

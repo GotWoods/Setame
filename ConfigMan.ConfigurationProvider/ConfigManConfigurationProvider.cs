@@ -12,6 +12,8 @@ public class AppLoginRequest
     public string Token { get; set; }
 }
 
+
+
 public class ConfigManConfigurationProvider : Microsoft.Extensions.Configuration.ConfigurationProvider
 {
     private readonly HttpClient _httpClient;
@@ -73,5 +75,13 @@ public class ConfigManConfigurationProvider : Microsoft.Extensions.Configuration
         {
             throw new Exception($"Failed to fetch settings. Status code: {response.StatusCode}");
         }
+    }
+
+    public override string Get(string key)
+    {
+        // Implement the tracking logic here
+        Console.WriteLine($"Accessed configuration value for key: {key}");
+
+        return base.Get(key);
     }
 }
