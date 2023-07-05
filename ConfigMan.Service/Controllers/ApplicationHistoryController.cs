@@ -22,6 +22,6 @@ public class ApplicationHistoryController : ControllerBase
     public async Task<ActionResult<IEnumerable<ApplicationChangeHistory>>> GetAll(Guid id)
     {
         //TODO: paging and search
-        return Ok(await _querySession.Query<ApplicationChangeHistory>().Where(x => x.Id == id).ToListAsync());
+        return Ok(await _querySession.Query<ApplicationChangeHistory>().Where(x => x.ApplicationId == id).ToListAsync());
     }
 }

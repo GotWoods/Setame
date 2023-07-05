@@ -13,6 +13,15 @@ class ApplicationSettingsClient extends SettingsClient {
         return this.handleResponse(response);
     }
 
+    async getApplicationHistory(applicationId) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/applicationHistory/${applicationId}`, {
+            method: 'GET',
+            headers: this.getAuthHeaders(),
+        });
+
+        return this.handleResponse(response);
+    }
+
     async deleteApplication(applicationId) {
         console.log("Deleting app", applicationId);
         const response = await this.apiRequest(`${this.apiUrl}/api/applications/${applicationId}`, {

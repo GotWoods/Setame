@@ -25,9 +25,9 @@ on startup and be changed without requiring an application to be redeployed for 
 - Forgot Password
 
 Environment Sets
-- Delete Environment Set not working (I think because we are getting live events)
 - Delete Environment (will cascase to all children apps?)
 - Rename Environment (will cascade to all children apps?)
+- Order Environments
 - Duplicate Prevention (in progress)
 - History (in progress)
 - Copy Environment Set?
@@ -36,9 +36,10 @@ Environment Sets
 Applications
 - Detach from Environment Set
 - Add custom environment above environment set
+- Order Environments
 - Applied Config 
 - Duplicate Prevention (in progress)
-- History (in progress)
+- History (partially completed)
 - Copy Application
 - Host Based or Percentage Based Config. A certain percentage of clients can get a specific setting (this could be used for A/B testing)
 - Versioning (in progress)

@@ -11,8 +11,10 @@ public class ApplicationChangeHistoryTransformation : EventProjection
         return new ApplicationChangeHistory(
 
             CombGuidIdGeneration.NewGuid(),
-            ActionType.Create,
-            $"['{input.Timestamp}'] Created: '{input.Data.Name}'",
+            input.StreamId,
+            input.Timestamp,
+            ApplicationActionType.Create,
+            $"Created: '{input.Data.Name}'",
             Guid.Parse(input.GetHeader("user-id").ToString())
         );
     }
@@ -22,8 +24,10 @@ public class ApplicationChangeHistoryTransformation : EventProjection
         return new ApplicationChangeHistory(
 
             CombGuidIdGeneration.NewGuid(),
-            ActionType.Create,
-            $"['{input.Timestamp}'] Renamed: '{input.Data.NewName}'",
+            input.StreamId,
+            input.Timestamp,
+            ApplicationActionType.Create,
+            $"Renamed: '{input.Data.NewName}'",
             Guid.Parse(input.GetHeader("user-id").ToString())
         );
     }
@@ -33,8 +37,10 @@ public class ApplicationChangeHistoryTransformation : EventProjection
         return new ApplicationChangeHistory(
 
             CombGuidIdGeneration.NewGuid(),
-            ActionType.VariableCreate,
-            $"['{input.Timestamp}'] Application Variable Created: '{input.Data.Name}'",
+            input.StreamId,
+            input.Timestamp,
+            ApplicationActionType.VariableCreate,
+            $"Application Variable Created: '{input.Data.Name}'",
             Guid.Parse(input.GetHeader("user-id").ToString())
         );
     }
@@ -44,8 +50,10 @@ public class ApplicationChangeHistoryTransformation : EventProjection
         return new ApplicationChangeHistory(
 
             CombGuidIdGeneration.NewGuid(),
-            ActionType.VariableChange,
-            $"['{input.Timestamp}'] Application Variable {input.Data.VariableName} changed to {input.Data.NewValue} for {input.Data.Environment}",
+            input.StreamId,
+            input.Timestamp,
+            ApplicationActionType.VariableChange,
+            $"Application Variable {input.Data.VariableName} changed to {input.Data.NewValue} for {input.Data.Environment}",
             Guid.Parse(input.GetHeader("user-id").ToString())
         );
     }
@@ -55,21 +63,45 @@ public class ApplicationChangeHistoryTransformation : EventProjection
         return new ApplicationChangeHistory(
 
             CombGuidIdGeneration.NewGuid(),
-            ActionType.VariableRename,
-            $"['{input.Timestamp}'] Application Variable {input.Data.VariableName} renamed to {input.Data.NewName}",
+            input.StreamId,
+            input.Timestamp,
+            ApplicationActionType.VariableRename,
+            $"Application Variable {input.Data.VariableName} renamed to {input.Data.NewName}",
             Guid.Parse(input.GetHeader("user-id").ToString())
         );
     }
 
-    //TODO:
-    // public record ApplicationDefaultVariableAdded(string VariableName);
-    // public record ApplicationDefaultVariableChanged(string VariableName, string NewValue);
+    public ApplicationChangeHistory Transform(IEvent<ApplicationDefaultVariableAdded> input)
+    {
+        return new ApplicationChangeHistory(
+
+            CombGuidIdGeneration.NewGuid(),
+            input.StreamId,
+            input.Timestamp,
+            ApplicationActionType.VariableRename,
+            $"Application Default {input.Data.VariableName} added",
+            Guid.Parse(input.GetHeader("user-id").ToString())
+        );
+    }
+
+    public ApplicationChangeHistory Transform(IEvent<ApplicationDefaultVariableChanged> input)
+    {
+        return new ApplicationChangeHistory(
+
+            CombGuidIdGeneration.NewGuid(),
+            input.StreamId,
+            input.Timestamp,
+            ApplicationActionType.VariableRename,
+            $"Application Default {input.Data.VariableName} changed to {input.Data.NewValue}",
+            Guid.Parse(input.GetHeader("user-id").ToString())
+        );
+    }
 }
 
-public record ApplicationChangeHistory(Guid Id, ActionType EnvironmentActionType, string Description, Guid User);
+public record ApplicationChangeHistory(Guid Id, Guid ApplicationId, DateTimeOffset EventTime, ApplicationActionType ApplicationActionType, string Description, Guid User);
 
 
-public enum ActionType
+public enum ApplicationActionType
 {
     Create,
     Delete,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
     Table,
     TableBody,
@@ -28,6 +28,7 @@ const ApplicationDetail = () => {
     const [transformedSettings, setTransformedSettings] = useState([]);
     const settingsClient = new ApplicationSettingsClient();
     const environmentSetSettingsClient = new EnvironmentSetSettingsClient();
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchEnvironments();
@@ -204,7 +205,7 @@ const ApplicationDetail = () => {
                 <h1>{application.name}</h1>
                 <div>
                     {/* <Button variant="contained" color="primary">View Applied Settings</Button> &nbsp;&nbsp; */}
-                    <Button variant="contained" color="primary">History</Button>
+                    <Button variant="contained" color="primary" onClick={() => navigate(`/applicationHistory/${applicationId}`)}>History</Button>
                 </div>
             </div>
 

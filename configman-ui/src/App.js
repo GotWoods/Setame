@@ -5,6 +5,7 @@ import EnvironmentSets from './components/EnvironmentSetComponents/EnvironmentSe
 import NavigationBar from './components/NavigationBar';
 import Applications from './components/ApplicationComponents/Applications';
 import ApplicationDetail from './components/ApplicationComponents/ApplicationDetail';
+import ApplicationHistory from './components/ApplicationComponents/ApplicationHistory';
 import Users from './components/Users';
 import './App.css';
 import VariableGroups from './components/VariableGroups';
@@ -32,6 +33,9 @@ function App() {
             </Route>
             <Route path="/applicationDetail/:applicationId" element={<ProtectedOutlet />}>
               <Route index element={<ApplicationDetail />} />
+            </Route>
+            <Route path="/applicationHistory/:applicationId" element={<ProtectedOutlet />}>
+              <Route index element={<ApplicationHistory />} />
             </Route>
             <Route path="/environmentGroups" element={<ProtectedOutlet />}>
               <Route index element={<EnvironmentGroups />} />
