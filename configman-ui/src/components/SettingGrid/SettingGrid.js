@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -10,12 +10,14 @@ import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Button from '@mui/material/Button';
 
-const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSettingRename, onHeaderClick }) => {
+const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSettingRename, onEnvironmentRename }) => {
     const [settings, setSettings] = useState(transformedSettings);
     const [newEnvironmentSettingName, setNewEnvironmentSettingName] = useState('');
     const [errors, setErrors] = useState({}); // a map of error states
-    const [newSettingError, setNewSettingError] = useState(false); // new state for the new setting error
-
+    const [newSettingError, setNewSettingError] = useState(false);
+    const [editingEnvironment, setEditingEnvironment] = useState(null);
+    const editingEnvironmentRef = useRef(editingEnvironment);
+    const inputRefs = useRef({});
 
     const handleNewSetting = (newSettingName) => {
         if (newEnvironmentSettingName in settings.settings) {
@@ -31,6 +33,17 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
             setErrors({}); // Reset errors state when new valid setting is added
             setNewSettingError(false);
         }
+    }
+
+    const handleEnvironmentRename = (newValue) => {
+        const originalValue = editingEnvironmentRef.current;
+        if (settings.environments.includes(newValue) && newValue !== originalValue) {
+            // handle error, environment name already exists
+        } else {
+            if (onEnvironmentRename != undefined)
+                onEnvironmentRename(originalValue, newValue);
+        }
+        setEditingEnvironment(null);
     }
 
     const handleSettingRename = (originalValue, newValue) => {
@@ -52,23 +65,57 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
         setErrors({});
     }, [settings]);
 
+    useEffect(() => {
+        editingEnvironmentRef.current = editingEnvironment;
+    }, [editingEnvironment]);
+
+
     return (
         <TableContainer component={Paper}>
             <Table>
                 <TableHead>
                     <TableRow>
                         <TableCell></TableCell>
-                        {settings.environments.map((env) => (
-                            <TableCell key={env}>
-                                {env}
-                                <Button onClick={() => onHeaderClick()} color="secondary">
-                                    <i className="fa-regular fa-pen-to-square"></i>&nbsp;
-                                </Button>
-                                <Button onClick={() => onHeaderClick(env)} color="secondary">
-                                    <i className="fa-solid fa-trash-can"></i>
-                                </Button>
-                            </TableCell>
-                        ))}
+                        {settings.environments.map((env) => {
+                            if (!inputRefs.current[env]) {
+                                inputRefs.current[env] = React.createRef();
+                            }
+                            return (
+                                <TableCell key={env}>
+                                    {/* The rest of your code */}
+                                    {editingEnvironment === env ? (
+                                        <TextField
+                                            inputRef={inputRefs.current[env]}
+                                            key={env + Date.now()}
+                                            defaultValue={env}
+                                            onBlur={(e) => {
+                                                const newValue = e.target.value;
+                                                if (newValue !== editingEnvironmentRef.current) {
+                                                    handleEnvironmentRename(newValue);
+                                                }
+                                                setEditingEnvironment(null);
+                                            }}
+                                        />
+                                    ) : env}
+                                    {editingEnvironment === env ? null : (
+                                        <>
+                                            <Button onClick={() => {
+                                                setEditingEnvironment(env)
+                                                setTimeout(() => {
+                                                    inputRefs.current[env].current.focus();
+                                                }, 200);
+                                            }} color="secondary">
+                                                <i className="fa-regular fa-pen-to-square"></i>&nbsp;
+                                            </Button>
+                                            <Button color="secondary">
+                                                <i className="fa-solid fa-trash-can"></i>
+                                            </Button>
+                                        </>
+                                    )}
+                                </TableCell>
+                            );
+                        })}
+
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -77,6 +124,7 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
                             <TableCell>
                                 <Tooltip title={errors[settingName] ? "Variable name already exists" : ""}>
                                     <TextField
+
                                         error={errors[settingName]}
                                         defaultValue={settingName}
                                         onBlur={(e) => {

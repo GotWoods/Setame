@@ -4,12 +4,12 @@ ConfigMan is a configuration management server designed to have a central locati
 on startup and be changed without requiring an application to be redeployed for a config change.
 
 ## Features
-- Ability to define global environments sets 
-- Ability to set global variables per environment that every application can inherit
+- Ability to define global deployment environments as well as global settings that all applications can inherit (e.g. you can set a log server for all applications)
 - Create variables at the application level that are inherited by each environment
 - .NET Configuration Provider
 - Audit logs of variable changes
 
+## Features I am thinking about
 - Case Sensitive Config?
 - Per Application Access (read/write/Whatever people want)?
 - Secret storage?

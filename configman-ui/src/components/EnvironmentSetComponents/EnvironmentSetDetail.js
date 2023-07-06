@@ -122,7 +122,6 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
                 onClose={handleAddEnvironmentSetDialogClose}
                 //onAdded={fetchEnvironments}
                 environmentSet={environmentSet} />
-            <h2>
                 {
                     isEditingName ? (
                         <TextField
@@ -147,8 +146,6 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
                         </h2>
                     )
                 }
-            </h2>
-
 
             {
                 transformedSettings.environments?.length > 0 ? (
