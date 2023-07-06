@@ -16,6 +16,12 @@ class EnvironmentSetSettingsClient extends SettingsClient {
         return this.handleResponse(response);
     }
 
+    async getHistory(environmentSetId) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSetHistory/${environmentSetId}`, {
+            headers: this.getAuthHeaders(),
+        });
+        return this.handleResponse(response);
+    }
     
     async renameEnvironmentSet(environmentSetId, newName) {
         console.log("Renaming", newName);

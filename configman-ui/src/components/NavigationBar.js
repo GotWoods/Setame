@@ -18,7 +18,7 @@ const NavigationBar = () => {
         <TitleTypography variant="h6">ConfigMan</TitleTypography>
         {token && (
           <>
-        <Button color="inherit" href="/environments">
+        <Button color="inherit" href="/environmentSets">
           Environment Sets
         </Button>
         <Button color="inherit" href="/applications">

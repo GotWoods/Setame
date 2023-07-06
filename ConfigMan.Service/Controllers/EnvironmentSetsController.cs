@@ -22,12 +22,12 @@ public class EnvironmentSetsController : ControllerBase
         return Ok(await _environmentSetService.GetAll());
     }
 
-    // [HttpGet("{environmentSetId}")]
-    // public async Task<ActionResult<EnvironmentSet>> GetOne(Guid environmentSetId)
-    // {
-    //     var deploymentEnvironment = await _querySession.Events.AggregateStreamAsync<EnvironmentSet>(environmentSetId);
-    //     return Ok(deploymentEnvironment);
-    // }
+    [HttpGet("{environmentSetId}")]
+    public async Task<ActionResult<EnvironmentSet>> GetOne(Guid environmentSetId)
+    {
+        var deploymentEnvironment = await _environmentSetService.GetOne(environmentSetId);
+        return Ok(deploymentEnvironment);
+    }
 
     [HttpPost]
     public async Task<ActionResult<EnvironmentSet>> Create(EnvironmentSet environmentSet)

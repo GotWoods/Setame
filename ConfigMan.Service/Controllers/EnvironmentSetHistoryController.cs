@@ -22,6 +22,6 @@ public class EnvironmentSetHistoryController : ControllerBase
     public async Task<ActionResult<IEnumerable<EnvironmentSetChangeHistory>>> GetAll(Guid id)
     {
         //TODO: paging and search
-        return Ok(await _querySession.Query<EnvironmentSetChangeHistory>().Where(x => x.Id == id).ToListAsync());
+        return Ok(await _querySession.Query<EnvironmentSetChangeHistory>().Where(x => x.EnvironmentSetId == id).ToListAsync());
     }
 }

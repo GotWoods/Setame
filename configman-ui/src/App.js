@@ -13,6 +13,7 @@ import Main from './components/Main';
 import ProtectedOutlet from './components/ProtectedOutlet';
 import EnvironmentGroups from './components/EnvironmentGroups';
 import Settings from './components/Settings';
+import EnvironmentSetHistory from './components/EnvironmentSetComponents/EnvironmentSetHistory';
 
 function App() {
   return (
@@ -25,8 +26,11 @@ function App() {
             <Route path="/" element={<ProtectedOutlet />}>
               <Route index element={<Main />} />
             </Route>
-            <Route path="/environments" element={<ProtectedOutlet />}>
+            <Route path="/environmentSets" element={<ProtectedOutlet />}>
               <Route index element={<EnvironmentSets />} />
+            </Route>
+            <Route path="environmentSetHistory/:environmentSetId" element={<ProtectedOutlet />}>
+              <Route index element={<EnvironmentSetHistory />} />
             </Route>
             <Route path="/applications" element={<ProtectedOutlet />}>
               <Route index element={<Applications />} />

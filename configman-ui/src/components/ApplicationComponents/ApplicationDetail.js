@@ -72,20 +72,35 @@ const ApplicationDetail = () => {
             result.environments.push(env.name);
         });
 
-        let keys = Object.keys(environmentSettings);
-        keys.forEach((env) => {
-            environmentSettings[env].forEach((setting) => {
+        environmentSettings.forEach((environment) => {
+            environment.settings.forEach(setting => {
                 if (!result.settings[setting.name]) {
                     result.settings[setting.name] = [];
                 }
 
-                if (!result.settings[setting.name][env]) {
-                    result.settings[setting.name][env] = "";
+                if (!result.settings[setting.name][environment.name]) {
+                    result.settings[setting.name][environment.name] = "";
                 }
-                result.settings[setting.name][env] = setting.value;
-            });
 
-        });
+                result.settings[setting.name][environment.name] = setting.value;
+            });
+        })
+
+
+        // let keys = Object.keys(environmentSettings);
+        // keys.forEach((env) => {
+        //     environmentSettings[env].forEach((setting) => {
+        //         if (!result.settings[setting.name]) {
+        //             result.settings[setting.name] = [];
+        //         }
+
+        //         if (!result.settings[setting.name][env]) {
+        //             result.settings[setting.name][env] = "";
+        //         }
+        //         result.settings[setting.name][env] = setting.value;
+        //     });
+
+        // });
         return result;
     }
 
@@ -271,7 +286,7 @@ const ApplicationDetail = () => {
 
             <h2>Environment Specific Settings</h2>
             {/* <div>TODO: ability to use your own environments just for this application and ignore the global environments</div> */}
-            <TableContainer component={Paper}>
+            {/* <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
                         <TableRow>
@@ -293,7 +308,7 @@ const ApplicationDetail = () => {
 
                     </TableBody>
                 </Table>
-            </TableContainer>
+            </TableContainer> */}
 
             {transformedSettings.environments && (
                 <SettingsGrid

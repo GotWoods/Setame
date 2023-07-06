@@ -6,15 +6,15 @@ namespace ConfigMan.Data.Models.Projections;
 
 public class EnvironmentSetHistoryTransformation : EventProjection
 {
-    
-
     public EnvironmentSetChangeHistory Transform(IEvent<EnvironmentSetRenamed> input)
     {
         return new EnvironmentSetChangeHistory(
             
             CombGuidIdGeneration.NewGuid(),
+            input.StreamId,
+            input.Timestamp,
             EnvironmentActionType.Rename,
-            $"['{input.Timestamp}'] Renamed To: '{input.Data.NewName}'",
+            $"Renamed To: '{input.Data.NewName}'",
             Guid.Parse(input.GetHeader("user-id").ToString())
         );
     }
@@ -23,8 +23,10 @@ public class EnvironmentSetHistoryTransformation : EventProjection
     {
         return new EnvironmentSetChangeHistory(
             CombGuidIdGeneration.NewGuid(),
+            input.StreamId,
+            input.Timestamp,
             EnvironmentActionType.Create,
-            $"['{input.Timestamp}'] Created: '{input.Data.Name}'",
+            $"Created: '{input.Data.Name}'",
             Guid.Parse(input.GetHeader("user-id").ToString())
         );
     }
@@ -33,19 +35,35 @@ public class EnvironmentSetHistoryTransformation : EventProjection
     {
         return new EnvironmentSetChangeHistory(
             CombGuidIdGeneration.NewGuid(),
+            input.StreamId,
+            input.Timestamp,
             EnvironmentActionType.Delete,
-            $"['{input.Timestamp}'] Deleted: ",
+            $"Deleted: ",
+            Guid.Parse(input.GetHeader("user-id").ToString())
+        );
+    }
+
+    public EnvironmentSetChangeHistory Transform(IEvent<EnvironmentAdded> input)
+    {
+        return new EnvironmentSetChangeHistory(
+            CombGuidIdGeneration.NewGuid(),
+            input.StreamId,
+            input.Timestamp,
+            EnvironmentActionType.EnvironmentAdded,
+            $"Environment Added: {input.Data.Name}",
             Guid.Parse(input.GetHeader("user-id").ToString())
         );
     }
 }
 
-public record EnvironmentSetChangeHistory(Guid Id, EnvironmentActionType EnvironmentActionType, string Description, Guid User);
+public record EnvironmentSetChangeHistory(Guid Id, Guid EnvironmentSetId, DateTimeOffset timestamp, EnvironmentActionType EnvironmentActionType, string Description, Guid User);
 
 
 public enum EnvironmentActionType
 {
     Create,
     Delete,
-    Rename
+    Rename,
+    EnvironmentAdded
+
 }

@@ -34,6 +34,7 @@ public interface IEnvironmentSetService
     Task Handle(AddVariableToEnvironmentSet command);
     Task Handle(UpdateEnvironmentSetVariable command);
     Task Handle(RenameEnvironmentSetVariable command);
+    Task<EnvironmentSet> GetOne(Guid environmentSetId);
 }
 
 public class EnvironmentSetService : ServiceBase, IEnvironmentSetService
@@ -66,7 +67,12 @@ public class EnvironmentSetService : ServiceBase, IEnvironmentSetService
         return sorted.ToList();
     }
 
-//
+    public async Task<EnvironmentSet> GetOne(Guid environmentSetId)
+    {
+        return await _querySession.Events.AggregateStreamAsync<EnvironmentSet>(environmentSetId) ?? throw new NullReferenceException("The environment set could not be found");
+    }
+
+    //
     public async Task Handle(CreateEnvironmentSet command)
     {
         if (string.IsNullOrEmpty(command.Name)) throw new ArgumentNullException(nameof(command.Name));

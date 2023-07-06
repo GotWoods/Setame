@@ -8,13 +8,14 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
+import Button from '@mui/material/Button';
 
 const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSettingRename, onHeaderClick }) => {
     const [settings, setSettings] = useState(transformedSettings);
     const [newEnvironmentSettingName, setNewEnvironmentSettingName] = useState('');
     const [errors, setErrors] = useState({}); // a map of error states
     const [newSettingError, setNewSettingError] = useState(false); // new state for the new setting error
- 
+
 
     const handleNewSetting = (newSettingName) => {
         if (newEnvironmentSettingName in settings.settings) {
@@ -59,13 +60,13 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
                         <TableCell></TableCell>
                         {settings.environments.map((env) => (
                             <TableCell key={env}>
-                                {onHeaderClick ? (
-                                    <a href="#" onClick={() => onHeaderClick(env)}>
-                                        {env}
-                                    </a>
-                                ) : (
-                                    env
-                                )}
+                                {env}
+                                <Button onClick={() => onHeaderClick()} color="secondary">
+                                    <i className="fa-regular fa-pen-to-square"></i>&nbsp;
+                                </Button>
+                                <Button onClick={() => onHeaderClick(env)} color="secondary">
+                                    <i className="fa-solid fa-trash-can"></i>
+                                </Button>
                             </TableCell>
                         ))}
                     </TableRow>
@@ -76,7 +77,7 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
                             <TableCell>
                                 <Tooltip title={errors[settingName] ? "Variable name already exists" : ""}>
                                     <TextField
-                                         error={errors[settingName]}
+                                        error={errors[settingName]}
                                         defaultValue={settingName}
                                         onBlur={(e) => {
                                             const newValue = e.target.value;
@@ -94,7 +95,7 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
                                     <TextField
                                         label={env}
                                         defaultValue={settings.settings[settingName][env]}
-                                      
+
                                         onBlur={(e) => {
                                             const newValue = e.target.value;
                                             const originalValue = settings.settings[settingName][env];
@@ -109,7 +110,7 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
                     ))}
 
                     <TableRow key="new">
-                    <TableCell>
+                        <TableCell>
                             <Tooltip title={errors[newEnvironmentSettingName] ? "Variable name already exists" : ""}>
                                 <TextField
                                     error={errors[newEnvironmentSettingName]}
