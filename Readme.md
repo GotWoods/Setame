@@ -7,7 +7,7 @@ on startup and be changed without requiring an application to be redeployed for 
 - Ability to define global deployment environments as well as global settings that all applications can inherit (e.g. you can set a log server for all applications)
 - Create variables at the application level that are inherited by each environment
 - .NET Configuration Provider
-- Audit logs of variable changes
+- Audit logs of changes
 
 ## Features I am thinking about
 - Case Sensitive Config?
@@ -20,17 +20,15 @@ on startup and be changed without requiring an application to be redeployed for 
 
 
 ## TODO
-- Setup Screen
 - Forgot Password
 - Optomistic Concurrency
 - Showing errors to user instead of console
 - Internationalization
 
 Environment Sets
-- Grid fixes
 - Delete Environment (will cascase to all children apps?)
 - Rename Environment (will cascade to all children apps?)
-- Order Environments (drag/drop would be nice)
+- Order Environments
 - Duplicate Prevention (in progress)
 - History (partially completed)
 - Versioning (in progress)
@@ -38,9 +36,10 @@ Environment Sets
 - Duplicate Environment Set?
 
 Applications
+- Move logic from controller to service
 - Remove summary screen
 - Detach from Environment Set
-- Add custom environment above environment set
+- Add custom environment in addition of what comes from environment set
 - Order Environments
 - Applied Config 
 - Duplicate Prevention (in progress)
@@ -49,7 +48,6 @@ Applications
 - Host Based or Percentage Based Config. A certain percentage of clients can get a specific setting (this could be used for A/B testing)
 - Versioning (in progress)
 - Regenerate Token
-- Hide EnvironmentSet data when there are no values
 
 Users
 - All of it

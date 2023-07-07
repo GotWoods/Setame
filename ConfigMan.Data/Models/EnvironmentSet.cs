@@ -10,13 +10,15 @@ public record EnvironmentSetDeleted(Guid Id);
 public record EnvironmentSetVariableAdded(string Name);
 public record EnvironmentSetVariableChanged(string Environment, string VariableName, string NewValue);
 public record EnvironmentSetVariableRenamed(string VariableName, string NewName);
+public record ApplicationAssociatedToEnvironmentSet(Guid ApplicationId, Guid EnvironmentSetId);
 
 public class EnvironmentSet
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public List<DeploymentEnvironment> DeploymentEnvironments { get; set; } = new();
-    
+    public List<Guid> Applications { get; set; } = new();
+
     public void Apply(EnvironmentSetCreated e)
     {
         this.Id = e.Id;
@@ -62,6 +64,11 @@ public class EnvironmentSet
             environment.EnvironmentSettings.Remove(e.VariableName);
             environment.EnvironmentSettings.Add(e.NewName, value);
         }
+    }
+
+    public void Apply(ApplicationAssociatedToEnvironmentSet e)
+    {
+        this.Applications.Add(e.ApplicationId);
     }
 
     public void Apply(EnvironmentSetDeleted e)

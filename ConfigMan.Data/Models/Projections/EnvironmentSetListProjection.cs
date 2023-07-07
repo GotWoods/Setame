@@ -32,4 +32,3 @@ public class EnvironmentSetSummaryProjection : MultiStreamProjection<Environment
         current.Environments[e.Id] = e.NewName;
     }
 }
-

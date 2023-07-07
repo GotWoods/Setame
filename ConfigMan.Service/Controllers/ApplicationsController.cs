@@ -2,10 +2,8 @@
 using ConfigMan.Data.Models;
 using JasperFx.Core;
 using Marten;
-using Marten.Internal.Sessions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
 
 namespace ConfigMan.Service.Controllers.MyApplication.Controllers;
 
@@ -42,11 +40,12 @@ public class ApplicationsController : ControllerBase
         return Ok(sorted);
     }
 
-    
+
     [HttpGet("{applicationId}")]
     public async Task<ActionResult<Application>> GetApplication(Guid applicationId)
     {
         var app = await _querySession.Events.AggregateStreamAsync<Application>(applicationId);
+        //var associations = _querySession.Query<EnvironmentSetApplicationAssociation>().First(x => x.Id == app.EnvironmentSetId);
         //var application = await _applicationService.GetApplicationByIdAsync(name);
         return Ok(app);
     }
@@ -61,8 +60,10 @@ public class ApplicationsController : ControllerBase
         await _documentSession.Add<Application>(id, new ApplicationCreated(id, application.Name, application.Token, application.EnvironmentSetId), User, ct);
         foreach (var deploymentEnvironment in environment.DeploymentEnvironments)
         {
-            await _documentSession.GetAndUpdate<Application>(id, -1, x=>new ApplicationEnvironmentAdded(deploymentEnvironment.Name), User, ct);
+            await _documentSession.GetAndUpdate<Application>(id, -1, x => new ApplicationEnvironmentAdded(deploymentEnvironment.Name), User, ct);
+            await _documentSession.GetAndUpdate<EnvironmentSet>(application.EnvironmentSetId, -1, x => new ApplicationAssociatedToEnvironmentSet(id, application.EnvironmentSetId), User, ct);
         }
+
         await _documentSession.SaveChangesAsync(ct);
         return NoContent();
     }

@@ -77,11 +77,11 @@ public class ConfigManConfigurationProvider : Microsoft.Extensions.Configuration
         }
     }
 
-    public override string Get(string key)
-    {
-        // Implement the tracking logic here
-        Console.WriteLine($"Accessed configuration value for key: {key}");
-
-        return base.Get(key);
-    }
+    // public override string Get(string key)
+    // {
+    //     // Implement the tracking logic here
+    //     Console.WriteLine($"Accessed configuration value for key: {key}");
+    //
+    //     return base.Get(key);
+    // }
 }

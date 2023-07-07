@@ -18,21 +18,36 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
     const [editingEnvironment, setEditingEnvironment] = useState(null);
     const editingEnvironmentRef = useRef(editingEnvironment);
     const inputRefs = useRef({});
+    const [newRecords, setNewRecords] = useState([{ name: '', values: {} }]);
+    const [focusNew, setFocusNew] = useState(false);
 
-    const handleNewSetting = (newSettingName) => {
-        if (newEnvironmentSettingName in settings.settings) {
+    const handleNewSetting = (newSettingName, rowIndex) => {
+        if (newSettingName in settings.settings) {
             const updatedErrors = Object.keys(settings.settings).reduce((errorsMap, settingName) => ({
                 ...errorsMap,
-                [settingName]: settingName === newEnvironmentSettingName, // set error for all settings with the same name
+                [settingName]: settingName === newSettingName, // set error for all settings with the same name
             }), {});
             setErrors(updatedErrors);
             setNewSettingError(true);
         } else {
-            if (onAddSetting != undefined)
+            if (onAddSetting != undefined) {
                 onAddSetting(newSettingName);
+            }
+
+            // Add the new setting to the settings state
+            const updatedSettings = { ...settings };
+            updatedSettings.settings[newSettingName] = newRecords[rowIndex].values;
+            setSettings(updatedSettings);
+
+            const updatedNewRecords = [...newRecords];
+            updatedNewRecords.splice(rowIndex, 1);
+            setNewRecords(updatedNewRecords);
+
             setErrors({}); // Reset errors state when new valid setting is added
             setNewSettingError(false);
         }
+
+        setFocusNew(true);
     }
 
     const handleEnvironmentRename = (newValue) => {
@@ -69,6 +84,16 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
         editingEnvironmentRef.current = editingEnvironment;
     }, [editingEnvironment]);
 
+    useEffect(() => {
+        if (focusNew) {
+            // focus on the new input only after it is rendered and ref is assigned to it
+            const lastIndex = newRecords.length - 1;
+            if (inputRefs.current[`newRecord${lastIndex}`]) {
+                inputRefs.current[`newRecord${lastIndex}`].focus();
+            }
+            setFocusNew(false); // reset it back to false
+        }
+    }, [focusNew, newRecords.length]); // execute this block whenever focusNew or newRecords.length changes
 
     return (
         <TableContainer component={Paper}>
@@ -157,28 +182,62 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
                         </TableRow>
                     ))}
 
-                    <TableRow key="new">
-                        <TableCell>
-                            <Tooltip title={errors[newEnvironmentSettingName] ? "Variable name already exists" : ""}>
-                                <TextField
-                                    error={errors[newEnvironmentSettingName]}
-                                    label="Name"
-                                    defaultValue={newEnvironmentSettingName || ''}
-                                    onChange={(e) => setNewEnvironmentSettingName(e.target.value)}
-                                    onBlur={(e) => { handleNewSetting(e.target.value) }}
-                                />
-                            </Tooltip>
-                        </TableCell>
-                        {settings.environments.map((env) => (
-                            <TableCell key={"new" + env}>
-                                <TextField
-                                    label={env}
-                                    defaultValue=""
-                                    onBlur={(e) => { onSettingChange(newEnvironmentSettingName, env, e.target.value) }}
-                                />
+                    {newRecords.map((newRecord, i) => (
+                        <TableRow key={i}>
+                            <TableCell>
+                                <Tooltip title={errors[newEnvironmentSettingName] ? "Variable name already exists" : ""}>
+                                    <TextField
+                                        inputRef={el => inputRefs.current[`newRecord${i}`] = el}
+                                        key={`newRecord${i}`}
+                                        label="Name"
+                                        value={newRecord.name}
+                                        inputProps={{ tabIndex: "1" }}
+                                        onChange={(e) => {
+                                            const updatedNewRecords = [...newRecords];
+                                            updatedNewRecords[i].name = e.target.value;
+                                            setNewRecords(updatedNewRecords);
+
+                                            if (i === newRecords.length - 1) {
+                                                setNewRecords([...updatedNewRecords, { name: '', values: {} }]);
+                                                setTimeout(() => {
+                                                    if (inputRefs.current[`newRecord${i}`]) {
+                                                        inputRefs.current[`newRecord${i}`].focus();
+                                                    }
+                                                }, 0);
+                                            }
+                                        }}
+                                        onBlur={(e) => { handleNewSetting(e.target.value, i) }}
+                                    />
+
+                                </Tooltip>
                             </TableCell>
-                        ))}
-                    </TableRow>
+                            {settings.environments.map((env) => (
+                                <TableCell key={"new" + env}>
+                                    <TextField
+                                        inputRef={el => inputRefs.current[`newRecord${i}-${env}`] = el}
+                                        key={`newRecord${i}-${env}`}
+                                        label={env}
+                                        value={newRecord.values[env] || ''}
+                                        inputProps={{ tabIndex: i * settings.environments.length + settings.environments.indexOf(env) + 2 }}
+                                        onChange={(e) => {
+                                            const updatedNewRecords = [...newRecords];
+                                            if (!updatedNewRecords[i].values) {
+                                                updatedNewRecords[i].values = {};
+                                            }
+                                            updatedNewRecords[i].values[env] = e.target.value;
+                                            setNewRecords(updatedNewRecords);
+
+                                            if (i === newRecords.length - 1) {
+                                                setNewRecords([...updatedNewRecords, { name: '', values: {} }]);
+                                            }
+                                        }}
+                                        onBlur={(e) => { onSettingChange(newRecord.name, env, e.target.value) }}
+                                    />
+
+                                </TableCell>
+                            ))}
+                        </TableRow>
+                    ))}
 
                 </TableBody>
             </Table>

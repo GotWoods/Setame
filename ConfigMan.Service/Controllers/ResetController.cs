@@ -20,7 +20,7 @@ namespace ConfigMan.Service.Controllers
             _documentStore = documentStore;
         }
 
-        [HttpPost("login")]
+        [HttpGet()]
         public async Task Reset()
         {
             await _documentStore.Advanced.Clean.CompletelyRemoveAllAsync();

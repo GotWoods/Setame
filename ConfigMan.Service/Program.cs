@@ -64,7 +64,7 @@ builder.Services.AddMarten(opts =>
     opts.Projections.Add<UsersProjection>(ProjectionLifecycle.Inline);
     opts.Projections.Add<EnvironmentSetHistoryTransformation>(ProjectionLifecycle.Async);
     opts.Projections.Add<ApplicationChangeHistoryTransformation>(ProjectionLifecycle.Async);
-
+    opts.Projections.Add<EnvironmentSetApplicationsProjection>(ProjectionLifecycle.Async);
 
 
     //var agent = await StartDaemon();
