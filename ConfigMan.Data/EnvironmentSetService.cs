@@ -12,7 +12,7 @@ public record DeleteEnvironmentSet(Guid EnvironmentSetId, Guid PerformedBy) : Ap
 
 public record AddEnvironmentToEnvironmentSet(Guid EnvironmentSetId, string Name, Guid PerformedBy) : ApplicationCommand(PerformedBy);
 
-public record RenameEnvironment(Guid EnvironmentSetId, string newName, Guid PerformedBy) : ApplicationCommand(PerformedBy);
+public record RenameEnvironment(Guid EnvironmentSetId, string OldName, string NewName, Guid PerformedBy) : ApplicationCommand(PerformedBy);
 
 public record DeleteEnvironmentFromEnvironmentSet(Guid EnvironmentSetId, string environmentName, Guid PerformedBy) : ApplicationCommand(PerformedBy);
 
@@ -34,6 +34,7 @@ public interface IEnvironmentSetService
     Task Handle(AddVariableToEnvironmentSet command);
     Task Handle(UpdateEnvironmentSetVariable command);
     Task Handle(RenameEnvironmentSetVariable command);
+    Task Handle(RenameEnvironment command);
     Task<EnvironmentSet> GetOne(Guid environmentSetId);
 }
 
@@ -140,6 +141,17 @@ public class EnvironmentSetService : ServiceBase, IEnvironmentSetService
         await AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new EnvironmentSetVariableRenamed(command.OldName, command.NewName), command.PerformedBy);
     }
 
+    public async Task Handle(RenameEnvironment command)
+    {
+        var environmentRenamed = new EnvironmentRenamed(command.OldName, command.NewName);
+        await AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, environmentRenamed, command.PerformedBy);
+
+        var associations = _querySession.Query<EnvironmentSetApplicationAssociation>().First(x => x.Id == command.EnvironmentSetId);
+        foreach (var application in associations.Applications)
+        {
+            await AppendToStreamAndSave<Application>(application.Id, environmentRenamed, command.PerformedBy);
+        }
+    }
 
     // public async Task Handle(RenameEnvironment command)
     // {

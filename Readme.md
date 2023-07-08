@@ -26,29 +26,31 @@ on startup and be changed without requiring an application to be redeployed for 
 - Internationalization
 
 Environment Sets
-- Delete Environment (will cascase to all children apps?)
-- Rename Environment (will cascade to all children apps?)
+- Delete Environment
 - Order Environments
 - Duplicate Prevention (in progress)
 - History (partially completed)
-- Versioning (in progress)
-- You should not be able to add an Environment Set variable if a child application is already using that name (or it can prompt you if that is the case)
-- Duplicate Environment Set?
+
+- Low Priority: Versioning (in progress)
+- Low Priority: You should not be able to add an Environment Set variable if a child application is already using that name (or it can prompt you if that is the case)
+- Low Priority: Duplicate Environment Set?
 
 Applications
 - Move logic from controller to service
+- Can not remove/rename environment if from environment set
 - Remove summary screen
-- Detach from Environment Set
-- Add custom environment in addition of what comes from environment set
 - Order Environments
-- Applied Config 
 - Duplicate Prevention (in progress)
 - History (partially completed)
-- Copy Application
-- Host Based or Percentage Based Config. A certain percentage of clients can get a specific setting (this could be used for A/B testing)
-- Versioning (in progress)
+- Applied Config 
 - Regenerate Token
 
+- Low Priority: Host Based or Percentage Based Config. A certain percentage of clients can get a specific setting (this could be used for A/B testing)
+- Low Priority: Versioning (in progress)
+- Low Priority: Detach from Environment Set
+- Low Priority: Add custom environment in addition of what comes from environment set
+- Low Priority: Copy Application
+ 
 Users
 - All of it
 

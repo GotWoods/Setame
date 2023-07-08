@@ -43,7 +43,7 @@ public class EnvironmentSetsController : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("{environmentSetId}/rename")]
+    [HttpPut("{environmentSetId}/rename")]
     public async Task<IActionResult> RenameEnvironmentSet(Guid environmentSetId, [FromBody] string newName)
     {
         await _environmentSetService.Handle(new RenameEnvironmentSet(environmentSetId, newName, ClaimsHelper.GetCurrentUserId(User)));
@@ -64,7 +64,14 @@ public class EnvironmentSetsController : ControllerBase
         await _environmentSetService.Handle(new DeleteEnvironmentFromEnvironmentSet(environmentSetId, environmentName, ClaimsHelper.GetCurrentUserId(User)));
         return NoContent();
     }
-    
+
+    [HttpPut("{environmentSetId}/environment/{environmentName}/rename")]
+    public async Task<IActionResult> RenameEnvironment(Guid environmentSetId, string environmentName, [FromBody] string newName)
+    {
+        await _environmentSetService.Handle(new RenameEnvironment(environmentSetId, environmentName, newName, ClaimsHelper.GetCurrentUserId(User)));
+        return NoContent();
+    }
+
     [HttpPost("{environmentSetId}/variable")]
     public async Task<IActionResult> AddVariable(Guid environmentSetId, [FromBody] string variableName)
     {

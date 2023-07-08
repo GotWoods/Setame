@@ -54,6 +54,18 @@ public class EnvironmentSetHistoryTransformation : EventProjection
             Guid.Parse(input.GetHeader("user-id").ToString())
         );
     }
+
+    public EnvironmentSetChangeHistory Transform(IEvent<EnvironmentRenamed> input)
+    {
+        return new EnvironmentSetChangeHistory(
+            CombGuidIdGeneration.NewGuid(),
+            input.StreamId,
+            input.Timestamp,
+            EnvironmentActionType.Rename,
+            $"Environment Renamed from {input.Data.OldName} to {input.Data.NewName}",
+            Guid.Parse(input.GetHeader("user-id").ToString())
+        );
+    }
 }
 
 public record EnvironmentSetChangeHistory(Guid Id, Guid EnvironmentSetId, DateTimeOffset timestamp, EnvironmentActionType EnvironmentActionType, string Description, Guid User);

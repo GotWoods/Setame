@@ -6,6 +6,7 @@ public record EnvironmentSetCreated(Guid Id, string Name);
 public record EnvironmentSetRenamed(Guid Id, string NewName);
 public record EnvironmentAdded(string Name);
 public record EnvironmentRemoved(string Name);
+public record EnvironmentRenamed(string OldName, string NewName);
 public record EnvironmentSetDeleted(Guid Id);
 public record EnvironmentSetVariableAdded(string Name);
 public record EnvironmentSetVariableChanged(string Environment, string VariableName, string NewValue);
@@ -74,5 +75,10 @@ public class EnvironmentSet
     public void Apply(EnvironmentSetDeleted e)
     {
 
+    }
+
+    public void Apply(EnvironmentRenamed e)
+    {
+        DeploymentEnvironments.First(x => x.Name == e.OldName).Name = e.NewName;
     }
 }

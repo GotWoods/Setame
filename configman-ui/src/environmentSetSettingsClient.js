@@ -16,6 +16,14 @@ class EnvironmentSetSettingsClient extends SettingsClient {
         return this.handleResponse(response);
     }
 
+    async getEnvironmentSetToApplicationAssociation(environmentSetId) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/EnvironmentSetApplicationAssociation/${environmentSetId}`, {
+            headers: this.getAuthHeaders(),
+        });
+
+        return this.handleResponse(response);
+    }
+
     async getHistory(environmentSetId) {
         const response = await this.apiRequest(`${this.apiUrl}/api/environmentSetHistory/${environmentSetId}`, {
             headers: this.getAuthHeaders(),
@@ -26,9 +34,19 @@ class EnvironmentSetSettingsClient extends SettingsClient {
     async renameEnvironmentSet(environmentSetId, newName) {
         console.log("Renaming", newName);
         const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSetId}/rename`, {
-            method: 'POST',
+            method: 'PUT',
             headers: this.getAuthHeaders(),
             body: JSON.stringify(newName),
+        });
+        return this.handleResponse(response);
+    }
+
+    async renameEnvironment(environmentSetId, oldValue,newValue) {
+        console.log("Renaming", oldValue, "to", newValue);
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSetId}/environment/${oldValue}/rename`, {
+            method: 'PUT',
+            headers: this.getAuthHeaders(),
+            body: JSON.stringify(newValue),
         });
         return this.handleResponse(response);
     }

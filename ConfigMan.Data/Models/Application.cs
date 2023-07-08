@@ -69,6 +69,11 @@ public class Application
         ApplicationDefaults.First(x => x.Name == e.VariableName).Value = e.NewValue;
     }
 
+    public void Apply(EnvironmentRenamed e)
+    {
+        EnvironmentSettings.First(x => x.Name == e.OldName).Name = e.NewName;
+    }
+
     // public Dictionary<string, string> GetAppliedSettings(DeploymentEnvironment environment)
     // {
     //     var appliedSettings = new Dictionary<string, string>();
