@@ -4,26 +4,25 @@ import { SettingGridData } from '../SettingGrid/SettingGridData';
 import SettingsGrid from '../SettingGrid/SettingGrid';
 import Box from '@mui/material/Box';
 import EnvironmentSetSettingsClient from '../../environmentSetSettingsClient';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import {
     Button,
 } from '@mui/material';
 import EnvironmentSetName from './EnvironmentSetName';
+import RenameEnvironmentDialog from './RenameEnvironmentDialog';
+import DeleteEnvironmentDialog from './DeleteEnvironmentDialog';
 
 const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
     const [transformedSettings, setTransformedSettings] = useState([]);
     const [environmentDialogOpen, setEnvironmentDialogOpen] = useState(false);
     const settingsClient = new EnvironmentSetSettingsClient();
-    
+
     const [renameEnvironmentDialogOpen, setRenameEnvironmentDialogOpen] = useState(false);
     const [applications, setApplications] = useState([]);
     const [editedEnvironmentName, setEditedEnvironmentName] = useState(null);
     const [originalEnvironmentName, setOriginalEnvironmentName] = useState(null);
-    
+    const [deleteEnvironmentDialogOpen, setDeleteEnvironmentDialogOpen] = useState(false);
+    const [environmentToDelete, setEnvironmentToDelete] = useState(null);
+
 
     const handleAddEnvironmentSetDialogClose = () => {
         setEnvironmentDialogOpen(false);
@@ -45,6 +44,31 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
         }
         setRenameEnvironmentDialogOpen(false);
     };
+
+
+    const handleDeleteEnvironment = async (environmentName) => {
+        console.log("I want to delete, showing dialog")
+        const response = await settingsClient.getEnvironmentSetToApplicationAssociation(environmentSet.id);
+        setApplications(response.applications);
+        setEnvironmentToDelete(environmentName);
+        setDeleteEnvironmentDialogOpen(true);
+    }
+
+    const handleDeleteEnvironmentDialogClose = () => {
+        setDeleteEnvironmentDialogOpen(false);
+        setEnvironmentToDelete(null);
+    }
+
+    const handleConfirmDeleteEnvironment = async () => {
+        if (environmentToDelete !== null) {
+            await settingsClient.deleteEnvironment(environmentSet.id, environmentToDelete);
+            setEnvironmentToDelete(null);
+        }
+        setDeleteEnvironmentDialogOpen(false);
+
+        if (refreshRequested !== undefined)
+            refreshRequested();
+    }
 
     useEffect(() => {
         const transformedSettings = loadGrid(environmentSet.deploymentEnvironments);
@@ -101,7 +125,7 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
     };
 
     const handleEnvironmentRename = async (originalValue, newValue) => {
-        setOriginalEnvironmentName(originalValue); 
+        setOriginalEnvironmentName(originalValue);
         setEditedEnvironmentName(newValue);
         setRenameEnvironmentDialogOpen(true);
         const response = await settingsClient.getEnvironmentSetToApplicationAssociation(environmentSet.id);
@@ -127,6 +151,7 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
                             onSettingRename={handleSettingRename}
                             onSettingChange={handleSettingChange}
                             onEnvironmentRename={handleEnvironmentRename}
+                            onDeleteEnvironment={handleDeleteEnvironment}
                         />
                     </>
                 ) : (
@@ -146,31 +171,21 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
                 )
             }
 
-            <Dialog open={renameEnvironmentDialogOpen} onClose={handleRenameEnvironmentClose}>
-                <DialogTitle>Associated Applications</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Renaming this environment will rename the environment in these applications:
-                        <ul>
-                            {applications ? applications.map((app, index) => (
-                                <li key={index}>{app.name}</li>
-                            )) : null}
-                        </ul>
-                        Ensure you have updated the applications to use the new environment name or else the application may fail to load its configuration.
-                    </DialogContentText>
+            <RenameEnvironmentDialog
+                open={renameEnvironmentDialogOpen}
+                handleClose={handleRenameEnvironmentClose}
+                handleConfirm={handleConfirmRenameEnvironment}
+                applications={applications}
+                editedEnvironmentName={editedEnvironmentName}
+                originalEnvironmentName={originalEnvironmentName}
+            />
 
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleRenameEnvironmentClose} color="primary">
-                        Cancel
-                    </Button>
-                    <Button onClick={handleConfirmRenameEnvironment} color="primary">
-                        Confirm
-                    </Button>
-
-                </DialogActions>
-            </Dialog>
-
+            <DeleteEnvironmentDialog
+                open={deleteEnvironmentDialogOpen}
+                handleClose={handleDeleteEnvironmentDialogClose}
+                handleConfirm={handleConfirmDeleteEnvironment}
+                applications={applications}
+            />
         </div>
 
     );

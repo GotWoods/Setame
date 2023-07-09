@@ -26,7 +26,7 @@ on startup and be changed without requiring an application to be redeployed for 
 - Internationalization
 
 Environment Sets
-- Delete Environment
+- Delete Environment (apply to applications)
 - Order Environments
 - Duplicate Prevention (in progress)
 - History (partially completed)

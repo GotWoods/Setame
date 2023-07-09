@@ -74,6 +74,15 @@ public class Application
         EnvironmentSettings.First(x => x.Name == e.OldName).Name = e.NewName;
     }
 
+    public void Apply(EnvironmentRemoved e)
+    {
+        foreach (var environmentSetting in EnvironmentSettings)
+        {
+            environmentSetting.Settings.RemoveAll(x => x.Name == e.Name);
+        }
+        //EnvironmentSettings.Remove(EnvironmentSettings.First(x => x.Name == e.Name));
+    }
+
     // public Dictionary<string, string> GetAppliedSettings(DeploymentEnvironment environment)
     // {
     //     var appliedSettings = new Dictionary<string, string>();

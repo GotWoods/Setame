@@ -119,8 +119,14 @@ public class EnvironmentSetService : ServiceBase, IEnvironmentSetService
 
     public async Task Handle(DeleteEnvironmentFromEnvironmentSet command)
     {
-        //TODO: remove from all children applications?
-        await AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new EnvironmentRemoved(command.environmentName), command.PerformedBy);
+        var environmentRemoved = new EnvironmentRemoved(command.environmentName);
+        await AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, environmentRemoved, command.PerformedBy);
+
+        var associations = _querySession.Query<EnvironmentSetApplicationAssociation>().First(x => x.Id == command.EnvironmentSetId);
+        foreach (var application in associations.Applications)
+        {
+            await AppendToStreamAndSave<Application>(application.Id, environmentRemoved, command.PerformedBy);
+        }
     }
 
     public async Task Handle(AddVariableToEnvironmentSet command)
