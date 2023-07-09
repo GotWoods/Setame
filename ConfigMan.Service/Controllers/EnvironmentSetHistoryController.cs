@@ -24,11 +24,11 @@ public class EnvironmentSetHistoryController : ControllerBase
     public async Task<ActionResult<IEnumerable<ChangeHistory>>> GetAll(Guid id)
     {
         //TODO: paging and search
-        var listAsync = await _querySession.Query<EnvironmentSetChangeHistory>().Where(x => x.EnvironmentSetId == id).ToListAsync();
+        var changeHistories = await _querySession.Query<EnvironmentSetChangeHistory>().Where(x => x.EnvironmentSetId == id).ToListAsync();
         var results = new List<ChangeHistory>();
-        foreach (var history in listAsync)
+        foreach (var history in changeHistories)
         {
-            var user = await _querySession.Events.AggregateStreamAsync<User>(history.User);
+            var user = _querySession.Query<UserSummary>().FirstOrDefault(x => x.Id == history.User);
             if (user == null)
                 throw new NullReferenceException("User could not be found!");
                 

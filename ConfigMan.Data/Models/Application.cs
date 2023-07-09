@@ -10,6 +10,7 @@ public record ApplicationVariableChanged(string Environment, string VariableName
 public record ApplicationDefaultVariableAdded(string VariableName);
 public record ApplicationDefaultVariableChanged(string VariableName, string NewValue);
 public record ApplicationVariableRenamed(string VariableName, string NewName);
+public record ApplicationDeleted(Guid applicationId);
 
 public class Application
 {
