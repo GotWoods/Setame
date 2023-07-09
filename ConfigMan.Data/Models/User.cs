@@ -6,7 +6,7 @@ public record UserCreated(Guid Id, string Username, string PasswordHash, string 
 
 public class User
 {
-    [Key] public Guid Id { get; set; }
+    public Guid Id { get; set; }
     public string Username { get; set; }
     public string PasswordHash { get; set; }
     public string Salt { get; set; }

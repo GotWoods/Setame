@@ -40,8 +40,8 @@ const EnvironmentSetHistory = () => {
         <TableBody>
           {history.map((record, index) => (
             <TableRow key={index}>
-              <TableCell>{new Date(record.dateTime).toLocaleString()}</TableCell>
-              <TableCell>{record.environmentActionType}</TableCell>
+              <TableCell>{new Date(record.timestamp).toLocaleString()}</TableCell>
+              <TableCell>{record.actionType}</TableCell>
               <TableCell>{record.description}</TableCell>
               <TableCell>{record.user}</TableCell>
             </TableRow>

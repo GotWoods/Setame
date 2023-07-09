@@ -13,17 +13,17 @@ import ApplicationSettingsClient from '../../applicationSettingsClient';
 //import axios from 'axios';
 
 const ApplicationHistory = () => {
-    const { applicationId } = useParams();
+  const { applicationId } = useParams();
   const [history, setHistory] = useState([]);
   const settingsClient = new ApplicationSettingsClient();
 
   useEffect(() => {
-      fetchApplicationHistory();
+    fetchApplicationHistory();
   }, []);
 
   const fetchApplicationHistory = async () => {
-      const data = await settingsClient.getApplicationHistory(applicationId);
-      setHistory(data);
+    const data = await settingsClient.getApplicationHistory(applicationId);
+    setHistory(data);
   };
 
 
@@ -41,8 +41,8 @@ const ApplicationHistory = () => {
         <TableBody>
           {history.map((record, index) => (
             <TableRow key={index}>
-              <TableCell>{new Date(record.dateTime).toLocaleString()}</TableCell>
-              <TableCell>{record.applicationActionType}</TableCell>
+              <TableCell>{new Date(record.timestamp).toLocaleString()}</TableCell>
+              <TableCell>{record.actionType}</TableCell>
               <TableCell>{record.description}</TableCell>
               <TableCell>{record.user}</TableCell>
             </TableRow>
