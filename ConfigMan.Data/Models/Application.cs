@@ -5,7 +5,7 @@ namespace ConfigMan.Data.Models;
 public record ApplicationCreated(Guid Id, string Name, string Token, Guid EnvironmentSet);
 public record ApplicationEnvironmentAdded(string Name);
 public record ApplicationRenamed(string NewName);
-public record ApplicationVariableAdded(string Name);
+public record ApplicationVariableAdded(string Environment, string Name);
 public record ApplicationVariableChanged(string Environment, string VariableName, string NewValue);
 public record ApplicationDefaultVariableAdded(string VariableName);
 public record ApplicationDefaultVariableChanged(string VariableName, string NewValue);

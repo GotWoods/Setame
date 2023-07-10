@@ -8,6 +8,11 @@ public class ApplicationChangeHistoryTransformation : EventProjection
 {
     public ApplicationChangeHistory Transform(IEvent<ApplicationCreated> input)
     {
+        var userHeader = input.GetHeader("user-id");
+        var userId = Guid.Empty;
+        if (userHeader != null)
+            userId = Guid.Parse((string)userHeader);
+
         return new ApplicationChangeHistory(
 
             CombGuidIdGeneration.NewGuid(),
@@ -15,7 +20,7 @@ public class ApplicationChangeHistoryTransformation : EventProjection
             input.Timestamp,
             ApplicationActionType.Create,
             $"Created: '{input.Data.Name}'",
-            Guid.Parse(input.GetHeader("user-id").ToString())
+            userId
         );
     }
 

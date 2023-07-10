@@ -10,11 +10,11 @@ on startup and be changed without requiring an application to be redeployed for 
 - Audit logs of changes
 
 ## Features I am thinking about
-- Case Sensitive Config?
-- Per Application Access (read/write/Whatever people want)?
-- Secret storage?
-- Variable version pinning?
-- Live variables changes?
+- Case Sensitive Config (possibly as a configuration option)
+- Per Application Access (read/write/Whatever people want)
+- Secret storage
+- Variable version pinning
+- Live variables changes (May be .NET provider only)
 - Tracking of variable usages (may be .NET only)
 - Host Based or Percentage Based Config. A certain percentage of clients can get a specific setting (this could be used for A/B testing)
 
@@ -35,7 +35,6 @@ Environment Sets
 - Low Priority: History screen to implement paging/searching
 
 Applications
-- Move logic from controller to service
 - Can not remove/rename environment if from environment set
 - Remove summary screen
 - Order Environments

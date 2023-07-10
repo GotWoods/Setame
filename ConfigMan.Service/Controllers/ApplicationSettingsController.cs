@@ -1,8 +1,5 @@
-﻿using System;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using ConfigMan.Data;
-using ConfigMan.Data.Models;
-using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,13 +12,11 @@ public class ApplicationSettingsController : ControllerBase
 {
     private readonly IApplicationService _applicationService;
     private readonly ILogger<ApplicationSettingsController> _logger;
-    private readonly IDocumentSession _documentSession;
 
-    public ApplicationSettingsController(IApplicationService applicationService, ILogger<ApplicationSettingsController> logger, IDocumentSession documentSession)
+    public ApplicationSettingsController(IApplicationService applicationService, ILogger<ApplicationSettingsController> logger)
     {
         _applicationService = applicationService;
         _logger = logger;
-        _documentSession = documentSession;
     }
 
     [HttpGet]
@@ -34,52 +29,20 @@ public class ApplicationSettingsController : ControllerBase
             _logger.LogWarning("Can not find application @{Claims}", User.Claims);
             return NotFound("Claim not found");
         }
-        return Ok(); 
-    }
 
-    // [HttpPost("{applicationId}/default/")]
-    // public async Task<ActionResult> CreateNewDefault(Guid applicationId, [FromBody]string variable, CancellationToken ct)
-    // {
-    //     await _documentSession.GetAndUpdate<Application>(applicationId, -1, x => new ApplicationDefaultVariableAdded(variable), User, ct);
-    //     await _documentSession.SaveChangesAsync(ct);
-    //     return CreatedAtAction(nameof(CreateNewDefault), null);
-    // }
+        return Ok();
+    }
 
     [HttpPost("{applicationId}/{environment}")]
-    public async Task<ActionResult> CreateNew(Guid applicationId, string environment, [FromBody]string variable, CancellationToken ct)
+    public async Task<ActionResult> CreateNew(Guid applicationId, string environment, [FromBody] string variable, CancellationToken ct)
     {
-        if (environment =="default")
-            await _documentSession.GetAndUpdate<Application>(applicationId, -1, x => new ApplicationDefaultVariableAdded(variable), User, ct);
+        if (environment == "default")
+            await _applicationService.Handle(new CreateDefaultApplicationVariable(applicationId, variable, ClaimsHelper.GetCurrentUserId(User)));
+
         else
-            await _documentSession.GetAndUpdate<Application>(applicationId, -1, x => new ApplicationVariableAdded(variable), User, ct);
-        await _documentSession.SaveChangesAsync(ct);
-
-        // var app = await _applicationService.GetApplicationByIdAsync(application);
-        // var environmentSet = await _environmentService.GetOneAsync(app.EnvironmentSet);
-        //
-        // if (environment == "Default")
-        // {
-        //     var setting = new Setting();
-        //     setting.Name = variable;
-        //     app.ApplicationDefaults.Add(setting);
-        // }
-        // else
-        // {
-        //     foreach (var environmentSetting in environmentSet.DeploymentEnvironments)
-        //     {
-        //         var setting = new Setting();
-        //         setting.Name = variable;
-        //         if (!app.EnvironmentSettings.ContainsKey(environmentSetting.Name))
-        //             app.EnvironmentSettings.Add(environmentSetting.Name, new List<Setting>());
-        //         app.EnvironmentSettings[environmentSetting.Name].Add(setting);
-        //     }
-        // }
-        //
-        // await _applicationService.UpdateApplicationAsync(app);
-
+            await _applicationService.Handle(new CreateApplicationVariable(applicationId, environment, variable, ClaimsHelper.GetCurrentUserId(User)));
         return CreatedAtAction(nameof(CreateNew), null);
     }
-
 
     [HttpPut("{applicationId}/{environment}/{variable}")]
     public async Task<ActionResult> Update(Guid applicationId, string environment, string variable, [FromBody] string value, CancellationToken ct)
@@ -95,47 +58,16 @@ public class ApplicationSettingsController : ControllerBase
 
 
         if (environment == "default")
-        {
-            await _documentSession.GetAndUpdate<Application>(applicationId, -1, x => new ApplicationDefaultVariableChanged(variable, value), User, ct);
-        }
+            await _applicationService.Handle(new UpdateDefaultApplicationVariable(applicationId, variable, value, ClaimsHelper.GetCurrentUserId(User)));
         else
-        {
-            await _documentSession.GetAndUpdate<Application>(applicationId, -1, x => new ApplicationVariableChanged(environment, variable, value), User, ct);
-        }
-        await _documentSession.SaveChangesAsync(ct);
-
-        // var app = await _applicationService.GetApplicationByIdAsync(application);
-        //
-        // if (environment == "Default")
-        // {
-        //     app.ApplicationDefaults.First(x => x.Name == variable).Value = value;
-        // }
-        // else
-        // {
-        //     //in case we have duplicates, we clean them up here
-        //     var firstMatch = app.EnvironmentSettings[environment].First(x => x.Name == variable);
-        //     app.EnvironmentSettings[environment].RemoveAll(x => x.Name == variable && x != firstMatch);
-        //
-        //     firstMatch.Value = value;
-        // }
-        //
-        // await _applicationService.UpdateApplicationAsync(app);
-
+            await _applicationService.Handle(new UpdateApplicationVariable(applicationId, environment, variable, value, ClaimsHelper.GetCurrentUserId(User)));
         return Ok();
     }
 
-    [HttpPost("{application}/{variable}/rename")]
-    public async Task<IActionResult> RenameVariable(string application, string variable, [FromBody] string newName)
+    [HttpPost("{applicationId}/{variable}/rename")]
+    public async Task<IActionResult> RenameVariable(Guid applicationId, string variable, [FromBody] string newName)
     {
-        // var app = await _applicationService.GetApplicationByIdAsync(application);
-        //
-        // foreach (var environmentSetting in app.EnvironmentSettings)
-        // foreach (var item in environmentSetting.Value)
-        //     if (item.Name == variable)
-        //         item.Name = newName;
-        //
-        // await _applicationService.UpdateApplicationAsync(app);
-
+        await _applicationService.Handle(new RenameApplicationVariable(applicationId, variable, newName, ClaimsHelper.GetCurrentUserId(User)));
         return Ok();
     }
 }
