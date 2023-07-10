@@ -1,4 +1,4 @@
-﻿using ConfigMan.Data.Models.Projections;
+﻿using ConfigMan.Data.Projections;
 using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

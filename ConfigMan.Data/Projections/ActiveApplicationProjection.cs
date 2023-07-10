@@ -14,7 +14,7 @@ public class ActiveApplicationProjection : SingleStreamProjection<ActiveApplicat
 {
     public ActiveApplicationProjection()
     {
-        //DeleteEvent<ApplicationDeleted>();
+        DeleteEvent<ApplicationDeleted>();
     }
 
     public ActiveApplication Create(ApplicationCreated created)

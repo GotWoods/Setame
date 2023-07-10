@@ -1,10 +1,11 @@
 ﻿using System.Data;
+using ConfigMan.Data.Handlers.EnvironmentSets;
 using ConfigMan.Data.Models;
 using ConfigMan.Data.Models.Projections;
 using JasperFx.Core;
 using Marten;
 
-public record CreateEnvironmentSet(string Name, Guid PerformedBy): ApplicationCommand(PerformedBy);
+
 
 public record RenameEnvironmentSet(Guid EnvironmentSetId, string newName, Guid PerformedBy) : ApplicationCommand(PerformedBy);
 
@@ -51,15 +52,12 @@ public class EnvironmentSetService : ServiceBase, IEnvironmentSetService
 
     public async Task<List<EnvironmentSet>> GetAll()
     {
-        var summary = await _querySession.Query<EnvironmentSetSummary>().FirstOrDefaultAsync();
+        var summary = await _querySession.Query<ActiveEnvironmentSet>().ToListAsync();
         var items = new List<EnvironmentSet>();
 
-        if (summary == null)
-            return items;
-
-        foreach (var id in summary.Environments.Keys)
+        foreach (var activeEnvironmentSet in summary)
         {
-            var aggregateStreamAsync = await _querySession.Events.AggregateStreamAsync<EnvironmentSet>(id);
+            var aggregateStreamAsync = await _querySession.Events.AggregateStreamAsync<EnvironmentSet>(activeEnvironmentSet.Id);
             if (aggregateStreamAsync != null)
                 items.Add(aggregateStreamAsync);
         }
@@ -78,13 +76,13 @@ public class EnvironmentSetService : ServiceBase, IEnvironmentSetService
     {
         if (string.IsNullOrEmpty(command.Name)) throw new ArgumentNullException(nameof(command.Name));
 
-        var summaryDocument = _querySession.Query<EnvironmentSetSummary>().FirstOrDefault();
-        if (summaryDocument != null)
-        {
-            var foundWithSameName = summaryDocument.Environments.Any(x => x.Value == command.Name);
-            if (foundWithSameName) throw new DuplicateNameException($"The name {command.Name} is already in use");
-        }
-
+        // var summaryDocument = _querySession.Query<ActiveEnvironmentSet>();
+        // if (summaryDocument != null)
+        // {
+        //     var foundWithSameName = summaryDocument.Environments.Any(x => x.Value == command.Name);
+        //     if (foundWithSameName) throw new DuplicateNameException($"The name {command.Name} is already in use");
+        // }
+        //
         var id = CombGuidIdGeneration.NewGuid();
         _documentSession.SetHeader("user-id", command.PerformedBy);
         _documentSession.Events.StartStream<EnvironmentSet>(id, new EnvironmentSetCreated(id, command.Name));
@@ -93,15 +91,10 @@ public class EnvironmentSetService : ServiceBase, IEnvironmentSetService
 
     public async Task Handle(RenameEnvironmentSet command)
     {
-        var summaryDocument = _querySession.Query<EnvironmentSetSummary>().FirstOrDefault();
-        if (summaryDocument != null)
-        {
-            var foundWithSameName = summaryDocument.Environments.Any(x => x.Value == command.newName);
-            if (foundWithSameName) throw new DuplicateNameException($"The name {command.newName} is already in use");
-        }
-
+        //var allActiveEnvironments =  _querySession.Query<ActiveEnvironmentSet>().Where(x=>x.Name == command.newName);
+        //var foundWithSameName = allActiveEnvironments.Environments.Any(x => x.Value == command.newName);
+        //if (foundWithSameName) throw new DuplicateNameException($"The name {command.newName} is already in use");
         await AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new EnvironmentSetRenamed(command.EnvironmentSetId, command.newName), command.PerformedBy);
-
     }
 
     public async Task Handle(DeleteEnvironmentSet command)

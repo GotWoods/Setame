@@ -96,11 +96,11 @@ public class ApplicationService : ServiceBase, IApplicationService
         _documentSession.SetHeader("user-id", command.PerformedBy);
         _documentSession.Events.StartStream<Application>(command.ApplicationId, new ApplicationCreated(command.ApplicationId, command.Name, command.Token, command.EnvironmentSetId));
         await _documentSession.SaveChangesAsync();
-        // foreach (var deploymentEnvironment in environment.DeploymentEnvironments)
-        // {
-        //     await AppendToStreamAndSave<Application>(command.ApplicationId, new ApplicationEnvironmentAdded(deploymentEnvironment.Name), command.PerformedBy);
-        //     await AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new ApplicationAssociatedToEnvironmentSet(command.ApplicationId, command.EnvironmentSetId), command.PerformedBy);
-        // }
+        foreach (var deploymentEnvironment in environment.DeploymentEnvironments)
+        {
+            await AppendToStreamAndSave<Application>(command.ApplicationId, new ApplicationEnvironmentAdded(deploymentEnvironment.Name), command.PerformedBy);
+            await AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new ApplicationAssociatedToEnvironmentSet(command.ApplicationId, command.EnvironmentSetId), command.PerformedBy);
+        }
     }
 
     public async Task Handle(CreateApplicationVariable command)

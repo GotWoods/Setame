@@ -1,5 +1,5 @@
 ﻿using ConfigMan.Data.Models;
-using ConfigMan.Data.Models.Projections;
+using ConfigMan.Data.Projections;
 using ConfigMan.Service.Models;
 using Marten;
 using Microsoft.AspNetCore.Authorization;

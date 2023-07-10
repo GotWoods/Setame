@@ -11,7 +11,7 @@ public class ApplicationChangeHistoryTransformation : EventProjection
         var userHeader = input.GetHeader("user-id");
         var userId = Guid.Empty;
         if (userHeader != null)
-            userId = Guid.Parse((string)userHeader);
+            userId = Guid.Parse(userHeader.ToString() ?? string.Empty);
 
         return new ApplicationChangeHistory(
 

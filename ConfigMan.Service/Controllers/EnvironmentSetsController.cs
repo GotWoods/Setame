@@ -1,4 +1,7 @@
-﻿using ConfigMan.Data.Models;
+﻿using ConfigMan.Data.Handlers;
+using ConfigMan.Data.Handlers.EnvironmentSets;
+using ConfigMan.Data.Models;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,11 +13,13 @@ namespace ConfigMan.Service.Controllers;
 public class EnvironmentSetsController : ControllerBase
 {
  private readonly IEnvironmentSetService _environmentSetService;
+ private readonly IMediator _mediator;
 
- public EnvironmentSetsController(IEnvironmentSetService environmentSetService)
-    {
-        _environmentSetService = environmentSetService;
-    }
+ public EnvironmentSetsController(IEnvironmentSetService environmentSetService, IMediator mediator)
+ {
+     _environmentSetService = environmentSetService;
+     _mediator = mediator;
+ }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<EnvironmentSet>>> GetAll()
@@ -30,9 +35,9 @@ public class EnvironmentSetsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<EnvironmentSet>> Create(EnvironmentSet environmentSet)
+    public async Task<ActionResult> Create(EnvironmentSet environmentSet)
     {
-        await _environmentSetService.Handle(new CreateEnvironmentSet(environmentSet.Name, ClaimsHelper.GetCurrentUserId(User)));
+        await _mediator.Send(new CreateEnvironmentSet(environmentSet.Name, ClaimsHelper.GetCurrentUserId(User)));
         return NoContent();
     }
 

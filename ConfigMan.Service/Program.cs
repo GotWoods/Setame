@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Text;
 using ConfigMan.Data;
+using ConfigMan.Data.Handlers.EnvironmentSets;
 using ConfigMan.Data.Models;
 using ConfigMan.Data.Models.Projections;
 using ConfigMan.Service;
@@ -60,7 +61,7 @@ builder.Services.AddMarten(opts =>
     opts.Connection(builder.Configuration.GetConnectionString("DefaultConnection"));
     opts.Events.MetadataConfig.HeadersEnabled = true;
     opts.Schema.For<EnvironmentSet>().SoftDeleted();
-    opts.Projections.Add<EnvironmentSetSummaryProjection>(ProjectionLifecycle.Inline);
+    opts.Projections.Add<ActiveEnvironmentSetProjection>(ProjectionLifecycle.Inline);
     opts.Projections.Add<UsersProjection>(ProjectionLifecycle.Inline);
     opts.Projections.Add<EnvironmentSetHistoryTransformation>(ProjectionLifecycle.Async);
     opts.Projections.Add<ApplicationChangeHistoryTransformation>(ProjectionLifecycle.Async);
@@ -74,6 +75,10 @@ builder.Services.AddMarten(opts =>
     //LoadAsync will actually load the document from the table
 }).AddAsyncDaemon(DaemonMode.Solo); //TODO: adjust this for prod?
 
+builder.Services.AddMediatR(x=>
+{
+    x.RegisterServicesFromAssemblyContaining<CreateEnvironmentSetHandler>();
+});
 
 // Add Prometheus
 //builder.Services.AddHttpMetrics();

@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 using ConfigMan.Data.Models;
-using ConfigMan.Data.Models.Projections;
+using ConfigMan.Data.Projections;
 using JasperFx.Core;
 using Marten;
 
