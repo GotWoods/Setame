@@ -80,21 +80,21 @@ public class EnvironmentSetsController : ControllerBase
     [HttpPost("{environmentSetId}/variable")]
     public async Task<IActionResult> AddVariable(Guid environmentSetId, [FromBody] string variableName)
     {
-        await _environmentSetService.Handle(new AddVariableToEnvironmentSet(environmentSetId, variableName, ClaimsHelper.GetCurrentUserId(User)));
+        await _mediator.Send(new AddVariableToEnvironmentSet(environmentSetId, variableName, ClaimsHelper.GetCurrentUserId(User)));
         return NoContent();
     }
 
     [HttpPut("{environmentSetId}/variable/{environment}/{variableName}")]
     public async Task<IActionResult> UpdateVariable(Guid environmentSetId, string environment, string variableName, [FromBody] string variableValue)
     {
-        await _environmentSetService.Handle(new UpdateEnvironmentSetVariable(environmentSetId, environment, variableName, variableValue, ClaimsHelper.GetCurrentUserId(User)));
+        await _mediator.Send(new UpdateEnvironmentSetVariable(environmentSetId, environment, variableName, variableValue, ClaimsHelper.GetCurrentUserId(User)));
         return NoContent();
     }
 
     [HttpPut("{environmentSetId}/variable/{variableName}/rename")]
     public async Task<IActionResult> RenameVariable(Guid environmentSetId, string variableName, [FromBody] string newName)
     {
-        await _environmentSetService.Handle(new RenameEnvironmentSetVariable(environmentSetId, variableName, newName, ClaimsHelper.GetCurrentUserId(User)));
+        await _mediator.Send(new RenameEnvironmentSetVariable(environmentSetId, variableName, newName, ClaimsHelper.GetCurrentUserId(User)));
         return NoContent();
     }
 }

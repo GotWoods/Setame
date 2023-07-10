@@ -4,31 +4,14 @@ using MediatR;
 
 namespace ConfigMan.Data.Handlers.EnvironmentSets;
 
-public record AddEnvironmentToEnvironmentSet(Guid EnvironmentSetId, string Name, Guid PerformedBy) : ApplicationCommand(PerformedBy), IRequest;
 
-public record RenameEnvironment(Guid EnvironmentSetId, string OldName, string NewName, Guid PerformedBy) : ApplicationCommand(PerformedBy);
 
-public record DeleteEnvironmentFromEnvironmentSet(Guid EnvironmentSetId, string environmentName, Guid PerformedBy) : ApplicationCommand(PerformedBy);
+
+
+
 
 
 public record RenameEnvironmentSet(Guid EnvironmentSetId, string newName, Guid PerformedBy) : ApplicationCommand(PerformedBy), IRequest;
-
-
-public class AddEnvironmentToEnvironmentSetHandler : IRequestHandler<AddEnvironmentToEnvironmentSet>
-{
-    private readonly IDocumentSession _documentSession;
-
-    public AddEnvironmentToEnvironmentSetHandler(IDocumentSession documentSession)
-    {
-        _documentSession = documentSession;
-    }
-
-
-    public Task Handle(AddEnvironmentToEnvironmentSet request, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-}
 
 public class RenameEnvironmentSetHandler : IRequestHandler<RenameEnvironmentSet>
 {
@@ -49,3 +32,20 @@ public class RenameEnvironmentSetHandler : IRequestHandler<RenameEnvironmentSet>
 }
 
 
+public async Task Handle(AddVariableToEnvironmentSet command)
+{
+    //TODO: ensure the variable is not already created
+    await AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new EnvironmentSetVariableAdded(command.VariableName), command.PerformedBy);
+}
+
+public async Task Handle(UpdateEnvironmentSetVariable command)
+{
+    //TODO: basic input validation
+    await AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new EnvironmentSetVariableChanged(command.Environment, command.VariableName, command.VariableValue), command.PerformedBy);
+}
+
+public async Task Handle(RenameEnvironmentSetVariable command)
+{
+    //TODO: ensure the variable name does not collide
+    await AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new EnvironmentSetVariableRenamed(command.OldName, command.NewName), command.PerformedBy);
+}
