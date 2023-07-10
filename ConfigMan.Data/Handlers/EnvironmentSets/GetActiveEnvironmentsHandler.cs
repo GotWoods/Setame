@@ -8,32 +8,31 @@ using ConfigMan.Data.Projections;
 using Marten;
 using MediatR;
 
-namespace ConfigMan.Data.Handlers.EnvironmentSets
+namespace ConfigMan.Data.Handlers.EnvironmentSets;
+
+public record GetActiveEnvironments : IRequest<List<EnvironmentSet>>;
+internal class GetActiveEnvironmentsHandler : IRequestHandler<GetActiveEnvironments, List<EnvironmentSet>>
 {
-    public record GetActiveEnvironments : IRequest<List<EnvironmentSet>>;
-    internal class GetActiveEnvironmentsHandler : IRequestHandler<GetActiveEnvironments, List<EnvironmentSet>>
+    private readonly IQuerySession _querySession;
+
+    public GetActiveEnvironmentsHandler(IQuerySession querySession)
     {
-        private readonly IQuerySession _querySession;
+        _querySession = querySession;
+    }
 
-        public GetActiveEnvironmentsHandler(IQuerySession querySession)
+    public async Task<List<EnvironmentSet>> Handle(GetActiveEnvironments request, CancellationToken cancellationToken)
+    {
+        var summary = await _querySession.Query<ActiveEnvironmentSet>().ToListAsync(token: cancellationToken);
+        var items = new List<EnvironmentSet>();
+
+        foreach (var activeEnvironmentSet in summary)
         {
-            _querySession = querySession;
+            var aggregateStreamAsync = await _querySession.Events.AggregateStreamAsync<EnvironmentSet>(activeEnvironmentSet.Id, token: cancellationToken);
+            if (aggregateStreamAsync != null)
+                items.Add(aggregateStreamAsync);
         }
 
-        public async Task<List<EnvironmentSet>> Handle(GetActiveEnvironments request, CancellationToken cancellationToken)
-        {
-            var summary = await _querySession.Query<ActiveEnvironmentSet>().ToListAsync(token: cancellationToken);
-            var items = new List<EnvironmentSet>();
-
-            foreach (var activeEnvironmentSet in summary)
-            {
-                var aggregateStreamAsync = await _querySession.Events.AggregateStreamAsync<EnvironmentSet>(activeEnvironmentSet.Id, token: cancellationToken);
-                if (aggregateStreamAsync != null)
-                    items.Add(aggregateStreamAsync);
-            }
-
-            var sorted = items.OrderBy(x => x.Name);
-            return sorted.ToList();
-        }
+        var sorted = items.OrderBy(x => x.Name);
+        return sorted.ToList();
     }
 }

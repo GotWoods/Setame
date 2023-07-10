@@ -6,11 +6,11 @@ using MediatR;
 namespace ConfigMan.Data.Handlers.Applications
 {
     public record GetActiveApplications : IRequest<List<Application>>;
-    internal class GetActiveApplicationssHandler : IRequestHandler<GetActiveApplications, List<Application>>
+    internal class GetActiveApplicationsHandler : IRequestHandler<GetActiveApplications, List<Application>>
     {
         private readonly IQuerySession _querySession;
 
-        public GetActiveApplicationssHandler(IQuerySession querySession)
+        public GetActiveApplicationsHandler(IQuerySession querySession)
         {
             _querySession = querySession;
         }

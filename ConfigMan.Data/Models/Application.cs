@@ -81,7 +81,6 @@ public class Application
         {
             environmentSetting.Settings.RemoveAll(x => x.Name == e.Name);
         }
-        //EnvironmentSettings.Remove(EnvironmentSettings.First(x => x.Name == e.Name));
     }
 
     // public Dictionary<string, string> GetAppliedSettings(DeploymentEnvironment environment)
