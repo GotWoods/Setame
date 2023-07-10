@@ -30,6 +30,7 @@ builder.Services.AddScoped<IEnvironmentSetService, EnvironmentSetService>();
 //builder.Services.AddScoped<IVariableGroupService, VariableGroupService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserInfo, ClaimsUserInfo>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
     {
@@ -79,6 +80,8 @@ builder.Services.AddMediatR(x=>
 {
     x.RegisterServicesFromAssemblyContaining<CreateEnvironmentSetHandler>();
 });
+
+builder.Services.AddSingleton<Microsoft.AspNetCore.Http.IHttpContextAccessor, Microsoft.AspNetCore.Http.HttpContextAccessor>();
 
 // Add Prometheus
 //builder.Services.AddHttpMetrics();

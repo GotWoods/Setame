@@ -4,20 +4,23 @@ using MediatR;
 
 namespace ConfigMan.Data.Handlers.EnvironmentSets;
 
-public record AddEnvironmentToEnvironmentSet(Guid EnvironmentSetId, string Name, Guid PerformedBy) : ApplicationCommand(PerformedBy), IRequest;
+public record AddEnvironmentToEnvironmentSet(Guid EnvironmentSetId, string Name) : IRequest;
 public class AddEnvironmentToEnvironmentSetHandler : IRequestHandler<AddEnvironmentToEnvironmentSet>
 {
     private readonly IDocumentSession _documentSession;
+    private readonly IUserInfo _userInfo;
 
-    public AddEnvironmentToEnvironmentSetHandler(IDocumentSession documentSession)
+    public AddEnvironmentToEnvironmentSetHandler(IDocumentSession documentSession, IUserInfo userInfo)
     {
         _documentSession = documentSession;
+        _userInfo = userInfo;
     }
 
 
     public async Task Handle(AddEnvironmentToEnvironmentSet command, CancellationToken cancellationToken)
     {
         //TODO: Add environment to all Children Applications?
-        await _documentSession.AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new EnvironmentAdded(command.Name), command.PerformedBy);
+        //TODO: ensure no duplicates
+        await _documentSession.AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new EnvironmentAdded(command.Name), _userInfo.GetCurrentUserId());
     }
 }

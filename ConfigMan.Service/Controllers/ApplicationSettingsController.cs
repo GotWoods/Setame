@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
-using ConfigMan.Data;
+using ConfigMan.Data.Handlers.Applications;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,13 +11,12 @@ namespace ConfigMan.Service.Controllers;
 [Authorize(Roles = "Administrator")]
 public class ApplicationSettingsController : ControllerBase
 {
-    private readonly IApplicationService _applicationService;
-    private readonly ILogger<ApplicationSettingsController> _logger;
+    private readonly IMediator _mediator;
+    
 
-    public ApplicationSettingsController(IApplicationService applicationService, ILogger<ApplicationSettingsController> logger)
+    public ApplicationSettingsController(IMediator mediator)
     {
-        _applicationService = applicationService;
-        _logger = logger;
+        _mediator = mediator;
     }
 
     [HttpGet]
@@ -26,7 +26,7 @@ public class ApplicationSettingsController : ControllerBase
         var claim = User.FindFirst(ClaimTypes.NameIdentifier);
         if (claim == null)
         {
-            _logger.LogWarning("Can not find application @{Claims}", User.Claims);
+    //        _logger.LogWarning("Can not find application @{Claims}", User.Claims);
             return NotFound("Claim not found");
         }
 
@@ -37,10 +37,10 @@ public class ApplicationSettingsController : ControllerBase
     public async Task<ActionResult> CreateNew(Guid applicationId, string environment, [FromBody] string variable, CancellationToken ct)
     {
         if (environment == "default")
-            await _applicationService.Handle(new CreateDefaultApplicationVariable(applicationId, variable, ClaimsHelper.GetCurrentUserId(User)));
+            await _mediator.Send(new CreateDefaultApplicationVariable(applicationId, variable));
 
         else
-            await _applicationService.Handle(new CreateApplicationVariable(applicationId, environment, variable, ClaimsHelper.GetCurrentUserId(User)));
+            await _mediator.Send(new CreateApplicationVariable(applicationId, environment, variable));
         return CreatedAtAction(nameof(CreateNew), null);
     }
 
@@ -58,16 +58,16 @@ public class ApplicationSettingsController : ControllerBase
 
 
         if (environment == "default")
-            await _applicationService.Handle(new UpdateDefaultApplicationVariable(applicationId, variable, value, ClaimsHelper.GetCurrentUserId(User)));
+            await _mediator.Send(new UpdateDefaultApplicationVariable(applicationId, variable, value));
         else
-            await _applicationService.Handle(new UpdateApplicationVariable(applicationId, environment, variable, value, ClaimsHelper.GetCurrentUserId(User)));
+            await _mediator.Send(new UpdateApplicationVariable(applicationId, environment, variable, value));
         return Ok();
     }
 
     [HttpPost("{applicationId}/{variable}/rename")]
     public async Task<IActionResult> RenameVariable(Guid applicationId, string variable, [FromBody] string newName)
     {
-        await _applicationService.Handle(new RenameApplicationVariable(applicationId, variable, newName, ClaimsHelper.GetCurrentUserId(User)));
+        await _mediator.Send(new RenameApplicationVariable(applicationId, variable, newName));
         return Ok();
     }
 }

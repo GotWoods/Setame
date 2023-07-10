@@ -26,19 +26,4 @@ public class ActiveEnvironmentSetProjection : SingleStreamProjection<ActiveEnvir
     {
         current.Name = e.NewName;
     }
-
-    // public void Apply(EnvironmentSetDeleted e, ActiveEnvironmentSet current)
-    // {
-    //     current.Environments.Remove(e.Id);
-    // }
-
-    // public void Apply(EnvironmentSetCreated e, ActiveEnvironmentSet current)
-    // {
-    //     current.Environments.Add(e.Id, e.Name);
-    // }
-
-    // public void Apply(EnvironmentSetRenamed e, ActiveEnvironmentSet current)
-    // {
-    //     current.Environments[e.Id] = e.NewName;
-    // }
 }

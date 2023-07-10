@@ -6,15 +6,17 @@ using MediatR;
 namespace ConfigMan.Data.Handlers.EnvironmentSets;
 
 //TODO: change to Request<Guid, ValidationFailed>
-public record CreateEnvironmentSet(string Name, Guid PerformedBy) : ApplicationCommand(PerformedBy), IRequest<Guid>;
+public record CreateEnvironmentSet(string Name) : IRequest<Guid>;
 
 public class CreateEnvironmentSetHandler : IRequestHandler<CreateEnvironmentSet, Guid>
 {
     private readonly IDocumentSession _documentSession;
+    private readonly IUserInfo _userInfo;
 
-    public CreateEnvironmentSetHandler(IDocumentSession documentSession)
+    public CreateEnvironmentSetHandler(IDocumentSession documentSession, IUserInfo userInfo)
     {
         _documentSession = documentSession;
+        _userInfo = userInfo;
     }
 
     public async Task<Guid> Handle(CreateEnvironmentSet command, CancellationToken cancellationToken)
@@ -29,7 +31,7 @@ public class CreateEnvironmentSetHandler : IRequestHandler<CreateEnvironmentSet,
         // }
         //
         var id = CombGuidIdGeneration.NewGuid();
-        _documentSession.SetHeader("user-id", command.PerformedBy);
+        _documentSession.SetHeader("user-id", _userInfo.GetCurrentUserId());
         _documentSession.Events.StartStream<EnvironmentSet>(id, new EnvironmentSetCreated(id, command.Name));
         await _documentSession.SaveChangesAsync(cancellationToken);
 

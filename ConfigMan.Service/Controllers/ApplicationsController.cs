@@ -1,7 +1,8 @@
 ﻿using ConfigMan.Data;
+using ConfigMan.Data.Handlers.Applications;
 using ConfigMan.Data.Models;
 using JasperFx.Core;
-using Marten;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,10 +14,12 @@ namespace ConfigMan.Service.Controllers.MyApplication.Controllers;
 public class ApplicationsController : ControllerBase
 {
     private readonly IApplicationService _applicationService;
+    private readonly IMediator _mediator;
 
-    public ApplicationsController(IApplicationService applicationService)
+    public ApplicationsController(IApplicationService applicationService, IMediator mediator)
     {
         _applicationService = applicationService;
+        _mediator = mediator;
     }
 
     [HttpGet]
@@ -37,14 +40,14 @@ public class ApplicationsController : ControllerBase
     public async Task<IActionResult> CreateApplication(Application application, CancellationToken ct)
     {
         var id = CombGuidIdGeneration.NewGuid();
-        await _applicationService.Handle(new CreateApplication(id, application.Name, application.Token, application.EnvironmentSetId, ClaimsHelper.GetCurrentUserId(User)));
+        await _mediator.Send(new CreateApplication(id, application.Name, application.Token, application.EnvironmentSetId));
         return NoContent();
     }
 
     [HttpDelete("{applicationId}")]
     public async Task<IActionResult> DeleteApplication(Guid applicationId)
     {
-        await _applicationService.Handle(new DeleteApplication(applicationId, ClaimsHelper.GetCurrentUserId(User)));
+        await _mediator.Send(new DeleteApplication(applicationId));
         return NoContent();
     }
 }
