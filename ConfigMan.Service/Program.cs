@@ -3,7 +3,7 @@ using System.Text;
 using ConfigMan.Data;
 using ConfigMan.Data.Handlers.EnvironmentSets;
 using ConfigMan.Data.Models;
-using ConfigMan.Data.Models.Projections;
+using ConfigMan.Data.Projections;
 using ConfigMan.Service;
 using Marten;
 using Marten.Events.Daemon.Resiliency;

@@ -1,11 +1,12 @@
-﻿using Marten.Events.Projections;
+﻿using ConfigMan.Data.Models;
+using Marten.Events.Projections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConfigMan.Data.Models.Projections
+namespace ConfigMan.Data.Projections
 {
     public class UserSummary
     {

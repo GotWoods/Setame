@@ -1,7 +1,8 @@
-﻿using Marten.Events.Aggregation;
+﻿using ConfigMan.Data.Models;
+using Marten.Events.Aggregation;
 using Marten.Events.Projections;
 
-namespace ConfigMan.Data.Models.Projections;
+namespace ConfigMan.Data.Projections;
 
 public class ActiveEnvironmentSet
 {

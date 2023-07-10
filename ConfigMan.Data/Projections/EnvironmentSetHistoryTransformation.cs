@@ -1,15 +1,16 @@
-﻿using JasperFx.Core;
+﻿using ConfigMan.Data.Models;
+using JasperFx.Core;
 using Marten.Events;
 using Marten.Events.Projections;
 
-namespace ConfigMan.Data.Models.Projections;
+namespace ConfigMan.Data.Projections;
 
 public class EnvironmentSetHistoryTransformation : EventProjection
 {
     public EnvironmentSetChangeHistory Transform(IEvent<EnvironmentSetRenamed> input)
     {
         return new EnvironmentSetChangeHistory(
-            
+
             CombGuidIdGeneration.NewGuid(),
             input.StreamId,
             input.Timestamp,

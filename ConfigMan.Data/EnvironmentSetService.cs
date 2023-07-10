@@ -1,21 +1,6 @@
-﻿using System.Data;
-using ConfigMan.Data.Handlers.EnvironmentSets;
-using ConfigMan.Data.Models;
-using ConfigMan.Data.Models.Projections;
-using JasperFx.Core;
+﻿using ConfigMan.Data.Models;
+using ConfigMan.Data.Projections;
 using Marten;
-
-
-
-public record RenameEnvironmentSet(Guid EnvironmentSetId, string newName, Guid PerformedBy) : ApplicationCommand(PerformedBy);
-
-public record DeleteEnvironmentSet(Guid EnvironmentSetId, Guid PerformedBy) : ApplicationCommand(PerformedBy);
-
-public record AddEnvironmentToEnvironmentSet(Guid EnvironmentSetId, string Name, Guid PerformedBy) : ApplicationCommand(PerformedBy);
-
-public record RenameEnvironment(Guid EnvironmentSetId, string OldName, string NewName, Guid PerformedBy) : ApplicationCommand(PerformedBy);
-
-public record DeleteEnvironmentFromEnvironmentSet(Guid EnvironmentSetId, string environmentName, Guid PerformedBy) : ApplicationCommand(PerformedBy);
 
 public record AddVariableToEnvironmentSet(Guid EnvironmentSetId, string VariableName, Guid PerformedBy) : ApplicationCommand(PerformedBy);
 
@@ -27,26 +12,18 @@ public record RenameEnvironmentSetVariable(Guid EnvironmentSetId, string OldName
 public interface IEnvironmentSetService
 {
     Task<List<EnvironmentSet>> GetAll();
-    Task Handle(CreateEnvironmentSet command);
-    Task Handle(RenameEnvironmentSet command);
-    Task Handle(DeleteEnvironmentSet command);
-    Task Handle(AddEnvironmentToEnvironmentSet command);
-    Task Handle(DeleteEnvironmentFromEnvironmentSet command);
     Task Handle(AddVariableToEnvironmentSet command);
     Task Handle(UpdateEnvironmentSetVariable command);
     Task Handle(RenameEnvironmentSetVariable command);
-    Task Handle(RenameEnvironment command);
     Task<EnvironmentSet> GetOne(Guid environmentSetId);
 }
 
 public class EnvironmentSetService : ServiceBase, IEnvironmentSetService
 {
-    private readonly IDocumentSession _documentSession;
     private readonly IQuerySession _querySession;
 
     public EnvironmentSetService(IDocumentSession documentSession, IQuerySession querySession) : base(documentSession)
     {
-        _documentSession = documentSession;
         _querySession = querySession;
     }
 
@@ -71,56 +48,9 @@ public class EnvironmentSetService : ServiceBase, IEnvironmentSetService
         return await _querySession.Events.AggregateStreamAsync<EnvironmentSet>(environmentSetId) ?? throw new NullReferenceException("The environment set could not be found");
     }
 
-    //
-    public async Task Handle(CreateEnvironmentSet command)
-    {
-        if (string.IsNullOrEmpty(command.Name)) throw new ArgumentNullException(nameof(command.Name));
 
-        // var summaryDocument = _querySession.Query<ActiveEnvironmentSet>();
-        // if (summaryDocument != null)
-        // {
-        //     var foundWithSameName = summaryDocument.Environments.Any(x => x.Value == command.Name);
-        //     if (foundWithSameName) throw new DuplicateNameException($"The name {command.Name} is already in use");
-        // }
-        //
-        var id = CombGuidIdGeneration.NewGuid();
-        _documentSession.SetHeader("user-id", command.PerformedBy);
-        _documentSession.Events.StartStream<EnvironmentSet>(id, new EnvironmentSetCreated(id, command.Name));
-        await _documentSession.SaveChangesAsync();
-    }
 
-    public async Task Handle(RenameEnvironmentSet command)
-    {
-        //var allActiveEnvironments =  _querySession.Query<ActiveEnvironmentSet>().Where(x=>x.Name == command.newName);
-        //var foundWithSameName = allActiveEnvironments.Environments.Any(x => x.Value == command.newName);
-        //if (foundWithSameName) throw new DuplicateNameException($"The name {command.newName} is already in use");
-        await AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new EnvironmentSetRenamed(command.EnvironmentSetId, command.newName), command.PerformedBy);
-    }
 
-    public async Task Handle(DeleteEnvironmentSet command)
-    {
-        //TODO: query all applications and see if any are using this environmentSet
-        //   throw new InvalidOperationException("Can not delete an Environment Set when an application is associated to the environment set");
-        await AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new EnvironmentSetDeleted(command.EnvironmentSetId), command.PerformedBy);
-    }
-
-    public async Task Handle(AddEnvironmentToEnvironmentSet command)
-    {
-        //TODO: Add environment to all Children Applications?
-        await AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new EnvironmentAdded(command.Name), command.PerformedBy);
-    }
-
-    public async Task Handle(DeleteEnvironmentFromEnvironmentSet command)
-    {
-        var environmentRemoved = new EnvironmentRemoved(command.environmentName);
-        await AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, environmentRemoved, command.PerformedBy);
-
-        var associations = _querySession.Query<EnvironmentSetApplicationAssociation>().First(x => x.Id == command.EnvironmentSetId);
-        foreach (var application in associations.Applications)
-        {
-            await AppendToStreamAndSave<Application>(application.Id, environmentRemoved, command.PerformedBy);
-        }
-    }
 
     public async Task Handle(AddVariableToEnvironmentSet command)
     {
@@ -140,17 +70,6 @@ public class EnvironmentSetService : ServiceBase, IEnvironmentSetService
         await AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new EnvironmentSetVariableRenamed(command.OldName, command.NewName), command.PerformedBy);
     }
 
-    public async Task Handle(RenameEnvironment command)
-    {
-        var environmentRenamed = new EnvironmentRenamed(command.OldName, command.NewName);
-        await AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, environmentRenamed, command.PerformedBy);
-
-        var associations = _querySession.Query<EnvironmentSetApplicationAssociation>().First(x => x.Id == command.EnvironmentSetId);
-        foreach (var application in associations.Applications)
-        {
-            await AppendToStreamAndSave<Application>(application.Id, environmentRenamed, command.PerformedBy);
-        }
-    }
 
     // public async Task Handle(RenameEnvironment command)
     // {

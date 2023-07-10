@@ -44,14 +44,14 @@ public class EnvironmentSetsController : ControllerBase
     [HttpDelete("{environmentSetId}")]
     public async Task<IActionResult> Delete(Guid environmentSetId)
     {
-        await _environmentSetService.Handle(new DeleteEnvironmentSet(environmentSetId, ClaimsHelper.GetCurrentUserId(User)));
+        await _mediator.Send(new DeleteEnvironmentSet(environmentSetId, ClaimsHelper.GetCurrentUserId(User)));
         return NoContent();
     }
 
     [HttpPut("{environmentSetId}/rename")]
     public async Task<IActionResult> RenameEnvironmentSet(Guid environmentSetId, [FromBody] string newName)
     {
-        await _environmentSetService.Handle(new RenameEnvironmentSet(environmentSetId, newName, ClaimsHelper.GetCurrentUserId(User)));
+        await _mediator.Send(new RenameEnvironmentSet(environmentSetId, newName, ClaimsHelper.GetCurrentUserId(User)));
         return NoContent();
     }
 
@@ -59,21 +59,21 @@ public class EnvironmentSetsController : ControllerBase
     [HttpPost("{environmentSetId}/environment")]
     public async Task<IActionResult> AddEnvironment(Guid environmentSetId, [FromBody] string environmentName)
     {
-        await _environmentSetService.Handle(new AddEnvironmentToEnvironmentSet(environmentSetId, environmentName, ClaimsHelper.GetCurrentUserId(User)));
+        await _mediator.Send(new AddEnvironmentToEnvironmentSet(environmentSetId, environmentName, ClaimsHelper.GetCurrentUserId(User)));
         return NoContent();
     }
 
     [HttpDelete("{environmentSetId}/environment/{environmentName}")]
     public async Task<IActionResult> DeleteEnvironment(Guid environmentSetId, string environmentName)
     {
-        await _environmentSetService.Handle(new DeleteEnvironmentFromEnvironmentSet(environmentSetId, environmentName, ClaimsHelper.GetCurrentUserId(User)));
+        await _mediator.Send(new DeleteEnvironmentFromEnvironmentSet(environmentSetId, environmentName, ClaimsHelper.GetCurrentUserId(User)));
         return NoContent();
     }
 
     [HttpPut("{environmentSetId}/environment/{environmentName}/rename")]
     public async Task<IActionResult> RenameEnvironment(Guid environmentSetId, string environmentName, [FromBody] string newName)
     {
-        await _environmentSetService.Handle(new RenameEnvironment(environmentSetId, environmentName, newName, ClaimsHelper.GetCurrentUserId(User)));
+        await _mediator.Send(new RenameEnvironment(environmentSetId, environmentName, newName, ClaimsHelper.GetCurrentUserId(User)));
         return NoContent();
     }
 

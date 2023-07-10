@@ -1,7 +1,8 @@
-﻿using Marten;
+﻿using ConfigMan.Data.Models;
+using Marten;
 using Marten.Events.Projections;
 
-namespace ConfigMan.Data.Models.Projections;
+namespace ConfigMan.Data.Projections;
 
 public class EnvironmentSetApplicationAssociation
 {

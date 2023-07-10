@@ -1,8 +1,9 @@
-﻿using JasperFx.Core;
+﻿using ConfigMan.Data.Models;
+using JasperFx.Core;
 using Marten.Events;
 using Marten.Events.Projections;
 
-namespace ConfigMan.Data.Models.Projections;
+namespace ConfigMan.Data.Projections;
 
 public class ApplicationChangeHistoryTransformation : EventProjection
 {
