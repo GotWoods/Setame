@@ -1,31 +1,28 @@
-﻿using ConfigMan.Data;
-using ConfigMan.Data.Handlers.Applications;
+﻿using ConfigMan.Data.Handlers.Applications;
 using ConfigMan.Data.Models;
 using JasperFx.Core;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ConfigMan.Service.Controllers.MyApplication.Controllers;
+namespace ConfigMan.Service.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
 [Authorize(Roles = "Administrator")]
 public class ApplicationsController : ControllerBase
 {
-    private readonly IApplicationService _applicationService;
     private readonly IMediator _mediator;
 
-    public ApplicationsController(IApplicationService applicationService, IMediator mediator)
+    public ApplicationsController(IMediator mediator)
     {
-        _applicationService = applicationService;
         _mediator = mediator;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Application>>> GetApplications(CancellationToken ct)
     {
-        var items = await _applicationService.GetAll();
+        var items = await _mediator.Send(new GetActiveApplications(), ct);
         var sorted = items.OrderBy(x => x.Name);
         return Ok(sorted);
     }
@@ -33,7 +30,7 @@ public class ApplicationsController : ControllerBase
     [HttpGet("{applicationId}")]
     public async Task<ActionResult<Application>> GetApplication(Guid applicationId)
     {
-        return Ok(await _applicationService.GetOne(applicationId));
+        return Ok(await _mediator.Send(new GetApplication(applicationId)));
     }
 
     [HttpPost]

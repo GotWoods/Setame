@@ -1,1 +1,0 @@
-﻿public abstract record ApplicationCommand(Guid PerformedBy);

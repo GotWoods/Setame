@@ -26,10 +26,10 @@ public class CreateApplicationHandler : IRequestHandler<CreateApplication>
 
     public async Task Handle(CreateApplication command, CancellationToken cancellationToken)
     {
-        var environment = await _querySession.Events.AggregateStreamAsync<EnvironmentSet>(command.EnvironmentSetId);
+        var environment = await _querySession.Events.AggregateStreamAsync<EnvironmentSet>(command.EnvironmentSetId, token: cancellationToken);
 
         _documentSession.Events.StartStream<Application>(command.ApplicationId, new ApplicationCreated(command.ApplicationId, command.Name, command.Token, command.EnvironmentSetId));
-        await _documentSession.SaveChangesAsync();
+        await _documentSession.SaveChangesAsync(cancellationToken);
 
         foreach (var deploymentEnvironment in environment.DeploymentEnvironments)
         {

@@ -1,5 +1,4 @@
-﻿using ConfigMan.Data;
-using ConfigMan.Data.Handlers.EnvironmentSets;
+﻿using ConfigMan.Data.Handlers.EnvironmentSets;
 using ConfigMan.Data.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -12,25 +11,24 @@ namespace ConfigMan.Service.Controllers;
 [Authorize(Roles = "Administrator")]
 public class EnvironmentSetsController : ControllerBase
 {
-    private readonly IEnvironmentSetService _environmentSetService;
     private readonly IMediator _mediator;
 
-    public EnvironmentSetsController(IEnvironmentSetService environmentSetService, IMediator mediator)
+    public EnvironmentSetsController(IMediator mediator)
     {
-        _environmentSetService = environmentSetService;
         _mediator = mediator;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<EnvironmentSet>>> GetAll()
     {
-        return Ok(await _environmentSetService.GetAll());
+        var results = await _mediator.Send(new GetActiveEnvironments());
+        return Ok(results);
     }
 
     [HttpGet("{environmentSetId}")]
     public async Task<ActionResult<EnvironmentSet>> GetOne(Guid environmentSetId)
     {
-        var deploymentEnvironment = await _environmentSetService.GetOne(environmentSetId);
+        var deploymentEnvironment = await _mediator.Send(new GetEnvironment(environmentSetId));
         return Ok(deploymentEnvironment);
     }
 

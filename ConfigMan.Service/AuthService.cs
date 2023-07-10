@@ -9,12 +9,11 @@ namespace ConfigMan.Service
     public class AuthService
     {
         private readonly IConfiguration _configuration;
-        private readonly IApplicationService _applicationService;
+        
 
-        public AuthService(IConfiguration configuration, IApplicationService applicationService)
+        public AuthService(IConfiguration configuration)
         {
             _configuration = configuration;
-            _applicationService = applicationService;
         }
 
         public string GenerateJwtToken(string userId, string role)

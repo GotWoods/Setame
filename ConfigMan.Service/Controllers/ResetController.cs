@@ -1,29 +1,25 @@
 ﻿using Marten;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Data;
 
 
 //TODO: Remove this before prod
-namespace ConfigMan.Service.Controllers
+namespace ConfigMan.Service.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class ResetController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    
+    private readonly IDocumentStore _documentStore;
 
-    public class ResetController : ControllerBase
+    public ResetController(IDocumentStore documentStore)
     {
-        private readonly IDocumentStore _documentStore;
+        _documentStore = documentStore;
+    }
 
-        public ResetController(IDocumentStore documentStore)
-        {
-            _documentStore = documentStore;
-        }
-
-        [HttpGet()]
-        public async Task Reset()
-        {
-            await _documentStore.Advanced.Clean.CompletelyRemoveAllAsync();
-        }
+    [HttpGet]
+    public async Task Reset()
+    {
+        //TODO: remove this before prod
+        await _documentStore.Advanced.Clean.CompletelyRemoveAllAsync();
     }
 }
