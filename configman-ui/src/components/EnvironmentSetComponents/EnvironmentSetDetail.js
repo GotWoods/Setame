@@ -153,6 +153,7 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
                             onSettingChange={handleSettingChange}
                             onEnvironmentRename={handleEnvironmentRename}
                             onDeleteEnvironment={handleDeleteEnvironment}
+                            showEditButtons={true}
                         />
                     </>
                 ) : (

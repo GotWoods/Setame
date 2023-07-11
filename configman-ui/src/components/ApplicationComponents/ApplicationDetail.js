@@ -316,6 +316,7 @@ const ApplicationDetail = () => {
                     onAddSetting={handleAddEnvironmentSetting}
                     onSettingChange={handleSettingChange}
                     onSettingRename={handleSettingRename}
+                    showEditButtons={false}
                 />
             )}
 

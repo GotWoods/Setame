@@ -10,7 +10,7 @@ import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Button from '@mui/material/Button';
 
-const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSettingRename, onEnvironmentRename, onDeleteEnvironment }) => {
+const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSettingRename, onEnvironmentRename, onDeleteEnvironment, showEditButtons }) => {
     const [settings, setSettings] = useState(transformedSettings);
     const [newEnvironmentSettingName, setNewEnvironmentSettingName] = useState('');
     const [errors, setErrors] = useState({}); // a map of error states
@@ -122,21 +122,25 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
                                             }}
                                         />
                                     ) : env}
-                                    {editingEnvironment === env ? null : (
+                                    {showEditButtons ? (
                                         <>
-                                            <Button onClick={() => {
-                                                setEditingEnvironment(env)
-                                                setTimeout(() => {
-                                                    inputRefs.current[env].current.focus();
-                                                }, 200);
-                                            }} color="secondary">
-                                                <i className="fa-regular fa-pen-to-square"></i>&nbsp;
-                                            </Button>
-                                            <Button color="secondary" onClick={() => onDeleteEnvironment(env)}>
-                                                <i className="fa-solid fa-trash-can"></i>
-                                            </Button>
+                                            {editingEnvironment === env ? null : (
+                                                <>
+                                                    <Button onClick={() => {
+                                                        setEditingEnvironment(env)
+                                                        setTimeout(() => {
+                                                            inputRefs.current[env].current.focus();
+                                                        }, 200);
+                                                    }} color="secondary">
+                                                        <i className="fa-regular fa-pen-to-square"></i>&nbsp;
+                                                    </Button>
+                                                    <Button color="secondary" onClick={() => onDeleteEnvironment(env)}>
+                                                        <i className="fa-solid fa-trash-can"></i>
+                                                    </Button>
+                                                </>
+                                            )}
                                         </>
-                                    )}
+                                    ) : null}
                                 </TableCell>
                             );
                         })}

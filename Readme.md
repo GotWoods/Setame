@@ -35,7 +35,6 @@ Environment Sets
 - Low Priority: History screen to implement paging/searching
 
 Applications
-- Can not remove/rename environment if from environment set
 - Remove summary screen
 - Order Environments
 - Duplicate Prevention (in progress)
