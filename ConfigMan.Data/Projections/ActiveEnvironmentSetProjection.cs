@@ -6,8 +6,9 @@ namespace ConfigMan.Data.Projections;
 
 public class ActiveEnvironmentSet
 {
-    public Guid Id { get; set; } //this will always be Guid.Empty as we only want 1 summary
+    public Guid Id { get; set; } 
     public string Name { get; set; }
+    public long Version { get; set; }
 }
 
 public class ActiveEnvironmentSetProjection : SingleStreamProjection<ActiveEnvironmentSet>
@@ -19,7 +20,7 @@ public class ActiveEnvironmentSetProjection : SingleStreamProjection<ActiveEnvir
 
     public ActiveEnvironmentSet Create(EnvironmentSetCreated created)
     {
-        return new ActiveEnvironmentSet() { Name = created.Name, Id = created.Id };
+        return new ActiveEnvironmentSet() { Name = created.Name, Id = created.Id, Version = 1};
     }
 
     public void Apply(EnvironmentSetRenamed e, ActiveEnvironmentSet current)

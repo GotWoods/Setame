@@ -19,6 +19,7 @@ public class EnvironmentSet
     public string Name { get; set; } = string.Empty;
     public List<DeploymentEnvironment> DeploymentEnvironments { get; set; } = new();
     public List<Guid> Applications { get; set; } = new();
+    public long Version { get; set; }
 
     public void Apply(EnvironmentSetCreated e)
     {

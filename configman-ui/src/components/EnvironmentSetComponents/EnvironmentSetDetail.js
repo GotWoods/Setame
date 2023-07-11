@@ -37,8 +37,9 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
     };
 
     const handleConfirmRenameEnvironment = async () => {
+        console.log("I want to rename", environmentSet);
         if (editedEnvironmentName !== null) {
-            await settingsClient.renameEnvironment(environmentSet.id, originalEnvironmentName, editedEnvironmentName);
+            await settingsClient.renameEnvironment(environmentSet.id, environmentSet.version, originalEnvironmentName, editedEnvironmentName);
             setOriginalEnvironmentName(null);
             setEditedEnvironmentName(null);
         }

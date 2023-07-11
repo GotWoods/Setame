@@ -21,7 +21,7 @@ public class EnvironmentSetsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<EnvironmentSet>>> GetAll()
     {
-        var results = await _mediator.Send(new GetActiveEnvironments());
+        var results = await _mediator.Send(new GetActiveEnvironmentSets());
         return Ok(results);
     }
 
@@ -49,7 +49,7 @@ public class EnvironmentSetsController : ControllerBase
     [HttpPut("{environmentSetId}/rename")]
     public async Task<IActionResult> RenameEnvironmentSet(Guid environmentSetId, [FromBody] string newName)
     {
-        await _mediator.Send(new RenameEnvironmentSet(environmentSetId, newName));
+        await _mediator.Send(new RenameEnvironmentSet(environmentSetId, Request.GetIfMatchRequestHeader(), newName));
         return NoContent();
     }
 

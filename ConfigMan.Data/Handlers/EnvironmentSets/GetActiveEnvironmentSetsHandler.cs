@@ -10,17 +10,17 @@ using MediatR;
 
 namespace ConfigMan.Data.Handlers.EnvironmentSets;
 
-public record GetActiveEnvironments : IRequest<List<EnvironmentSet>>;
-internal class GetActiveEnvironmentsHandler : IRequestHandler<GetActiveEnvironments, List<EnvironmentSet>>
+public record GetActiveEnvironmentSets : IRequest<List<EnvironmentSet>>;
+internal class GetActiveEnvironmentSetsHandler : IRequestHandler<GetActiveEnvironmentSets, List<EnvironmentSet>>
 {
     private readonly IQuerySession _querySession;
 
-    public GetActiveEnvironmentsHandler(IQuerySession querySession)
+    public GetActiveEnvironmentSetsHandler(IQuerySession querySession)
     {
         _querySession = querySession;
     }
 
-    public async Task<List<EnvironmentSet>> Handle(GetActiveEnvironments request, CancellationToken cancellationToken)
+    public async Task<List<EnvironmentSet>> Handle(GetActiveEnvironmentSets request, CancellationToken cancellationToken)
     {
         var summary = await _querySession.Query<ActiveEnvironmentSet>().ToListAsync(token: cancellationToken);
         var items = new List<EnvironmentSet>();

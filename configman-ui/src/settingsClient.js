@@ -22,16 +22,24 @@ class SettingsClient {
         // }
     }
 
-    getAuthHeaders() {
+    getHeaders(version) {
         if (this.isJwtTokenExpired()) {
            window.location.href = '/login';
         }
 
-        return {
+        const headers = {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${this.authToken}`,
         };
+    
+        if (version) {
+            headers['If-Match'] = `"${version}"`;
+        }
+        return headers;
     }
+
+    
+    
 
 
     isJwtTokenExpired() {
@@ -81,7 +89,7 @@ class SettingsClient {
 
     async getEnvironmentGroups() {
         const response = await this.apiRequest(`${this.apiUrl}/api/environmentGroups`, {
-            headers: this.getAuthHeaders(),
+            headers: this.getHeaders(),
         });
 
         return this.handleResponse(response);
@@ -90,7 +98,7 @@ class SettingsClient {
     async addEnvironmentGroup(environmentGroupName) {
         const response = await this.apiRequest(`${this.apiUrl}/api/environmentGroups`, {
             method: 'POST',
-            headers: this.getAuthHeaders(),
+            headers: this.getHeaders(),
             body: JSON.stringify({ name: environmentGroupName }),
         });
 
@@ -100,7 +108,7 @@ class SettingsClient {
     async addEnvironmentSettings(allSettings) {
         const response = await this.apiRequest(`${this.apiUrl}/api/environmentsettings`, {
             method: 'POST',
-            headers: this.getAuthHeaders(),
+            headers: this.getHeaders(),
             body: JSON.stringify(allSettings),
         });
 

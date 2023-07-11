@@ -15,7 +15,7 @@ const EnvironmentSetName = ({ environmentSet, refreshRequested }) => {
     }
 
     const handleRenameEnvironmentSet = async () => {
-        await settingsClient.renameEnvironmentSet(environmentSet.id, environmentSetName);
+        await settingsClient.renameEnvironmentSet(environmentSet.id, environmentSet.version, environmentSetName);
         setIsEditingName(false);
     }
 

@@ -21,7 +21,7 @@ on startup and be changed without requiring an application to be redeployed for 
 
 ## TODO
 - Forgot Password
-- Optomistic Concurrency
+- Optomistic Concurrency (in progress)
 - Showing errors to user instead of console
 - Internationalization
 
