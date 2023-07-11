@@ -53,13 +53,19 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
     const handleEnvironmentRename = (newValue) => {
         const originalValue = editingEnvironmentRef.current;
         if (settings.environments.includes(newValue) && newValue !== originalValue) {
-            // handle error, environment name already exists
+          // handle error, environment name already exists
         } else {
-            if (onEnvironmentRename != undefined)
-                onEnvironmentRename(originalValue, newValue);
+          if (onEnvironmentRename != undefined) {
+            onEnvironmentRename(originalValue, newValue);
+            // Update the settings state with the new environment name
+            const updatedSettings = { ...settings };
+            const environmentIndex = updatedSettings.environments.indexOf(originalValue);
+            updatedSettings.environments[environmentIndex] = newValue;
+            setSettings(updatedSettings);
+          }
         }
         setEditingEnvironment(null);
-    }
+      }
 
     const handleSettingRename = (originalValue, newValue) => {
         if (newValue in settings.settings && newValue !== originalValue) {

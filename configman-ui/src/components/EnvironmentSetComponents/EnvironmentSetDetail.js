@@ -122,6 +122,7 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
     };
 
     const handleEnvironmentRename = async (originalValue, newValue) => {
+        console.log("handleEnvironmentRename", originalValue, newValue);
         setOriginalEnvironmentName(originalValue);
         setEditedEnvironmentName(newValue);
         setRenameEnvironmentDialogOpen(true);
