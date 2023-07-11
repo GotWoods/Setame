@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
     Table,
     TableBody,
@@ -16,15 +16,12 @@ import SettingsGrid from '../SettingGrid/SettingGrid';
 import ApplicationSettingsClient from '../../applicationSettingsClient';
 import EnvironmentSetSettingsClient from '../../environmentSetSettingsClient';
 
-const ApplicationDetail = () => {
-    const { applicationId } = useParams();
+const ApplicationDetail = ({applicationId}) => {
     const [application, setApplication] = useState(null);
     const [newSettingName, setNewSettingName] = useState('');
     const [newSettingValue, setNewSettingValue] = useState('');
     const [environments, setEnvironmentSet] = useState([]);
     const [environmentSetVariableNames, setEnvironmentSetVariableNames] = useState([]);
-    // const [newEnvironmentSettingName, setNewEnvironmentSettingName] = useState('');
-    // const [newEnvironmentSettings, setNewEnvironmentSettings] = useState({});
     const [transformedSettings, setTransformedSettings] = useState([]);
     const settingsClient = new ApplicationSettingsClient();
     const environmentSetSettingsClient = new EnvironmentSetSettingsClient();
@@ -212,26 +209,9 @@ const ApplicationDetail = () => {
         <div>
 
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', marginTop: '1rem', marginRight: '1rem' }}>
-                <h1>{application.name}</h1>
-                <div>
                     {/* <Button variant="contained" color="primary">View Applied Settings</Button> &nbsp;&nbsp; */}
-                    <Button variant="contained" color="primary" onClick={() => navigate(`/applicationHistory/${applicationId}`)}>History</Button>
-                </div>
-            </div>
-
-            <h2>Settings</h2>
-
-            <div>These settings to the entire application no matter the environment. A setting here can be overriden by an explicit value being set in the environment settings<br /><br />
-                {/* TODO: have a way to see applied settings an application would have that merges in environment, app global settings, variable groups, and then environment specific settings */}
-            </div>
-
-
-
+              
             <h2>Default Settings</h2>
-            <p>
-                Default settings apply to all environments. You can override a default setting by adding a variable with the same name and specifying a value for specific environments
-            </p>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>

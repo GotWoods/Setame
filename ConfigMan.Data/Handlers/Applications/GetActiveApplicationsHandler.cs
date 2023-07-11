@@ -5,8 +5,8 @@ using MediatR;
 
 namespace ConfigMan.Data.Handlers.Applications
 {
-    public record GetActiveApplications : IRequest<List<Application>>;
-    internal class GetActiveApplicationsHandler : IRequestHandler<GetActiveApplications, List<Application>>
+    public record GetActiveApplications : IRequest<List<ActiveApplication>>;
+    internal class GetActiveApplicationsHandler : IRequestHandler<GetActiveApplications, List<ActiveApplication>>
     {
         private readonly IQuerySession _querySession;
 
@@ -15,16 +15,16 @@ namespace ConfigMan.Data.Handlers.Applications
             _querySession = querySession;
         }
 
-        public async Task<List<Application>> Handle(GetActiveApplications request, CancellationToken cancellationToken)
+        public async Task<List<ActiveApplication>> Handle(GetActiveApplications request, CancellationToken cancellationToken)
         {
             var allActivateApplications = _querySession.Query<ActiveApplication>().ToList();
-            var items = new List<Application>();
-            foreach (var activeApplication in allActivateApplications)
-            {
-                var aggregateStreamAsync = await _querySession.Events.AggregateStreamAsync<Application>(activeApplication.Id);
-                items.Add(aggregateStreamAsync);
-            }
-            return items;
+            // var items = new List<Application>();
+            // foreach (var activeApplication in allActivateApplications)
+            // {
+            //     var aggregateStreamAsync = await _querySession.Events.AggregateStreamAsync<Application>(activeApplication.Id);
+            //     items.Add(aggregateStreamAsync);
+            // }
+            return allActivateApplications;
         }
     }
 }

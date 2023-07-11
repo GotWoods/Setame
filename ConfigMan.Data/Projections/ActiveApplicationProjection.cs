@@ -22,8 +22,7 @@ public class ActiveApplicationProjection : SingleStreamProjection<ActiveApplicat
     {
         return new ActiveApplication() { Name = created.Name, Id = created.Id };
     }
-
-
+    
     public void Apply(ApplicationRenamed e, ActiveApplication current)
     {
         current.Name = e.NewName;

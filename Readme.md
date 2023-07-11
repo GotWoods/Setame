@@ -26,7 +26,6 @@ on startup and be changed without requiring an application to be redeployed for 
 
 Environment Sets
 - When a new variable is created (it is blank), loose focus, regain focus, and name, the Rename endpoint is being called and not the new endpoint
-
 - Order Environments
 - Duplicate Prevention (in progress)
 
@@ -36,15 +35,14 @@ Environment Sets
 
 Applications
 - Remove summary screen
-- Order Environments
-- Duplicate Prevention (in progress)
 - Applied Config 
+- Duplicate Prevention (in progress)
 - Regenerate Token
 - Versioning / Optomistic Concurrency (in progress)
 
 - Low Priority: Host Based or Percentage Based Config. A certain percentage of clients can get a specific setting (this could be used for A/B testing)
 - Low Priority: Detach from Environment Set
-- Low Priority: Add custom environment in addition of what comes from environment set
+- Low Priority: Add custom environment in addition of what comes from environment set (this will then require ordering of environments)
 - Low Priority: Copy Application
 - Low Priority: History screen to implement paging/searching
  
