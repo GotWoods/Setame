@@ -82,7 +82,7 @@ class EnvironmentSetSettingsClient extends SettingsClient {
             headers: this.getHeaders(environmentSet.version),
             body: JSON.stringify(environmentName),
         });
-        return this.handleResponse(response);
+        return this.handleResponse(response, environmentSet);
     }
 
     async addVariableToEnvironmentSet(environmentSet, variableName) {
@@ -91,7 +91,7 @@ class EnvironmentSetSettingsClient extends SettingsClient {
             headers: this.getHeaders(environmentSet.version),
             body: JSON.stringify(variableName),
         });
-        return this.handleResponse(response);
+        return this.handleResponse(response, environmentSet);
     }
 
     async updateVariableOnEnvironmentSet(environmentSet, environment, variableName, newValue, ) {
@@ -100,7 +100,7 @@ class EnvironmentSetSettingsClient extends SettingsClient {
             headers: this.getHeaders(environmentSet.version),
             body: JSON.stringify(newValue),
         });
-        return this.handleResponse(response);
+        return this.handleResponse(response, environmentSet);
     }
 
     async renameVariableOnEnvironmentSet(environmentSet, originalName, newName, ) {
@@ -109,20 +109,20 @@ class EnvironmentSetSettingsClient extends SettingsClient {
             headers: this.getHeaders(environmentSet.version),
             body: JSON.stringify(newName),
         });
-        return this.handleResponse(response);
+        return this.handleResponse(response, environmentSet);
     }
 
 
 
-    async updateEnvironmentSet(environmentSet) {
-        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSet.name}`, {
-            method: 'PUT',
-            headers: this.getHeaders(),
-            body: JSON.stringify(environmentSet),
-        });
+//     async updateEnvironmentSet(environmentSet) {
+//         const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSet.name}`, {
+//             method: 'PUT',
+//             headers: this.getHeaders(),
+//             body: JSON.stringify(environmentSet),
+//         });
 
-        return this.handleResponse(response);
-    }
+//         return this.handleResponse(response);
+//     }
 }
 
 export default EnvironmentSetSettingsClient;
