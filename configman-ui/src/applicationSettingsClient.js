@@ -23,7 +23,6 @@ class ApplicationSettingsClient extends SettingsClient {
     }
 
     async deleteApplication(applicationId) {
-        console.log("Deleting app", applicationId);
         const response = await this.apiRequest(`${this.apiUrl}/api/applications/${applicationId}`, {
             method: 'DELETE',
             headers: this.getHeaders(),

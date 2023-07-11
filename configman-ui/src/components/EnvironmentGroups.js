@@ -73,7 +73,6 @@ const EnvironmentGroups = () => {
   //       result.settings[setting.name][env.name] = setting.value;
   //     });
 
-  //     console.log("final", result);
   //   });
   //   return result;
   // }

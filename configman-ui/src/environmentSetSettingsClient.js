@@ -31,28 +31,26 @@ class EnvironmentSetSettingsClient extends SettingsClient {
         return this.handleResponse(response);
     }
     
-    async renameEnvironmentSet(environmentSetId, version, newName) {
-        console.log("Renaming", newName);
-        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSetId}/rename`, {
+    async renameEnvironmentSet(environmentSet, newName) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSet.id}/rename`, {
             method: 'PUT',
-            headers: this.getHeaders(version),
+            headers: this.getHeaders(environmentSet.version),
             body: JSON.stringify(newName),
         });
-        return this.handleResponse(response);
+        return this.handleResponse(response, environmentSet);
     }
 
-    async renameEnvironment(environmentSetId, version, oldValue,newValue) {
-        console.log("Renaming", oldValue, "to", newValue, "with version", version);
-        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSetId}/environment/${oldValue}/rename`, {
+    async renameEnvironment(environmentSet, oldValue,newValue) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSet.id}/environment/${oldValue}/rename`, {
             method: 'PUT',
-            headers: this.getHeaders(version),
+            headers: this.getHeaders(environmentSet.version),
             body: JSON.stringify(newValue),
         });
-        return this.handleResponse(response);
+        return this.handleResponse(response, environmentSet);
     }
 
-    async deleteEnvironmentSet(environmentSetId) {
-        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSetId}`, {
+    async deleteEnvironmentSet(environmentSet) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSet.id}`, {
             method: 'DELETE',
             headers: this.getHeaders(),
         });
@@ -60,8 +58,8 @@ class EnvironmentSetSettingsClient extends SettingsClient {
         return this.handleResponse(response);
     }
 
-    async deleteEnvironment(envrionmentSetId, environment) {
-        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${envrionmentSetId}/environment/${environment}`, {
+    async deleteEnvironment(envrionmentSet, environment) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${envrionmentSet.id}/environment/${environment}`, {
             method: 'DELETE',
             headers: this.getHeaders(),
         });
@@ -69,46 +67,46 @@ class EnvironmentSetSettingsClient extends SettingsClient {
         return this.handleResponse(response);
     }
 
-    async addEnvironmentSet(environmentName) {
+    async addEnvironmentSet(name) {
         const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets`, {
             method: 'POST',
             headers: this.getHeaders(),
-            body: JSON.stringify({ name: environmentName }),
+            body: JSON.stringify({ name }),
         });
         return this.handleResponse(response);
     }
 
-    async addEnvironmentToEnvironmentSet(environmentName, environmentSetId) {
-        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSetId}/environment`, {
+    async addEnvironmentToEnvironmentSet(environmentSet, environmentName) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSet.id}/environment`, {
             method: 'POST',
-            headers: this.getHeaders(),
+            headers: this.getHeaders(environmentSet.version),
             body: JSON.stringify(environmentName),
         });
         return this.handleResponse(response);
     }
 
-    async addVariableToEnvironmentSet(variableName, environmentSetId) {
-        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSetId}/variable`, {
+    async addVariableToEnvironmentSet(environmentSet, variableName) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSet.id}/variable`, {
             method: 'POST',
-            headers: this.getHeaders(),
+            headers: this.getHeaders(environmentSet.version),
             body: JSON.stringify(variableName),
         });
         return this.handleResponse(response);
     }
 
-    async updateVariableOnEnvironmentSet(environment, variableName, newValue, environmentSetId) {
-        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSetId}/variable/${environment}/${variableName}`, {
+    async updateVariableOnEnvironmentSet(environmentSet, environment, variableName, newValue, ) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSet.id}/variable/${environment}/${variableName}`, {
             method: 'PUT',
-            headers: this.getHeaders(),
+            headers: this.getHeaders(environmentSet.version),
             body: JSON.stringify(newValue),
         });
         return this.handleResponse(response);
     }
 
-    async renameVariableOnEnvironmentSet(originalName, newName, environmentSetId) {
-        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSetId}/variable/${originalName}/rename`, {
+    async renameVariableOnEnvironmentSet(environmentSet, originalName, newName, ) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSet.id}/variable/${originalName}/rename`, {
             method: 'PUT',
-            headers: this.getHeaders(),
+            headers: this.getHeaders(environmentSet.version),
             body: JSON.stringify(newName),
         });
         return this.handleResponse(response);

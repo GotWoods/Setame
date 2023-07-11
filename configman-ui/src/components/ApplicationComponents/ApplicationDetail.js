@@ -38,7 +38,6 @@ const ApplicationDetail = () => {
         const application = await settingsClient.getApplication(applicationId);
         setApplication(application);
         const environmentSet = await environmentSetSettingsClient.getEnvironmentSet(application.environmentSetId);
-        console.log("EnvironmentSet", environmentSet);
         setEnvironmentSet(environmentSet);
 
         const transformedSettings = loadGrid(application.environmentSettings, environmentSet.deploymentEnvironments);
@@ -140,7 +139,6 @@ const ApplicationDetail = () => {
     }
 
     const handleUpdateEnvironmentSettings = async (name, value) => {
-        console.log("Updating Glboal ", name, value);
         await settingsClient.updateGlobalApplicationSetting(applicationId, name, value);
 
         // update the application state with the updated setting
@@ -158,7 +156,6 @@ const ApplicationDetail = () => {
         //setTransformedSettings(updatedSettings);
         //var foundEnvironment = enviornmentSet.deploymentEnvironments.find(x=>x.name === environment);
         //foundEnvironment.environmentSettings[settingName] = newValue;
-        //console.log("Settings change", settingName, environment, newValue);
         //await settingsClient.updateEnvironmentSet(enviornmentSet);
     };
 
@@ -172,7 +169,6 @@ const ApplicationDetail = () => {
     };
 
     // const handleAddSetting = async () => {
-    //     console.log("new setting");
     //     await settingsClient.addGlobalApplicationSetting(applicationId, newSettingName, newSettingValue);
     //     setNewSettingName('');
     //     setNewSettingValue('');

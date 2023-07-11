@@ -19,7 +19,6 @@ const AddApplicationDialog = ({ open, onClose, onApplicationAdded }) => {
   const [selectedEnvironmentSet, setSelectedEnvironmentSet] = useState('');
 
   const handleAddApplication = async () => {
-    console.log("Adding?");
     await settingsClient.addApplication(applicationName, selectedEnvironmentSet, token);
     onClose();
     if (onApplicationAdded) {

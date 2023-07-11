@@ -3,6 +3,7 @@ using ConfigMan.Data.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace ConfigMan.Service.Controllers;
 
@@ -49,7 +50,9 @@ public class EnvironmentSetsController : ControllerBase
     [HttpPut("{environmentSetId}/rename")]
     public async Task<IActionResult> RenameEnvironmentSet(Guid environmentSetId, [FromBody] string newName)
     {
-        await _mediator.Send(new RenameEnvironmentSet(environmentSetId, Request.GetIfMatchRequestHeader(), newName));
+        var version = Request.GetIfMatchRequestHeader();
+        await _mediator.Send(new RenameEnvironmentSet(environmentSetId, version, newName));
+        Response.TrySetETagResponseHeader(version+1);
         return NoContent();
     }
 
@@ -57,7 +60,9 @@ public class EnvironmentSetsController : ControllerBase
     [HttpPost("{environmentSetId}/environment")]
     public async Task<IActionResult> AddEnvironment(Guid environmentSetId, [FromBody] string environmentName)
     {
-        await _mediator.Send(new AddEnvironmentToEnvironmentSet(environmentSetId, environmentName));
+        var version = Request.GetIfMatchRequestHeader();
+        await _mediator.Send(new AddEnvironmentToEnvironmentSet(environmentSetId, version, environmentName));
+        Response.TrySetETagResponseHeader(version + 1);
         return NoContent();
     }
 
@@ -71,28 +76,36 @@ public class EnvironmentSetsController : ControllerBase
     [HttpPut("{environmentSetId}/environment/{environmentName}/rename")]
     public async Task<IActionResult> RenameEnvironment(Guid environmentSetId, string environmentName, [FromBody] string newName)
     {
-        await _mediator.Send(new RenameEnvironment(environmentSetId, environmentName, newName));
+        var version = Request.GetIfMatchRequestHeader();
+        await _mediator.Send(new RenameEnvironment(environmentSetId, version, environmentName, newName));
+        Response.TrySetETagResponseHeader(version + 1);
         return NoContent();
     }
 
     [HttpPost("{environmentSetId}/variable")]
     public async Task<IActionResult> AddVariable(Guid environmentSetId, [FromBody] string variableName)
     {
-        await _mediator.Send(new AddVariableToEnvironmentSet(environmentSetId, variableName));
+        var version = Request.GetIfMatchRequestHeader();
+        await _mediator.Send(new AddVariableToEnvironmentSet(environmentSetId, version, variableName));
+        Response.TrySetETagResponseHeader(version + 1);
         return NoContent();
     }
 
     [HttpPut("{environmentSetId}/variable/{environment}/{variableName}")]
     public async Task<IActionResult> UpdateVariable(Guid environmentSetId, string environment, string variableName, [FromBody] string variableValue)
     {
-        await _mediator.Send(new UpdateEnvironmentSetVariable(environmentSetId, environment, variableName, variableValue));
+        var version = Request.GetIfMatchRequestHeader();
+        await _mediator.Send(new UpdateEnvironmentSetVariable(environmentSetId, version, environment, variableName, variableValue));
+        Response.TrySetETagResponseHeader(version + 1);
         return NoContent();
     }
 
     [HttpPut("{environmentSetId}/variable/{variableName}/rename")]
     public async Task<IActionResult> RenameVariable(Guid environmentSetId, string variableName, [FromBody] string newName)
     {
-        await _mediator.Send(new RenameEnvironmentSetVariable(environmentSetId, variableName, newName));
+        var version = Request.GetIfMatchRequestHeader();
+        await _mediator.Send(new RenameEnvironmentSetVariable(environmentSetId, version, variableName, newName));
+        Response.TrySetETagResponseHeader(version + 1);
         return NoContent();
     }
 }

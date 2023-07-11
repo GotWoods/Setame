@@ -37,9 +37,8 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
     };
 
     const handleConfirmRenameEnvironment = async () => {
-        console.log("I want to rename", environmentSet);
         if (editedEnvironmentName !== null) {
-            await settingsClient.renameEnvironment(environmentSet.id, environmentSet.version, originalEnvironmentName, editedEnvironmentName);
+            await settingsClient.renameEnvironment(environmentSet, originalEnvironmentName, editedEnvironmentName);
             setOriginalEnvironmentName(null);
             setEditedEnvironmentName(null);
         }
@@ -48,7 +47,6 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
 
 
     const handleDeleteEnvironment = async (environmentName) => {
-        console.log("I want to delete, showing dialog")
         const response = await settingsClient.getEnvironmentSetToApplicationAssociation(environmentSet.id);
         setApplications(response.applications);
         setEnvironmentToDelete(environmentName);
@@ -62,7 +60,7 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
 
     const handleConfirmDeleteEnvironment = async () => {
         if (environmentToDelete !== null) {
-            await settingsClient.deleteEnvironment(environmentSet.id, environmentToDelete);
+            await settingsClient.deleteEnvironment(environmentSet, environmentToDelete);
             setEnvironmentToDelete(null);
         }
         setDeleteEnvironmentDialogOpen(false);
@@ -74,7 +72,6 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
     useEffect(() => {
         const transformedSettings = loadGrid(environmentSet.deploymentEnvironments);
         setTransformedSettings(transformedSettings);
-        console.log('transformed', transformedSettings);
     }, [environmentSet]);  // The function will run whenever environmentSet changes
 
     const loadGrid = (environments) => {
@@ -107,22 +104,21 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
             env.environmentSettings[newValue] = "";
 
         });
-        await settingsClient.addVariableToEnvironmentSet(newValue, environmentSet.id);
+        await settingsClient.addVariableToEnvironmentSet(environmentSet, newValue);
     };
 
 
     const handleSettingRename = async (originalName, newName) => {
         if (newName === "")
             return;
-        await settingsClient.renameVariableOnEnvironmentSet(originalName, newName, environmentSet.id);
+        await settingsClient.renameVariableOnEnvironmentSet(environmentSet, originalName, newName);
     };
 
 
     const handleSettingChange = async (settingName, environment, newValue) => {
         var foundEnvironment = environmentSet.deploymentEnvironments.find(x => x.name === environment);
         foundEnvironment.environmentSettings[settingName] = newValue;
-        console.log("Settings change", settingName, environment, newValue);
-        await settingsClient.updateVariableOnEnvironmentSet(environment, settingName, newValue, environmentSet.id);
+        await settingsClient.updateVariableOnEnvironmentSet(environmentSet, environment, settingName, newValue);
     };
 
     const handleEnvironmentRename = async (originalValue, newValue) => {

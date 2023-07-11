@@ -4,7 +4,7 @@ using MediatR;
 
 namespace ConfigMan.Data.Handlers.EnvironmentSets;
 
-public record RenameEnvironmentSetVariable(Guid EnvironmentSetId, string OldName, string NewName): IRequest;
+public record RenameEnvironmentSetVariable(Guid EnvironmentSetId, int ExpectedVersion, string OldName, string NewName): IRequest;
 public class RenameEnvironmentSetVariableHandler : IRequestHandler<RenameEnvironmentSetVariable>
 {
     private readonly IDocumentSession _documentSession;
@@ -18,6 +18,6 @@ public class RenameEnvironmentSetVariableHandler : IRequestHandler<RenameEnviron
 
     public async Task Handle(RenameEnvironmentSetVariable command, CancellationToken cancellationToken)
     {
-        await _documentSession.AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new EnvironmentSetVariableRenamed(command.OldName, command.NewName), _userInfo.GetCurrentUserId());
+        await _documentSession.AppendToStreamAndSave<EnvironmentSet>(command.ExpectedVersion, command.EnvironmentSetId, new EnvironmentSetVariableRenamed(command.OldName, command.NewName), _userInfo.GetCurrentUserId());
     }
 }

@@ -6,7 +6,7 @@ using MediatR;
 
 namespace ConfigMan.Data.Handlers.EnvironmentSets;
 
-public record RenameEnvironment(Guid EnvironmentSetId, string OldName, string NewName) : IRequest;
+public record RenameEnvironment(Guid EnvironmentSetId, int ExpectedVersion, string OldName, string NewName) : IRequest;
 public class RenameEnvironmentHandler : IRequestHandler<RenameEnvironment>
 {
     private readonly IDocumentSession _documentSession;
@@ -24,7 +24,7 @@ public class RenameEnvironmentHandler : IRequestHandler<RenameEnvironment>
     public async Task Handle(RenameEnvironment command, CancellationToken cancellationToken)
     {
         var environmentRenamed = new EnvironmentRenamed(command.OldName, command.NewName);
-        await _documentSession.AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, environmentRenamed, _userInfo.GetCurrentUserId());
+        await _documentSession.AppendToStreamAndSave<EnvironmentSet>(command.ExpectedVersion, command.EnvironmentSetId, environmentRenamed, _userInfo.GetCurrentUserId());
 
         var associations = _querySession.Query<EnvironmentSetApplicationAssociation>().First(x => x.Id == command.EnvironmentSetId);
         foreach (var application in associations.Applications) await _documentSession.AppendToStreamAndSave<Application>(application.Id, environmentRenamed, _userInfo.GetCurrentUserId());

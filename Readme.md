@@ -20,6 +20,7 @@ on startup and be changed without requiring an application to be redeployed for 
 
 
 ## TODO
+- Home screen to show concepts
 - Forgot Password
 - Optomistic Concurrency (in progress)
 - Showing errors to user instead of console

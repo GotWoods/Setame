@@ -15,7 +15,7 @@ const EnvironmentSetName = ({ environmentSet, refreshRequested }) => {
     }
 
     const handleRenameEnvironmentSet = async () => {
-        await settingsClient.renameEnvironmentSet(environmentSet.id, environmentSet.version, environmentSetName);
+        await settingsClient.renameEnvironmentSet(environmentSet, environmentSetName);
         setIsEditingName(false);
     }
 
@@ -29,7 +29,7 @@ const EnvironmentSetName = ({ environmentSet, refreshRequested }) => {
 
     const handleConfirmDeleteEnvironment = async () => {
         setDeleteConfirmationOpen(false);
-        await settingsClient.deleteEnvironmentSet(environmentSet.id);
+        await settingsClient.deleteEnvironmentSet(environmentSet);
         if (refreshRequested !== undefined)
             refreshRequested();
     };

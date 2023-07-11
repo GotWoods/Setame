@@ -4,7 +4,7 @@ using MediatR;
 
 namespace ConfigMan.Data.Handlers.EnvironmentSets;
 
-public record AddVariableToEnvironmentSet(Guid EnvironmentSetId, string VariableName) : IRequest;
+public record AddVariableToEnvironmentSet(Guid EnvironmentSetId, int ExpectedVersion, string VariableName) : IRequest;
 public class AddVariableToEnvironmentSetHandler : IRequestHandler<AddVariableToEnvironmentSet>
 {
     private readonly IDocumentSession _documentSession;
@@ -18,6 +18,6 @@ public class AddVariableToEnvironmentSetHandler : IRequestHandler<AddVariableToE
 
     public async Task Handle(AddVariableToEnvironmentSet command, CancellationToken cancellationToken)
     {
-        await _documentSession.AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new EnvironmentSetVariableAdded(command.VariableName), _userInfo.GetCurrentUserId());
+        await _documentSession.AppendToStreamAndSave<EnvironmentSet>(command.ExpectedVersion, command.EnvironmentSetId, new EnvironmentSetVariableAdded(command.VariableName), _userInfo.GetCurrentUserId());
     }
 }
