@@ -20,7 +20,7 @@ public class Application
     public Guid EnvironmentSetId { get; set; }
     public List<Setting> ApplicationDefaults { get; set; } = new();
     public List<Environment> EnvironmentSettings { get; set; } = new();
-    
+    public int Version { get; set; }
 
     public void Apply(ApplicationCreated e)
     {

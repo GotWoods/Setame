@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ConfigMan.Data.Handlers.Applications;
 
-public record UpdateApplicationVariable(Guid ApplicationId, string Environment, string VariableName, string NewValue) : IRequest;
+public record UpdateApplicationVariable(Guid ApplicationId, int ExpectedVersion, string Environment, string VariableName, string NewValue) : IRequest;
 
 public class UpdateApplicationVariableHandler : IRequestHandler<UpdateApplicationVariable>
 {
@@ -24,6 +24,6 @@ public class UpdateApplicationVariableHandler : IRequestHandler<UpdateApplicatio
 
     public async Task Handle(UpdateApplicationVariable command, CancellationToken cancellationToken)
     {
-        await _documentSession.AppendToStreamAndSave<Application>(command.ApplicationId, new ApplicationVariableChanged(command.Environment, command.VariableName, command.NewValue), _userInfo.GetCurrentUserId());
+        await _documentSession.AppendToStreamAndSave<Application>(command.ExpectedVersion, command.ApplicationId, new ApplicationVariableChanged(command.Environment, command.VariableName, command.NewValue), _userInfo.GetCurrentUserId());
     }
 }

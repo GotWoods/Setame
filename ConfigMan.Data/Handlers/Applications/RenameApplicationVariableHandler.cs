@@ -4,7 +4,7 @@ using MediatR;
 
 namespace ConfigMan.Data.Handlers.Applications;
 
-public record RenameApplicationVariable(Guid ApplicationId, string OldName, string NewName) : IRequest;
+public record RenameApplicationVariable(Guid ApplicationId, int ExpectedVersion, string OldName, string NewName) : IRequest;
 public class RenameApplicationVariableHandler : IRequestHandler<RenameApplicationVariable>
 {
     private readonly IDocumentSession _documentSession;
@@ -18,6 +18,6 @@ public class RenameApplicationVariableHandler : IRequestHandler<RenameApplicatio
 
     public async Task Handle(RenameApplicationVariable command, CancellationToken cancellationToken)
     {
-        await _documentSession.AppendToStreamAndSave<Application>(command.ApplicationId, new ApplicationVariableRenamed(command.OldName, command.NewName), _userInfo.GetCurrentUserId());
+        await _documentSession.AppendToStreamAndSave<Application>(command.ExpectedVersion, command.ApplicationId, new ApplicationVariableRenamed(command.OldName, command.NewName), _userInfo.GetCurrentUserId());
     }
 }

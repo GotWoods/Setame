@@ -9,9 +9,6 @@ class SettingsClient {
 
     async apiRequest(url, options) {
         const response = await fetch(url, options);
-        for(let entry of response.headers.entries()) {
-            console.log(entry);
-          }
         return response;
     }
 
@@ -26,9 +23,7 @@ class SettingsClient {
 
     async handleResponse(response, versionedObject) {
         const etag = response.headers.get('etag');
-        console.log("Etag is ", etag, response.headers);
         const headers = response.headers;
-        console.log('headers', headers);
         if (response.status === 200) {
             if (versionedObject) {
                 versionedObject.version = this.extractNumericValue(etag);

@@ -1,5 +1,6 @@
 ﻿using ConfigMan.Data.Handlers.Applications;
 using ConfigMan.Data.Models;
+using JasperFx.CodeGeneration.Model;
 using JasperFx.Core;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -30,7 +31,9 @@ public class ApplicationsController : ControllerBase
     [HttpGet("{applicationId}")]
     public async Task<ActionResult<Application>> GetApplication(Guid applicationId)
     {
-        return Ok(await _mediator.Send(new GetApplication(applicationId)));
+        var application = await _mediator.Send(new GetApplication(applicationId));
+        Response.TrySetETagResponseHeader(application.Version);
+        return Ok(application);
     }
 
     [HttpPost]
@@ -45,6 +48,15 @@ public class ApplicationsController : ControllerBase
     public async Task<IActionResult> DeleteApplication(Guid applicationId)
     {
         await _mediator.Send(new DeleteApplication(applicationId));
+        return NoContent();
+    }
+
+    [HttpPut("{applicationId}/rename")]
+    public async Task<IActionResult> RenameApplication(Guid applicationId, [FromBody] string newName, CancellationToken ct)
+    {
+        var version = Request.GetIfMatchRequestHeader();
+        await _mediator.Send(new RenameApplication(applicationId, version, newName));
+        Response.TrySetETagResponseHeader(version + 1);
         return NoContent();
     }
 }

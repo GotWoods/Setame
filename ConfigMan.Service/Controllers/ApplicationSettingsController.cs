@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System;
+using System.Security.Claims;
 using ConfigMan.Data.Handlers.Applications;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -36,11 +37,13 @@ public class ApplicationSettingsController : ControllerBase
     [HttpPost("{applicationId}/{environment}")]
     public async Task<ActionResult> CreateNew(Guid applicationId, string environment, [FromBody] string variable, CancellationToken ct)
     {
+        var version = Request.GetIfMatchRequestHeader();
         if (environment == "default")
             await _mediator.Send(new CreateDefaultApplicationVariable(applicationId, variable));
 
         else
             await _mediator.Send(new CreateApplicationVariable(applicationId, environment, variable));
+        Response.TrySetETagResponseHeader(version + 1);
         return CreatedAtAction(nameof(CreateNew), null);
     }
 
@@ -56,18 +59,21 @@ public class ApplicationSettingsController : ControllerBase
         if (string.IsNullOrEmpty(value))
             throw new ArgumentNullException("value");
 
-
+        var version = Request.GetIfMatchRequestHeader();
         if (environment == "default")
-            await _mediator.Send(new UpdateDefaultApplicationVariable(applicationId, variable, value));
+            await _mediator.Send(new UpdateDefaultApplicationVariable(applicationId, version,variable, value));
         else
-            await _mediator.Send(new UpdateApplicationVariable(applicationId, environment, variable, value));
+            await _mediator.Send(new UpdateApplicationVariable(applicationId, version, environment, variable, value));
+        Response.TrySetETagResponseHeader(version + 1);
         return Ok();
     }
 
     [HttpPost("{applicationId}/{variable}/rename")]
     public async Task<IActionResult> RenameVariable(Guid applicationId, string variable, [FromBody] string newName)
     {
-        await _mediator.Send(new RenameApplicationVariable(applicationId, variable, newName));
+        var version = Request.GetIfMatchRequestHeader();
+        await _mediator.Send(new RenameApplicationVariable(applicationId, version, variable, newName));
+        Response.TrySetETagResponseHeader(version + 1);
         return Ok();
     }
 }

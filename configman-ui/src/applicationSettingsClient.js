@@ -13,6 +13,18 @@ class ApplicationSettingsClient extends SettingsClient {
         return this.handleResponse(response);
     }
 
+    async getApplication(applicationId) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/applications/${applicationId}`, {
+            method: 'GET',
+            headers: this.getHeaders(),
+        });
+
+        const etag = response.headers.get('etag');
+        var application = this.handleResponse(response);
+        application.version = this.extractNumericValue(etag);
+        return application;
+    }
+
     async getApplicationHistory(applicationId) {
         const response = await this.apiRequest(`${this.apiUrl}/api/applicationHistory/${applicationId}`, {
             method: 'GET',
@@ -31,36 +43,29 @@ class ApplicationSettingsClient extends SettingsClient {
         return this.handleResponse(response);
     }
 
-    async getApplication(applicationId) {
-        const response = await this.apiRequest(`${this.apiUrl}/api/applications/${applicationId}`, {
-            method: 'GET',
-            headers: this.getHeaders(),
-        });
 
-        return this.handleResponse(response);
-    }
 
-    async addApplicationSetting(applicationId, environment, variable) {
-        const response = await this.apiRequest(`${this.apiUrl}/api/ApplicationSettings/${applicationId}/${environment}`, {
+    async addApplicationSetting(application, environment, variable) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/ApplicationSettings/${application.id}/${environment}`, {
             method: 'POST',
-            headers: this.getHeaders(),
+            headers: this.getHeaders(application.version),
             body: JSON.stringify(variable)
             //     applicationId: applicationName,
             //     settings: allSettings
             // }),
         });
 
-        return this.handleResponse(response);
+        return this.handleResponse(response, application);
     }
 
-    async updateApplicationSetting(applicationName, environment, variable, value) {
-        const response = await this.apiRequest(`${this.apiUrl}/api/ApplicationSettings/${applicationName}/${environment}/${variable}`, {
+    async updateApplicationSetting(application, environment, variable, value) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/ApplicationSettings/${application.id}/${environment}/${variable}`, {
             method: 'PUT',
-            headers: this.getHeaders(),
+            headers: this.getHeaders(application.version),
             body: JSON.stringify(value),
         });
 
-        return this.handleResponse(response);
+        return this.handleResponse(response, application);
     }
 
     async renameApplicationSetting(applicationName, oldName, newName) {
@@ -73,10 +78,10 @@ class ApplicationSettingsClient extends SettingsClient {
         return this.handleResponse(response);
     }
 
-    async addGlobalApplicationSetting(applicationId, newSettingName) {
-        const response = await this.apiRequest(`${this.apiUrl}/api/ApplicationSettings/${applicationId}/default`, {
+    async addGlobalApplicationSetting(application, newSettingName) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/ApplicationSettings/${application.id}/default`, {
             method: 'POST',
-            headers: this.getHeaders(),
+            headers: this.getHeaders(application.version),
             body: JSON.stringify(newSettingName),
         });
 
@@ -84,14 +89,14 @@ class ApplicationSettingsClient extends SettingsClient {
     }
 
     
-    async updateGlobalApplicationSetting(applicationId, settingName, value) {
-        const response = await this.apiRequest(`${this.apiUrl}/api/ApplicationSettings/${applicationId}/default/${settingName}`, {
+    async updateGlobalApplicationSetting(application, settingName, value) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/ApplicationSettings/${application.id}/default/${settingName}`, {
             method: 'PUT',
-            headers: this.getHeaders(),
+            headers: this.getHeaders(application.version),
             body: JSON.stringify(value),
         });
 
-        return this.handleResponse(response);
+        return this.handleResponse(response, application);
     }
 
     async addApplication(applicationName, environmentSetId, token) {
