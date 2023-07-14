@@ -43,6 +43,16 @@ class ApplicationSettingsClient extends SettingsClient {
         return this.handleResponse(response);
     }
 
+    async renameApplication(application, newName) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/applications/${application.id}/rename`, {
+            method: 'PUT',
+            headers: this.getHeaders(application.version),
+            body: JSON.stringify(newName)
+        });
+
+        return this.handleResponse(response, application);
+    }
+
 
 
     async addApplicationSetting(application, environment, variable) {
