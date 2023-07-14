@@ -10,15 +10,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F92B96BB-1A75-4495-AA92-409BCC4409CF}"
 	ProjectSection(SolutionItems) = preProject
 		docker-compose.yml = docker-compose.yml
-		Migration.bat = Migration.bat
-		Readme.md = Readme.md
+		..\..\Readme.md = ..\..\Readme.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConfigMan.ConfigurationProvider", "ConfigMan.ConfigurationProvider\ConfigMan.ConfigurationProvider.csproj", "{6D037890-098D-45F9-BC34-4F3AF01EBC6F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConfigMan.Service.Tests.Functional", "ConfigMan.Service.Tests.Functional\ConfigMan.Service.Tests.Functional.csproj", "{769EAADF-554F-478F-A410-5184454826CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigMan.Service.Tests", "ConfigMan.Service.Tests\ConfigMan.Service.Tests.csproj", "{B86D9E17-4F96-46A1-AAFB-D3574985DE0C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConfigMan.Service.Tests", "ConfigMan.Service.Tests\ConfigMan.Service.Tests.csproj", "{B86D9E17-4F96-46A1-AAFB-D3574985DE0C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
