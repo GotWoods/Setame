@@ -1,0 +1,40 @@
+name: Release Application
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Replace settings.js file
+        run: echo "window.appSettings = { apiBaseUrl: '' };" > Service/ConfigMan.Service/www/settings.js
+
+      - name: Build and release React application
+        working-directory: UserInterface
+        run: |
+          npm ci
+          npm run build
+
+      - name: Copy release to .NET project folder
+        run: cp -r UserInterface/build Service/ConfigMan.Service/www
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Build and publish .NET application
+        working-directory: Service
+        run: dotnet publish -c Release -o publish
+
+      - name: Publish Application
+        run: |
+          # You can replace the command below with the actual command to publish your application.
+          echo "Publishing .NET application..."
