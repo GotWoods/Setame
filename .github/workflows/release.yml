@@ -18,13 +18,13 @@ jobs:
          echo "window.appSettings = { apiBaseUrl: '' };" > src/UserInterface/public/settings.js
 
       - name: Build and release React application
-        working-directory: UserInterface
+        working-directory: src/UserInterface
         run: |
           npm ci
           npm run build
 
       - name: Copy release to .NET project folder
-        run: cp -r UserInterface/build Service/ConfigMan.Service/www
+        run: cp -r src/UserInterface/build src/Service/ConfigMan.Service/www
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
@@ -32,7 +32,7 @@ jobs:
           dotnet-version: 6.0.x
 
       - name: Build and publish .NET application
-        working-directory: Service
+        working-directory: src/Service
         run: dotnet publish -c Release -o publish
 
       - name: Publish Application
