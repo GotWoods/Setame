@@ -12,15 +12,6 @@ class SettingsClient {
         return response;
     }
 
-    async handleResponse(response) {
-        if (response.status===200) {
-            return await response.json();
-        }
-        // } else {
-        //     throw new Error(`Request Failed. Status code: ${response.status}`);
-        // }
-    }
-
     async handleResponse(response, versionedObject) {
         const etag = response.headers.get('etag');
         //const headers = response.headers;
