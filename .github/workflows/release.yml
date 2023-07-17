@@ -14,7 +14,8 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Replace settings.js file
-        run: printf "window.appSettings = { apiBaseUrl: '' };" > Service/ConfigMan.Service/www/settings.js
+        run: |
+          printf "window.appSettings = { apiBaseUrl: '' };" > Service/ConfigMan.Service/www/settings.js
 
       - name: Build and release React application
         working-directory: UserInterface
