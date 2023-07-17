@@ -26,4 +26,10 @@ public class ActiveApplicationProjection : SingleStreamProjection<ActiveApplicat
     {
         current.Name = e.NewName;
     }
+
+    //subscribe so version matches underlying changes
+    public void Apply(IApplicationEvent e, ActiveApplication current)
+    {
+
+    }
 }

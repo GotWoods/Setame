@@ -1,16 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿namespace ConfigMan.Data.Models;
 
-namespace ConfigMan.Data.Models;
+public interface IApplicationEvent {}
 
-public record ApplicationCreated(Guid Id, string Name, string Token, Guid EnvironmentSet);
-public record ApplicationEnvironmentAdded(string Name);
-public record ApplicationRenamed(string NewName);
-public record ApplicationVariableAdded(string Environment, string Name);
-public record ApplicationVariableChanged(string Environment, string VariableName, string NewValue);
-public record ApplicationDefaultVariableAdded(string VariableName);
-public record ApplicationDefaultVariableChanged(string VariableName, string NewValue);
-public record ApplicationVariableRenamed(string VariableName, string NewName);
-public record ApplicationDeleted(Guid applicationId);
+public record ApplicationCreated(Guid Id, string Name, string Token, Guid EnvironmentSet) : IApplicationEvent;
+public record ApplicationEnvironmentAdded(string Name) : IApplicationEvent;
+public record ApplicationRenamed(string NewName) : IApplicationEvent;
+public record ApplicationVariableAdded(string Environment, string Name) : IApplicationEvent;
+public record ApplicationVariableChanged(string Environment, string VariableName, string NewValue) : IApplicationEvent;
+public record ApplicationDefaultVariableAdded(string VariableName) : IApplicationEvent;
+public record ApplicationDefaultVariableChanged(string VariableName, string NewValue) : IApplicationEvent;
+public record ApplicationVariableRenamed(string VariableName, string NewName) : IApplicationEvent;
+public record ApplicationDeleted(Guid ApplicationId) : IApplicationEvent;
 
 public class Application
 {

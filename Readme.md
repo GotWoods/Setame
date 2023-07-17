@@ -33,15 +33,18 @@ This is a rough roadmap of features we want to have but not a guarantee
 - History screens to have searching/paging
 - Attach/Detach application from Environment Set
 - Add custom environment to an application in addition of what comes from environment set (this will then require ordering of environments)
- 
+- Visual of applied config and why a given setting is being overriden
+- Internationalization
+- Filter/Search applications
+
 ## TODO
 Items that are still pending before this is considered a Beta:
 
 - Forgot Password
 - Showing errors to user instead of console
-- Internationalization
 - Build and deploy 
 - Logging
+- More server side validation
 
 ### Environment Sets
 - When a new variable is created (it is blank), loose focus, regain focus, and name, the Rename endpoint is being called and not the new endpoint
@@ -50,15 +53,12 @@ Items that are still pending before this is considered a Beta:
 - Rename environment when no apps are associated, should just proceed without the dialog warning
 
 ### Applications
-- Ability to rename an application
-- Versioning / Optomistic Concurrency (in progress)
-- Show Applied Config (and when settings are overridden)
+- Versioning / Optomistic Concurrency (in progress. There is a de-sync between the list and detail view that needs to be addressed)
 - Duplicate Prevention (in progress)
 - Regenerate Token
-- Filter/Search applications
  
 ### Users
 - All of it
 
 ### Settings
-- All of it
+- No settings yet

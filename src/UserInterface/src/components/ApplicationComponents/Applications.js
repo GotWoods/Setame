@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
+import { TextField } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import AddApplicationDialog from './AddApplicationDialog';
 import ApplicationSettingsClient from '../../applicationSettingsClient';
@@ -14,6 +15,7 @@ const Applications = () => {
   const navigate = useNavigate();
   const settingsClient = new ApplicationSettingsClient();
   const [selectedApplicationId, setSelectedApplicationId] = useState(null);
+  const [editingApplicationId, setEditingApplicationId] = useState(null);
 
   useEffect(() => {
     fetchApplications();
@@ -45,6 +47,16 @@ const Applications = () => {
     setSelectedApplicationId((prevId) => (prevId === applicationId ? null : applicationId));
   };
 
+  const handleEditApplicationName = (application) => {
+    setEditingApplicationId(application.id);
+  };
+
+  const handleUpdateApplicationName = async (application, newName) => {
+    setEditingApplicationId(null);
+    await settingsClient.renameApplication(application, newName);
+    fetchApplications();
+  };
+
   return (
     <div>
       <div
@@ -73,15 +85,32 @@ const Applications = () => {
         {applications.map((app) => (
           <Grid item xs={12} key={app.id}>
             <div>
+            {editingApplicationId === app.id ? (
+             <TextField
+             value={app.name}
+             onChange={(e) => {
+              const newName = e.target.value;
+              setApplications((prevApps) =>
+                prevApps.map((prevApp) =>
+                  prevApp.id === app.id ? { ...prevApp, name: newName } : prevApp
+                )
+              );
+            }}
+             onBlur={() => handleUpdateApplicationName(app, app.name)}
+             autoFocus
+            />
+
+            ) : (
               <Button
                 onClick={() => handleApplicationClick(app.id)}
                 startIcon={selectedApplicationId === app.id ? <ExpandLessIcon /> : <ExpandMoreIcon />}
               >
                 {app.name}
               </Button>
+              )}
               {selectedApplicationId === app.id && (
               <>
-                  <Button color="secondary">
+                  <Button color="secondary" onClick={() => handleEditApplicationName(app)}>
                     <i className="fa-regular fa-pen-to-square"></i>
                   </Button>
                   <Button onClick={() => handleDeleteApplication(app.id)} color="secondary">
