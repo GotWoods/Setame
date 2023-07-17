@@ -26,4 +26,8 @@
     <ProjectReference Include="..\ConfigMan.Data\ConfigMan.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
 </Project>

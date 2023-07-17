@@ -43,6 +43,13 @@ Items that are still pending before this is considered a Beta:
 - Forgot Password
 - Showing errors to user instead of console
 - Build and deploy 
+	- Generate the settings file (prod can just be /
+	- Compile react app in prod mode
+	- take output of the bundling and place it into the .net app
+	- compile the .net app
+	- create a zip of that for release
+	- create a docker container of it as well
+
 - Logging
 - More server side validation
 

@@ -104,6 +104,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpMetrics();
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseDefaultFiles(); //allows serving index.html as a default
 
 app.UseAuthorization();
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
