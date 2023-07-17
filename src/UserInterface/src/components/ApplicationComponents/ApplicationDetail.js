@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
     Table,
     TableBody,
@@ -9,7 +8,6 @@ import {
     TableRow,
     Paper,
     TextField,
-    Button,
 } from '@mui/material';
 import { SettingGridData } from '../SettingGrid/SettingGridData';
 import SettingsGrid from '../SettingGrid/SettingGrid';
@@ -20,22 +18,21 @@ const ApplicationDetail = ({applicationId}) => {
     const [application, setApplication] = useState(null);
     const [newSettingName, setNewSettingName] = useState('');
     const [newSettingValue, setNewSettingValue] = useState('');
-    const [environments, setEnvironmentSet] = useState([]);
-    const [environmentSetVariableNames, setEnvironmentSetVariableNames] = useState([]);
+    //const [environments, setEnvironmentSet] = useState([]);
+    //const [environmentSetVariableNames, setEnvironmentSetVariableNames] = useState([]);
     const [transformedSettings, setTransformedSettings] = useState([]);
     const settingsClient = new ApplicationSettingsClient();
     const environmentSetSettingsClient = new EnvironmentSetSettingsClient();
-    const navigate = useNavigate();
 
     useEffect(() => {
         fetchEnvironments();
-    }, []);
+    });
 
     const fetchEnvironments = async () => {
         const application = await settingsClient.getApplication(applicationId);
         setApplication(application);
         const environmentSet = await environmentSetSettingsClient.getEnvironmentSet(application.environmentSetId);
-        setEnvironmentSet(environmentSet);
+        //setEnvironmentSet(environmentSet);
 
         const transformedSettings = loadGrid(application.environmentSettings, environmentSet.deploymentEnvironments);
         setTransformedSettings(transformedSettings);
@@ -47,7 +44,7 @@ const ApplicationDetail = ({applicationId}) => {
                 uniqueKeys.add(key);
             });
         });
-        setEnvironmentSetVariableNames([...uniqueKeys]);
+      //  setEnvironmentSetVariableNames([...uniqueKeys]);
     };
 
     // const fetchApplication = async (environments) => {

@@ -1,9 +1,5 @@
 import SettingsClient from "./settingsClient";
 
-class SetupClient extends SettingsClient {
-    
-}
-
 class ApplicationSettingsClient extends SettingsClient {
     
 

@@ -23,7 +23,7 @@ class SettingsClient {
 
     async handleResponse(response, versionedObject) {
         const etag = response.headers.get('etag');
-        const headers = response.headers;
+        //const headers = response.headers;
         if (response.status === 200) {
             if (versionedObject) {
                 versionedObject.version = this.extractNumericValue(etag);

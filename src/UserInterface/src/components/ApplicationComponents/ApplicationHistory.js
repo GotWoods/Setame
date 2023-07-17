@@ -19,7 +19,7 @@ const ApplicationHistory = () => {
 
   useEffect(() => {
     fetchApplicationHistory();
-  }, []);
+  });
 
   const fetchApplicationHistory = async () => {
     const data = await settingsClient.getApplicationHistory(applicationId);

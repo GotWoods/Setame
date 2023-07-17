@@ -34,7 +34,7 @@ const AddApplicationDialog = ({ open, onClose, onApplicationAdded }) => {
     if (open) {
       fetchEnvironmentSets();
     }
-  }, [open]);
+  });
 
   const generateToken = () => {
     // Generate a random token (change this according to your requirements)

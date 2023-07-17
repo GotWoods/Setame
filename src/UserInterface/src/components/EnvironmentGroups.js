@@ -25,7 +25,7 @@ const EnvironmentGroups = () => {
 
   useEffect(() => {
     fetchEnvironmentGroups();
-  }, []);
+  });
 
   const fetchEnvironmentGroups = async () => {
     const envData = await settingsClient.getEnvironmentSets();

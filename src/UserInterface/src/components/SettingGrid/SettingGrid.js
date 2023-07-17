@@ -12,9 +12,9 @@ import Button from '@mui/material/Button';
 
 const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSettingRename, onEnvironmentRename, onDeleteEnvironment, showEditButtons }) => {
     const [settings, setSettings] = useState(transformedSettings);
-    const [newEnvironmentSettingName, setNewEnvironmentSettingName] = useState('');
+    //const [newEnvironmentSettingName, setNewEnvironmentSettingName] = useState('');
     const [errors, setErrors] = useState({}); // a map of error states
-    const [newSettingError, setNewSettingError] = useState(false);
+    //const [newSettingError, setNewSettingError] = useState(false);
     const [editingEnvironment, setEditingEnvironment] = useState(null);
     const editingEnvironmentRef = useRef(editingEnvironment);
     const inputRefs = useRef({});
@@ -28,9 +28,9 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
                 [settingName]: settingName === newSettingName, // set error for all settings with the same name
             }), {});
             setErrors(updatedErrors);
-            setNewSettingError(true);
+            //setNewSettingError(true);
         } else {
-            if (onAddSetting != undefined) {
+            if (onAddSetting !== undefined) {
                 onAddSetting(newSettingName);
             }
 
@@ -44,7 +44,7 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
             setNewRecords(updatedNewRecords);
 
             setErrors({}); // Reset errors state when new valid setting is added
-            setNewSettingError(false);
+            //setNewSettingError(false);
         }
 
         setFocusNew(true);
@@ -55,7 +55,7 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
         if (settings.environments.includes(newValue) && newValue !== originalValue) {
           // handle error, environment name already exists
         } else {
-          if (onEnvironmentRename != undefined) {
+          if (onEnvironmentRename !== undefined) {
             onEnvironmentRename(originalValue, newValue);
             // Update the settings state with the new environment name
             const updatedSettings = { ...settings };
@@ -77,7 +77,7 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
         } else {
             const { [originalValue]: _, ...rest } = errors; // remove the originalValue from the errors object
             setErrors(rest); // otherwise, set its error state to false
-            if (onSettingRename != undefined)
+            if (onSettingRename !== undefined)
                 onSettingRename(originalValue, newValue);
         }
     }
@@ -195,7 +195,8 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
                     {newRecords.map((newRecord, i) => (
                         <TableRow key={i}>
                             <TableCell>
-                                <Tooltip title={errors[newEnvironmentSettingName] ? "Variable name already exists" : ""}>
+                                <Tooltip>
+                                {/* <Tooltip title={errors[newEnvironmentSettingName] ? "Variable name already exists" : ""}> */}
                                     <TextField
                                         inputRef={el => inputRefs.current[`newRecord${i}`] = el}
                                         key={`newRecord${i}`}

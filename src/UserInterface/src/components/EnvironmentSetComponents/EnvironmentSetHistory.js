@@ -18,7 +18,7 @@ const EnvironmentSetHistory = () => {
 
   useEffect(() => {
       fetchEnvironmentSetHistory();
-  }, []);
+  });
 
   const fetchEnvironmentSetHistory = async () => {
       const data = await settingsClient.getHistory(environmentSetId);
