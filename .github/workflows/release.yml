@@ -13,6 +13,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Install dotnet-version tool
+        run: dotnet tool install --global dotnet-version
+        
+      - name: Determine version
+        id: determine-version
+        run: dotnet version
+      
+      - name: Set VERSION environment variable
+        run: |
+          echo "VERSION=${{ steps.determine-version.outputs.version }}" >> $GITHUB_ENV
+
       - name: Replace settings.js file
         run: |
          echo "window.appSettings = { apiBaseUrl: '' };" > src/UserInterface/public/settings.js
@@ -31,11 +42,23 @@ jobs:
         with:
           dotnet-version: 6.0.x
 
+      - name: Update assembly versions
+        run: |
+          dotnet msbuild /p:Version=${{ env.VERSION }} /t:UpdateAssemblyInfo
+          dotnet build
+      
       - name: Build and publish .NET application
         working-directory: src/Service/ConfigMan.Service
         run: dotnet publish -c Release -o publish
 
       - name: Publish Application
-        run: |
-          # You can replace the command below with the actual command to publish your application.
-          echo "Publishing .NET application..."
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ env.VERSION }}
+          release_name: Release v${{ env.VERSION }}
+          body: |
+            Release version ${{ env.VERSION }} of the application.
+          draft: true
+          prerelease: true
