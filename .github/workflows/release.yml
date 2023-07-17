@@ -32,7 +32,7 @@ jobs:
           dotnet-version: 6.0.x
 
       - name: Build and publish .NET application
-        working-directory: src/Service
+        working-directory: src/Service/ConfigMan.Service
         run: dotnet publish -c Release -o publish
 
       - name: Publish Application
