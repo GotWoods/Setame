@@ -11,8 +11,10 @@ using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.DependencyInjection;
 using Prometheus;
 using Serilog;
+using static System.Net.Mime.MediaTypeNames;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -93,6 +95,11 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
+builder.Services.AddSpaStaticFiles(configuration =>
+{
+    configuration.RootPath = "wwwroot";
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -104,8 +111,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpMetrics();
 app.UseHttpsRedirection();
-app.UseStaticFiles();
-app.UseDefaultFiles(); //allows serving index.html as a default
+//app.UseFileServer();
+//app.UseDefaultFiles(); //allows serving index.html as a default
+app.UseSpaStaticFiles();
 
 app.UseAuthorization();
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
@@ -117,5 +125,12 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseCors("ReactAppPolicy");
-
+app.UseSpa(spa =>
+{
+    //spa.Options.
+    if (builder.Environment.IsDevelopment())
+    {
+       spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
+    }
+});
 app.Run();
