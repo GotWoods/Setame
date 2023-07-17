@@ -5,6 +5,7 @@ using ConfigMan.Data.Handlers.EnvironmentSets;
 using ConfigMan.Data.Models;
 using ConfigMan.Data.Projections;
 using ConfigMan.Service;
+using ConfigMan.Service.Models;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;
@@ -24,6 +25,8 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserInfo, ClaimsUserInfo>();
+builder.Services.AddScoped<IEmailService, EMailService>();
+builder.Services.AddOptions<MailSettings>().BindConfiguration("MailSettings");
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
     {

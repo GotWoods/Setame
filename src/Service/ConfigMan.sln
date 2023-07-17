@@ -9,8 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConfigMan.Data", "ConfigMan
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F92B96BB-1A75-4495-AA92-409BCC4409CF}"
 	ProjectSection(SolutionItems) = preProject
-		docker-compose.yml = docker-compose.yml
 		..\..\Readme.md = ..\..\Readme.md
+		docker-compose.old.yml = docker-compose.old.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConfigMan.ConfigurationProvider", "ConfigMan.ConfigurationProvider\ConfigMan.ConfigurationProvider.csproj", "{6D037890-098D-45F9-BC34-4F3AF01EBC6F}"
@@ -18,6 +18,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConfigMan.Service.Tests.Functional", "ConfigMan.Service.Tests.Functional\ConfigMan.Service.Tests.Functional.csproj", "{769EAADF-554F-478F-A410-5184454826CB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConfigMan.Service.Tests", "ConfigMan.Service.Tests\ConfigMan.Service.Tests.csproj", "{B86D9E17-4F96-46A1-AAFB-D3574985DE0C}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{CAA1F119-90B4-4FC2-BAF2-E80AACCB923E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{B86D9E17-4F96-46A1-AAFB-D3574985DE0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B86D9E17-4F96-46A1-AAFB-D3574985DE0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B86D9E17-4F96-46A1-AAFB-D3574985DE0C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CAA1F119-90B4-4FC2-BAF2-E80AACCB923E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CAA1F119-90B4-4FC2-BAF2-E80AACCB923E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CAA1F119-90B4-4FC2-BAF2-E80AACCB923E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CAA1F119-90B4-4FC2-BAF2-E80AACCB923E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

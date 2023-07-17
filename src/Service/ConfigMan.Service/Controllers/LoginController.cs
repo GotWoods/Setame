@@ -13,11 +13,13 @@ namespace ConfigMan.Service.Controllers
     {
         private readonly IUserService _userService;
         private readonly AuthService _authService;
+        private readonly IEmailService _emailService;
 
-        public AuthenticationController(IUserService userService, AuthService authService)
+        public AuthenticationController(IUserService userService, AuthService authService, IEmailService emailService)
         {
             _userService = userService;
             _authService = authService;
+            _emailService = emailService;
         }
 
         [HttpPost("login")]
@@ -28,18 +30,15 @@ namespace ConfigMan.Service.Controllers
 
             if (user == null || !_userService.VerifyPassword(user, request.Password))
             {
-                if (request.Username == "admin" && request.Password == "admin") //this is an initial login to the system (as the previous check found the user was null)
-                {
-                    var newAdminUser = new User();
-                    newAdminUser.Username = request.Username;
-                    newAdminUser.Id = Guid.NewGuid();
-                    await _userService.CreateUserAsync(newAdminUser, request.Password);
-                    var newUserToken  = _authService.GenerateJwtToken(newAdminUser.Id.ToString(), "Administrator");
-                    return Ok(new { newUserToken });
-                }
-
                 return Unauthorized();
             }
+
+            // var mailRequest = new MailRequest();
+            // mailRequest.ToEmail = "dave@solidhouse.com";
+            // mailRequest.Subject = "Hello!";
+            // mailRequest.Body = "Someone logged in";
+            //
+            // await _emailService.SendEmailAsync(mailRequest);
 
             var token = _authService.GenerateJwtToken(user.Id.ToString(), "Administrator");
             return Ok(new { token });

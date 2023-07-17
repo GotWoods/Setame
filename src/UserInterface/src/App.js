@@ -14,6 +14,7 @@ import ProtectedOutlet from './components/ProtectedOutlet';
 import EnvironmentGroups from './components/EnvironmentGroups';
 import Settings from './components/Settings';
 import EnvironmentSetHistory from './components/EnvironmentSetComponents/EnvironmentSetHistory';
+import SetupPage from './components/SetupPage';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <div className="main-content">
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/setup" element={<SetupPage />} />
             <Route path="/" element={<ProtectedOutlet />}>
               <Route index element={<Main />} />
             </Route>

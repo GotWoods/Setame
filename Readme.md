@@ -8,6 +8,14 @@ on startup and be changed without requiring an application to be redeployed for 
 - .NET Configuration Provider
 - Audit logs of changes
 
+## Getting Started
+1. Open the configuration file and set the ConnecitonStrings.DefaultConnection to be to a postgress database. 
+1. Setup the MailSettings (this is used when a user forgets their password)
+1. Open the application and login with "admin@admin.com" and a password of "admin". This will open the setup page
+1. On the setup page enter a valid email address and your password
+1. Now login and you are ready to start configurating!
+ 
+
 ## Upcoming Feature Possibilities
 This is a rough roadmap of features we want to have but not a guarantee
 
@@ -33,6 +41,7 @@ Items that are still pending before this is considered a Beta:
 - Showing errors to user instead of console
 - Internationalization
 - Build and deploy 
+- Logging
 
 ### Environment Sets
 - When a new variable is created (it is blank), loose focus, regain focus, and name, the Rename endpoint is being called and not the new endpoint

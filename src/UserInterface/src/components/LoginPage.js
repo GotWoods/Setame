@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField, Button, Typography, Box, Paper, Container } from '@mui/material';
 import SettingsClient from '../settingsClient';
 
@@ -9,12 +9,25 @@ const LoginPage = () => {
 
   const settingsClient = new SettingsClient();
 
+  useEffect(() => {
+    const storedUsername = localStorage.getItem('username');
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (username === 'admin@admin.com' && password === 'admin') {
+      window.location.href = '/setup';
+      return;
+    }
+
     try {
-      const data = await settingsClient.login(username, password)
+      const data = await settingsClient.login(username, password);
       localStorage.setItem('authToken', data.token);
+      localStorage.setItem('username', username);
       window.location.href = '/';
     } catch (error) {
       setError('Invalid username or password');
