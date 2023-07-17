@@ -15,7 +15,7 @@ jobs:
 
       - name: Replace settings.js file
         run: |
-          printf "window.appSettings = { apiBaseUrl: '' };" > Service/ConfigMan.Service/www/settings.js
+          printf "window.appSettings = { apiBaseUrl: '' };" > src/UserInterface/public/settings.js
 
       - name: Build and release React application
         working-directory: UserInterface
