@@ -84,10 +84,10 @@ jobs:
       
       - name: Build and publish .NET application
         working-directory: src/Service/ConfigMan.Service
-        run: dotnet publish -c Release -o publish /p:Version=${{ env.VERSION }}
+        run: dotnet publish -c Release -o ../../../release /p:Version=${{ env.VERSION }}
 
       - uses: meeDamian/github-release@2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ env.VERSION }}
-          files: src/Service/ConfigMan.Service/publish/
+          files: release/
