@@ -15,11 +15,20 @@ jobs:
         with:
           fetch-depth: 1000
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+      
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0
         with:
           versionSpec: '5.x'
       
+      - name: Install dotnet-version tool
+        run: dotnet tool install --global dotnet-version
+        
+        
       - name: Determine Version
         id:   gitversion # id to later be referenced
         uses: gittools/actions/gitversion/execute@v0
@@ -77,10 +86,7 @@ jobs:
       - name: Copy release to .NET project folder
         run: cp -r src/UserInterface/build src/Service/ConfigMan.Service/www
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 6.0.x
+  
 
       - name: Update assembly versions
         working-directory: src/Service/ConfigMan.Service
