@@ -25,10 +25,6 @@ jobs:
         with:
           versionSpec: '5.x'
       
-      - name: Install dotnet-version tool
-        run: dotnet tool install --global dotnet-version
-        
-        
       - name: Determine Version
         id:   gitversion # id to later be referenced
         uses: gittools/actions/gitversion/execute@v0
@@ -85,18 +81,10 @@ jobs:
 
       - name: Copy release to .NET project folder
         run: cp -r src/UserInterface/build src/Service/ConfigMan.Service/www
-
-  
-
-      - name: Update assembly versions
-        working-directory: src/Service/ConfigMan.Service
-        run: |
-          dotnet msbuild /p:Version=${{ env.VERSION }} /t:UpdateAssemblyInfo
-          dotnet build
       
       - name: Build and publish .NET application
         working-directory: src/Service/ConfigMan.Service
-        run: dotnet publish -c Release -o publish
+        run: dotnet publish -c Release -o publish /p:Version=${{ env.VERSION }}
 
       - name: Publish Application
         uses: actions/create-release@v1
