@@ -13,6 +13,55 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0
+        with:
+          versionSpec: '5.x'
+      
+      - name: Determine Version
+        id:   gitversion # id to later be referenced
+        uses: gittools/actions/gitversion/execute@v0
+
+      - name: Display GitVersion outputs (step output)
+        run: |
+           echo "Major: ${{ steps.gitversion.outputs.major }}"
+           echo "Minor: ${{ steps.gitversion.outputs.minor }}"
+           echo "Patch: ${{ steps.gitversion.outputs.patch }}"
+           echo "PreReleaseTag: ${{ steps.gitversion.outputs.preReleaseTag }}"
+           echo "PreReleaseTagWithDash: ${{ steps.gitversion.outputs.preReleaseTagWithDash }}"
+           echo "PreReleaseLabel: ${{ steps.gitversion.outputs.preReleaseLabel }}"
+           echo "PreReleaseNumber: ${{ steps.gitversion.outputs.preReleaseNumber }}"
+           echo "WeightedPreReleaseNumber: ${{ steps.gitversion.outputs.weightedPreReleaseNumber }}"
+           echo "BuildMetaData: ${{ steps.gitversion.outputs.buildMetaData }}"
+           echo "BuildMetaDataPadded: ${{ steps.gitversion.outputs.buildMetaDataPadded }}"
+           echo "FullBuildMetaData: ${{ steps.gitversion.outputs.fullBuildMetaData }}"
+           echo "MajorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}"
+           echo "SemVer: ${{ steps.gitversion.outputs.semVer }}"
+           echo "LegacySemVer: ${{ steps.gitversion.outputs.legacySemVer }}"
+           echo "LegacySemVerPadded: ${{ steps.gitversion.outputs.legacySemVerPadded }}"
+           echo "AssemblySemVer: ${{ steps.gitversion.outputs.assemblySemVer }}"
+           echo "AssemblySemFileVer: ${{ steps.gitversion.outputs.assemblySemFileVer }}"
+           echo "FullSemVer: ${{ steps.gitversion.outputs.fullSemVer }}"
+           echo "InformationalVersion: ${{ steps.gitversion.outputs.informationalVersion }}"
+           echo "BranchName: ${{ steps.gitversion.outputs.branchName }}"
+           echo "EscapedBranchName: ${{ steps.gitversion.outputs.escapedBranchName }}"
+           echo "Sha: ${{ steps.gitversion.outputs.sha }}"
+           echo "ShortSha: ${{ steps.gitversion.outputs.shortSha }}"
+           echo "NuGetVersionV2: ${{ steps.gitversion.outputs.nuGetVersionV2 }}"
+           echo "NuGetVersion: ${{ steps.gitversion.outputs.nuGetVersion }}"
+           echo "NuGetPreReleaseTagV2: ${{ steps.gitversion.outputs.nuGetPreReleaseTagV2 }}"
+           echo "NuGetPreReleaseTag: ${{ steps.gitversion.outputs.nuGetPreReleaseTag }}"
+           echo "VersionSourceSha: ${{ steps.gitversion.outputs.versionSourceSha }}"
+           echo "CommitsSinceVersionSource: ${{ steps.gitversion.outputs.commitsSinceVersionSource }}"
+           echo "CommitsSinceVersionSourcePadded: ${{ steps.gitversion.outputs.commitsSinceVersionSourcePadded }}"
+           echo "UncommittedChanges: ${{ steps.gitversion.outputs.uncommittedChanges }}"
+           echo "CommitDate: ${{ steps.gitversion.outputs.commitDate }}"
+        
+  
+      - name: Set VERSION environment variable
+        run: |
+          echo "VERSION=${{ steps.gitversion.outputs.fullSemVer }}" >> $GITHUB_ENV
+
       - name: Replace settings.js file
         run: |
          echo "window.appSettings = { apiBaseUrl: '' };" > src/UserInterface/public/settings.js
@@ -31,11 +80,23 @@ jobs:
         with:
           dotnet-version: 6.0.x
 
+      - name: Update assembly versions
+        run: |
+          dotnet msbuild /p:Version=${{ env.VERSION }} /t:UpdateAssemblyInfo
+          dotnet build
+      
       - name: Build and publish .NET application
-        working-directory: src/Service
+        working-directory: src/Service/ConfigMan.Service
         run: dotnet publish -c Release -o publish
 
       - name: Publish Application
-        run: |
-          # You can replace the command below with the actual command to publish your application.
-          echo "Publishing .NET application..."
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ env.VERSION }}
+          release_name: Release v${{ env.VERSION }}
+          body: |
+            Release version ${{ env.VERSION }} of the application.
+          draft: true
+          prerelease: true
