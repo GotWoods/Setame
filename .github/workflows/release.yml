@@ -83,6 +83,7 @@ jobs:
           dotnet-version: 6.0.x
 
       - name: Update assembly versions
+        working-directory: src/Service/ConfigMan.Service
         run: |
           dotnet msbuild /p:Version=${{ env.VERSION }} /t:UpdateAssemblyInfo
           dotnet build
