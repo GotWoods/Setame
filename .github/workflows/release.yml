@@ -86,14 +86,7 @@ jobs:
         working-directory: src/Service/ConfigMan.Service
         run: dotnet publish -c Release -o publish /p:Version=${{ env.VERSION }}
 
-      - name: Publish Application
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: meeDamian/github-release@2.0
         with:
-          tag_name: v${{ env.VERSION }}
-          release_name: Release v${{ env.VERSION }}
-          body: |
-            Release version ${{ env.VERSION }} of the application.
-          draft: true
-          prerelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: src/Service/ConfigMan.Service/publish/
