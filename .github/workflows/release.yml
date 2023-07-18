@@ -67,7 +67,7 @@ jobs:
   
       - name: Set VERSION environment variable
         run: |
-          echo "VERSION=${{ steps.gitversion.outputs.fullSemVer }}" >> $GITHUB_ENV
+          echo "VERSION=${{ steps.gitversion.outputs.SemVer }}.${{ steps.gitversion.outputs.BuildMetaData }}" >> $GITHUB_ENV
 
       - name: Replace settings.js file
         run: |
