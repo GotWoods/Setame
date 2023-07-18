@@ -10,8 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Fetch unshallow
-        run: git fetch --prune --tags --unshallow
+      - name: Checkout source
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1000
 
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0
