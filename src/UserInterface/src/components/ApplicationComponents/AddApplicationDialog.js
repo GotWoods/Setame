@@ -10,6 +10,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import ApplicationSettingsClient from '../../applicationSettingsClient';
 import EnvironmentSetSettingsClient from '../../environmentSetSettingsClient';
 
+
 const AddApplicationDialog = ({ open, onClose, onApplicationAdded }) => {
   const [applicationName, setApplicationName] = useState('');
   const [token, setToken] = useState('');
