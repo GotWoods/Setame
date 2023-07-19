@@ -1,35 +1,59 @@
 ﻿using ConfigMan.Data.Models;
+using ConfigMan.Data.Projections;
 using Marten;
 using MediatR;
 
 namespace ConfigMan.Data.Handlers.Applications;
 
-public record CreateApplication(Guid ApplicationId, string Name, string Token, Guid EnvironmentSetId) : IRequest;
+public record CreateApplication(Guid ApplicationId, string Name, string Token, Guid EnvironmentSetId) : IRequest<HandlerResponse>;
 
-public class CreateApplicationHandler : IRequestHandler<CreateApplication>
+public class CreateApplicationHandler : IRequestHandler<CreateApplication, HandlerResponse>
 {
-    private readonly IDocumentSession _documentSession;
+    private readonly IDocumentSessionHelper<Application> _applicationSession;
+    private readonly IDocumentSessionHelper<EnvironmentSet> _environmentSetSession;
     private readonly IQuerySession _querySession;
-    private readonly IUserInfo _userInfo;
+    
 
-    public CreateApplicationHandler(IDocumentSession documentSession, IQuerySession querySession, IUserInfo userInfo)
+    public CreateApplicationHandler(IDocumentSessionHelper<Application> applicationSession,
+        IDocumentSessionHelper<EnvironmentSet> environmentSetSession, IQuerySession querySession)
     {
-        _documentSession = documentSession;
+        _applicationSession = applicationSession;
+        _environmentSetSession = environmentSetSession;
         _querySession = querySession;
-        _userInfo = userInfo;
     }
 
-    public async Task Handle(CreateApplication command, CancellationToken cancellationToken)
+    public async Task<HandlerResponse> Handle(CreateApplication command, CancellationToken cancellationToken)
     {
-        var environment = await _querySession.Events.AggregateStreamAsync<EnvironmentSet>(command.EnvironmentSetId, token: cancellationToken);
+        var response = new HandlerResponse();
+        var environment = await _environmentSetSession.GetFromEventStream(command.EnvironmentSetId);
+        if (environment == null)
+            throw new NullReferenceException("Could not find an environment set with an id of " +
+                                             command.EnvironmentSetId);
 
-        _documentSession.Events.StartStream<Application>(command.ApplicationId, new ApplicationCreated(command.ApplicationId, command.Name, command.Token, command.EnvironmentSetId));
-        await _documentSession.SaveChangesAsync(cancellationToken);
+        var matchingName = _querySession.Query<ActiveApplication>().FirstOrDefault(x => x.Name == command.Name);
+        if (matchingName != null)
+        {
+            response.Errors.Add(Errors.DuplicateName(command.Name));
+            return response;
+        }
 
+
+        var applicationEvents = new List<object>
+            { new ApplicationCreated(command.ApplicationId, command.Name, command.Token, command.EnvironmentSetId) };
+        response.NewVersion = 1;
         foreach (var deploymentEnvironment in environment.DeploymentEnvironments)
         {
-            await _documentSession.AppendToStreamAndSave<Application>(command.ApplicationId, new ApplicationEnvironmentAdded(deploymentEnvironment.Name), _userInfo.GetCurrentUserId());
-            await _documentSession.AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new ApplicationAssociatedToEnvironmentSet(command.ApplicationId, command.EnvironmentSetId), _userInfo.GetCurrentUserId());
+            response.NewVersion++;
+            applicationEvents.Add(new ApplicationEnvironmentAdded(deploymentEnvironment.Name));
+            await _environmentSetSession.AppendToStream<EnvironmentSet>(command.EnvironmentSetId,
+                new ApplicationAssociatedToEnvironmentSet(command.ApplicationId, command.EnvironmentSetId));
         }
+
+        _applicationSession.Start(command.ApplicationId, applicationEvents.ToArray());
+
+        await _applicationSession.SaveChangesAsync();
+        await _environmentSetSession.SaveChangesAsync();
+
+        return response;
     }
 }

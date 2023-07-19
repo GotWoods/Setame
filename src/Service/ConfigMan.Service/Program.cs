@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using System.Text;
 using ConfigMan.Data;
 using ConfigMan.Data.Handlers.EnvironmentSets;
@@ -11,10 +10,7 @@ using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.DependencyInjection;
-using Prometheus;
 using Serilog;
-using static System.Net.Mime.MediaTypeNames;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,19 +25,20 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserInfo, ClaimsUserInfo>();
 builder.Services.AddScoped<IEmailService, EMailService>();
 builder.Services.AddOptions<MailSettings>().BindConfiguration("MailSettings");
+builder.Services.AddScoped(typeof(IDocumentSessionHelper<>), typeof(DocumentSessionHelper<>));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]))
-        };
-    });
-
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey =
+            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]))
+    };
+});
 
 
 builder.Services.AddCors(options =>
@@ -75,19 +72,16 @@ builder.Services.AddMarten(opts =>
     //LoadAsync will actually load the document from the table
 }).AddAsyncDaemon(DaemonMode.Solo); //TODO: adjust this for prod?
 
-builder.Services.AddMediatR(x=>
-{
-    x.RegisterServicesFromAssemblyContaining<CreateEnvironmentSetHandler>();
-});
+builder.Services.AddMediatR(x => { x.RegisterServicesFromAssemblyContaining<CreateEnvironmentSetHandler>(); });
 
-builder.Services.AddSingleton<Microsoft.AspNetCore.Http.IHttpContextAccessor, Microsoft.AspNetCore.Http.HttpContextAccessor>();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 // Add Prometheus
 //builder.Services.AddHttpMetrics();
 
 //Configure Serilog
 Log.Logger = new LoggerConfiguration()
-  //  .ReadFrom.Configuration(builder.Configuration)
+    //  .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
     .WriteTo.Console()
     //.WriteTo.Seq(builder.Configuration["Seq:ServerUrl"])
@@ -95,10 +89,7 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-builder.Services.AddSpaStaticFiles(configuration =>
-{
-    configuration.RootPath = "wwwroot";
-});
+builder.Services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
 
 var app = builder.Build();
 
@@ -109,11 +100,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpMetrics();
+//app.UseHttpMetrics();
 app.UseHttpsRedirection();
 //app.UseFileServer();
 //app.UseDefaultFiles(); //allows serving index.html as a default
-app.UseSpaStaticFiles();
+
 
 app.UseAuthorization();
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
@@ -125,12 +116,21 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseCors("ReactAppPolicy");
-app.UseSpa(spa =>
+app.UseSpaStaticFiles();
+// app.UseSpa(spa =>
+// {
+//     //spa.Options.
+//     if (builder.Environment.IsDevelopment())
+//     {
+//        spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
+//     }
+// });
+
+app.MapWhen(x => !x.Request.Path.Value.StartsWith("/api"), config =>
 {
-    //spa.Options.
-    if (builder.Environment.IsDevelopment())
+    config.UseSpa(spa =>
     {
-       spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
-    }
+        if (builder.Environment.IsDevelopment()) spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
+    });
 });
 app.Run();

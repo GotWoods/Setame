@@ -19,7 +19,7 @@ const Applications = () => {
 
   useEffect(() => {
     fetchApplications();
-  });
+  }, []);
 
   const fetchApplications = async () => {
     const data = await settingsClient.getAllApplications();

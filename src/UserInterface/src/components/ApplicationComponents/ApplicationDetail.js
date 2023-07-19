@@ -26,7 +26,7 @@ const ApplicationDetail = ({applicationId}) => {
 
     useEffect(() => {
         fetchEnvironments();
-    });
+    }, []);
 
     const fetchEnvironments = async () => {
         const application = await settingsClient.getApplication(applicationId);

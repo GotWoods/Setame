@@ -2,7 +2,7 @@
 
 public interface IApplicationEvent {}
 
-public record ApplicationCreated(Guid Id, string Name, string Token, Guid EnvironmentSet) : IApplicationEvent;
+public record ApplicationCreated(Guid Id, string Name, string Token, Guid EnvironmentSetId) : IApplicationEvent;
 public record ApplicationEnvironmentAdded(string Name) : IApplicationEvent;
 public record ApplicationRenamed(string NewName) : IApplicationEvent;
 public record ApplicationVariableAdded(string Environment, string Name) : IApplicationEvent;
@@ -27,7 +27,7 @@ public class Application
         Id = e.Id;
         Name = e.Name;
         Token = e.Token;
-        EnvironmentSetId = e.EnvironmentSet;
+        EnvironmentSetId = e.EnvironmentSetId;
     }
 
     public void Apply(ApplicationRenamed e)
