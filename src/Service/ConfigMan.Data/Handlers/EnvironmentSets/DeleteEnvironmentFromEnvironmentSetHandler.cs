@@ -10,25 +10,30 @@ public record DeleteEnvironmentFromEnvironmentSet(Guid EnvironmentSetId, string 
 
 public class DeleteEnvironmentFromEnvironmentSetHandler : IRequestHandler<DeleteEnvironmentFromEnvironmentSet>
 {
-    private readonly IDocumentSession _documentSession;
+    private readonly IDocumentSessionHelper<EnvironmentSet> _documentSession;
+    private readonly IDocumentSessionHelper<Application> _applicationDocumentSessionHelper;
     private readonly IQuerySession _querySession;
-    private readonly IUserInfo _userInfo;
+    
 
-    public DeleteEnvironmentFromEnvironmentSetHandler(IDocumentSession documentSession, IQuerySession querySession, IUserInfo userInfo)
+    public DeleteEnvironmentFromEnvironmentSetHandler(IDocumentSessionHelper<EnvironmentSet> documentSession, IDocumentSessionHelper<Application> applicationDocumentSessionHelper, IQuerySession querySession)
     {
         _documentSession = documentSession;
+        _applicationDocumentSessionHelper = applicationDocumentSessionHelper;
         _querySession = querySession;
-        _userInfo = userInfo;
     }
 
 
     public async Task Handle(DeleteEnvironmentFromEnvironmentSet command, CancellationToken cancellationToken)
     {
         var environmentRemoved = new EnvironmentRemoved(command.environmentName);
-        await _documentSession.AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, environmentRemoved, _userInfo.GetCurrentUserId());
+
+        await _documentSession.AppendToStream(command.EnvironmentSetId, -1, environmentRemoved);
 
         var associations = _querySession.Query<EnvironmentSetApplicationAssociation>().First(x => x.Id == command.EnvironmentSetId);
         foreach (var application in associations.Applications) 
-            await _documentSession.AppendToStreamAndSave<Application>(application.Id, environmentRemoved, _userInfo.GetCurrentUserId());
+            await _applicationDocumentSessionHelper.AppendToStream(application.Id, -1, environmentRemoved);
+
+        await _documentSession.SaveChangesAsync();
+        await _applicationDocumentSessionHelper.SaveChangesAsync();
     }
 }

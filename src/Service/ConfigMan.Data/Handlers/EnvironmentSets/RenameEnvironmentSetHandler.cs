@@ -8,13 +8,11 @@ public record RenameEnvironmentSet(Guid EnvironmentSetId, int ExpectedVersion, s
 
 public class RenameEnvironmentSetHandler : IRequestHandler<RenameEnvironmentSet>
 {
-    private readonly IDocumentSession _documentSession;
-    private readonly IUserInfo _userInfo;
+    private readonly IDocumentSessionHelper<EnvironmentSet> _documentSession;
 
-    public RenameEnvironmentSetHandler(IDocumentSession documentSession, IUserInfo userInfo)
+    public RenameEnvironmentSetHandler(IDocumentSessionHelper<EnvironmentSet> documentSession)
     {
         _documentSession = documentSession;
-        _userInfo = userInfo;
     }
 
     public async Task Handle(RenameEnvironmentSet command, CancellationToken cancellationToken)
@@ -22,6 +20,6 @@ public class RenameEnvironmentSetHandler : IRequestHandler<RenameEnvironmentSet>
         //var allActiveEnvironments =  _querySession.Query<ActiveEnvironmentSet>().Where(x=>x.Name == command.newName);
         //var foundWithSameName = allActiveEnvironments.Environments.Any(x => x.Value == command.newName);
         //if (foundWithSameName) throw new DuplicateNameException($"The name {command.newName} is already in use");
-        await _documentSession.AppendToStreamAndSave<EnvironmentSet>(command.ExpectedVersion, command.EnvironmentSetId, new EnvironmentSetRenamed(command.EnvironmentSetId, command.NewName), _userInfo.GetCurrentUserId());
+        await _documentSession.AppendToStream(command.EnvironmentSetId, command.ExpectedVersion, new EnvironmentSetRenamed(command.EnvironmentSetId, command.NewName));
     }
 }

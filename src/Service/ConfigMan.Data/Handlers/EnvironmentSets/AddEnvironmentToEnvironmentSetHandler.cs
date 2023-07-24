@@ -7,20 +7,17 @@ namespace ConfigMan.Data.Handlers.EnvironmentSets;
 public record AddEnvironmentToEnvironmentSet(Guid EnvironmentSetId, int ExpectedVersion, string Name) : IRequest;
 public class AddEnvironmentToEnvironmentSetHandler : IRequestHandler<AddEnvironmentToEnvironmentSet>
 {
-    private readonly IDocumentSession _documentSession;
-    private readonly IUserInfo _userInfo;
+    private readonly IDocumentSessionHelper<EnvironmentSet> _documentSession;
 
-    public AddEnvironmentToEnvironmentSetHandler(IDocumentSession documentSession, IUserInfo userInfo)
+    public AddEnvironmentToEnvironmentSetHandler(IDocumentSessionHelper<EnvironmentSet> documentSession)
     {
         _documentSession = documentSession;
-        _userInfo = userInfo;
     }
-
-
+    
     public async Task Handle(AddEnvironmentToEnvironmentSet command, CancellationToken cancellationToken)
     {
         //TODO: Add environment to all Children Applications?
         //TODO: ensure no duplicates
-        await _documentSession.AppendToStreamAndSave<EnvironmentSet>(command.ExpectedVersion, command.EnvironmentSetId, new EnvironmentAdded(command.Name), _userInfo.GetCurrentUserId());
+        await _documentSession.AppendToStream(command.EnvironmentSetId, command.ExpectedVersion, new EnvironmentAdded(command.Name));
     }
 }

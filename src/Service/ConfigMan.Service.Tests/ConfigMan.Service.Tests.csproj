@@ -29,4 +29,8 @@
     <ProjectReference Include="..\ConfigMan.Service\ConfigMan.Service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Handlers\EnvironmentSets\" />
+  </ItemGroup>
+
 </Project>

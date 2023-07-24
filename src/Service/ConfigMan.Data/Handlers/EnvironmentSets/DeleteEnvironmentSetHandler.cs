@@ -8,17 +8,15 @@ public record DeleteEnvironmentSet(Guid EnvironmentSetId) : IRequest;
 
 public class DeleteEnvironmentSetHandler : IRequestHandler<DeleteEnvironmentSet>
 {
-    private readonly IDocumentSession _documentSession;
-    private readonly IUserInfo _userInfo;
+    private readonly IDocumentSessionHelper<EnvironmentSet> _documentSession;
 
-    public DeleteEnvironmentSetHandler(IDocumentSession documentSession, IUserInfo userInfo)
+    public DeleteEnvironmentSetHandler(IDocumentSessionHelper<EnvironmentSet> documentSession)
     {
         _documentSession = documentSession;
-        _userInfo = userInfo;
     }
 
     public async Task Handle(DeleteEnvironmentSet command, CancellationToken cancellationToken)
     {
-        await _documentSession.AppendToStreamAndSave<EnvironmentSet>(command.EnvironmentSetId, new EnvironmentSetDeleted(command.EnvironmentSetId), _userInfo.GetCurrentUserId());
+        await _documentSession.AppendToStream(command.EnvironmentSetId, -1, new EnvironmentSetDeleted(command.EnvironmentSetId));
     }
 }

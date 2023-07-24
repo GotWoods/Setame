@@ -7,17 +7,15 @@ namespace ConfigMan.Data.Handlers.EnvironmentSets;
 public record AddVariableToEnvironmentSet(Guid EnvironmentSetId, int ExpectedVersion, string VariableName) : IRequest;
 public class AddVariableToEnvironmentSetHandler : IRequestHandler<AddVariableToEnvironmentSet>
 {
-    private readonly IDocumentSession _documentSession;
-    private readonly IUserInfo _userInfo;
+    private readonly IDocumentSessionHelper<EnvironmentSet> _documentSession;
 
-    public AddVariableToEnvironmentSetHandler(IDocumentSession documentSession, IUserInfo userInfo)
+    public AddVariableToEnvironmentSetHandler(IDocumentSessionHelper<EnvironmentSet> documentSession)
     {
         _documentSession = documentSession;
-        _userInfo = userInfo;
     }
 
     public async Task Handle(AddVariableToEnvironmentSet command, CancellationToken cancellationToken)
     {
-        await _documentSession.AppendToStreamAndSave<EnvironmentSet>(command.ExpectedVersion, command.EnvironmentSetId, new EnvironmentSetVariableAdded(command.VariableName), _userInfo.GetCurrentUserId());
+        await _documentSession.AppendToStream(command.EnvironmentSetId, command.ExpectedVersion, new EnvironmentSetVariableAdded(command.VariableName));
     }
 }

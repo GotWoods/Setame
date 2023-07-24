@@ -7,17 +7,15 @@ namespace ConfigMan.Data.Handlers.EnvironmentSets;
 public record RenameEnvironmentSetVariable(Guid EnvironmentSetId, int ExpectedVersion, string OldName, string NewName): IRequest;
 public class RenameEnvironmentSetVariableHandler : IRequestHandler<RenameEnvironmentSetVariable>
 {
-    private readonly IDocumentSession _documentSession;
-    private readonly IUserInfo _userInfo;
+    private readonly IDocumentSessionHelper<EnvironmentSet> _documentSession;
 
-    public RenameEnvironmentSetVariableHandler(IDocumentSession documentSession, IUserInfo userInfo)
+    public RenameEnvironmentSetVariableHandler(IDocumentSessionHelper<EnvironmentSet> documentSession)
     {
         _documentSession = documentSession;
-        _userInfo = userInfo;
     }
 
     public async Task Handle(RenameEnvironmentSetVariable command, CancellationToken cancellationToken)
     {
-        await _documentSession.AppendToStreamAndSave<EnvironmentSet>(command.ExpectedVersion, command.EnvironmentSetId, new EnvironmentSetVariableRenamed(command.OldName, command.NewName), _userInfo.GetCurrentUserId());
+        await _documentSession.AppendToStream(command.EnvironmentSetId, command.ExpectedVersion, new EnvironmentSetVariableRenamed(command.OldName, command.NewName));
     }
 }

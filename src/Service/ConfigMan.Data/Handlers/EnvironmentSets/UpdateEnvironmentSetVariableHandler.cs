@@ -7,17 +7,15 @@ public record UpdateEnvironmentSetVariable(Guid EnvironmentSetId, int ExpectedVe
 
 public class UpdateEnvironmentSetVariableHandler : IRequestHandler<UpdateEnvironmentSetVariable>
 {
-    private readonly IDocumentSession _documentSession;
-    private readonly IUserInfo _userInfo;
+    private readonly IDocumentSessionHelper<EnvironmentSet> _documentSession;   
 
-    public UpdateEnvironmentSetVariableHandler(IDocumentSession documentSession, IUserInfo userInfo)
+    public UpdateEnvironmentSetVariableHandler(IDocumentSessionHelper<EnvironmentSet> documentSession)
     {
         _documentSession = documentSession;
-        _userInfo = userInfo;
     }
 
     public async Task Handle(UpdateEnvironmentSetVariable command, CancellationToken cancellationToken)
     {
-        await _documentSession.AppendToStreamAndSave<EnvironmentSet>(command.ExpectedVersion, command.EnvironmentSetId, new EnvironmentSetVariableChanged(command.Environment, command.VariableName, command.VariableValue), _userInfo.GetCurrentUserId());
+        await _documentSession.AppendToStream(command.EnvironmentSetId, command.ExpectedVersion, new EnvironmentSetVariableChanged(command.Environment, command.VariableName, command.VariableValue));
     }
 }
