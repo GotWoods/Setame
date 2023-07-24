@@ -1,4 +1,5 @@
-﻿using ConfigMan.Data.Models;
+﻿using ConfigMan.Data.Data;
+using ConfigMan.Data.Models;
 using Marten;
 using MediatR;
 
@@ -10,9 +11,9 @@ public record UpdateApplicationVariable(Guid ApplicationId, int ExpectedVersion,
 public class UpdateApplicationVariableHandler : IRequestHandler<UpdateApplicationVariable, CommandResponse>
 {
     private readonly IDocumentSessionHelper<Application> _documentSession;
-    private readonly IQuerySession _querySession;
+    private readonly IApplicationRepository _querySession;
 
-    public UpdateApplicationVariableHandler(IDocumentSessionHelper<Application> documentSession, IQuerySession querySession)
+    public UpdateApplicationVariableHandler(IDocumentSessionHelper<Application> documentSession, IApplicationRepository querySession)
     {
         _documentSession = documentSession;
         _querySession = querySession;
@@ -22,7 +23,7 @@ public class UpdateApplicationVariableHandler : IRequestHandler<UpdateApplicatio
     {
         var response = new CommandResponse();
 
-        var existing = await _querySession.Events.AggregateStreamAsync<Application>(command.ApplicationId, token: cancellationToken);
+        var existing = await _querySession.GetById(command.ApplicationId);
         if (existing == null)
         {
             response.Errors.Add(Errors.ApplicationNotFound(command.ApplicationId));

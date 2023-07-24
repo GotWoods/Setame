@@ -1,4 +1,5 @@
-﻿using ConfigMan.Data.Models;
+﻿using ConfigMan.Data.Data;
+using ConfigMan.Data.Models;
 using Marten;
 using MediatR;
 
@@ -8,9 +9,9 @@ public record RenameApplication(Guid ApplicationId, int ExpectedVersion, string 
 public class RenameApplicationHandler : IRequestHandler<RenameApplication, CommandResponse>
 {
     private readonly IDocumentSessionHelper<Application> _documentSession;
-    private readonly IQuerySession _querySession;
+    private readonly IApplicationRepository _querySession;
 
-    public RenameApplicationHandler(IDocumentSessionHelper<Application> documentSession, IQuerySession querySession)
+    public RenameApplicationHandler(IDocumentSessionHelper<Application> documentSession, IApplicationRepository querySession)
     {
         _documentSession = documentSession;
         _querySession = querySession;
@@ -19,8 +20,8 @@ public class RenameApplicationHandler : IRequestHandler<RenameApplication, Comma
     public async Task<CommandResponse> Handle(RenameApplication command, CancellationToken cancellationToken)
     {
         var response = new CommandResponse();
-        var existing = _querySession.Query<Application>().FirstOrDefault(x => x.Id == command.ApplicationId);
-        if (existing != null)
+        var existing =  await _querySession.GetById(command.ApplicationId);
+        if (existing == null)
            response.Errors.Add(Errors.ApplicationNotFound(command.ApplicationId));
 
         await _documentSession.AppendToStream(command.ApplicationId, command.ExpectedVersion, new ApplicationRenamed(command.NewName));

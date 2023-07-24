@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace ConfigMan.Data.Handlers.Applications;
+namespace ConfigMan.Data;
 
 public class ValidationHelper
 {

@@ -39,10 +39,10 @@ public class ApplicationSettingsController : ControllerBase
     {
         var version = Request.GetIfMatchRequestHeader();
         if (environment == "default")
-            await _mediator.Send(new CreateDefaultApplicationVariable(applicationId, variable));
+            await _mediator.Send(new CreateDefaultApplicationVariable(applicationId, version, variable));
 
         else
-            await _mediator.Send(new CreateApplicationVariable(applicationId, environment, variable));
+            await _mediator.Send(new CreateApplicationVariable(applicationId, version, environment, variable));
         Response.TrySetETagResponseHeader(version + 1);
         return CreatedAtAction(nameof(CreateNew), null);
     }

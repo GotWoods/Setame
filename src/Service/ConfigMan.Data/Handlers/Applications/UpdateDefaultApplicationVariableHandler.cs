@@ -1,5 +1,5 @@
-﻿using ConfigMan.Data.Models;
-using Marten;
+﻿using ConfigMan.Data.Data;
+using ConfigMan.Data.Models;
 using MediatR;
 
 namespace ConfigMan.Data.Handlers.Applications;
@@ -11,10 +11,10 @@ public class
     UpdateDefaultApplicationVariableHandler : IRequestHandler<UpdateDefaultApplicationVariable, CommandResponse>
 {
     private readonly IDocumentSessionHelper<Application> _documentSession;
-    private readonly IQuerySession _querySession;
+    private readonly IApplicationRepository _querySession;
 
     public UpdateDefaultApplicationVariableHandler(IDocumentSessionHelper<Application> documentSession,
-        IQuerySession querySession)
+        IApplicationRepository querySession)
     {
         _documentSession = documentSession;
         _querySession = querySession;
@@ -26,8 +26,7 @@ public class
         var response = new CommandResponse();
 
         var existing =
-            await _querySession.Events.AggregateStreamAsync<Application>(command.ApplicationId,
-                token: cancellationToken);
+            await _querySession.GetById(command.ApplicationId);
         if (existing == null)
         {
             response.Errors.Add(Errors.ApplicationNotFound(command.ApplicationId));
@@ -40,7 +39,8 @@ public class
             return response;
         }
 
-        await _documentSession.AppendToStream(command.ApplicationId, command.ExpectedVersion, new ApplicationDefaultVariableChanged(command.VariableName, command.NewValue));
+        await _documentSession.AppendToStream(command.ApplicationId, command.ExpectedVersion,
+            new ApplicationDefaultVariableChanged(command.VariableName, command.NewValue));
         await _documentSession.SaveChangesAsync();
         response.NewVersion = command.ExpectedVersion + 1;
         return response;

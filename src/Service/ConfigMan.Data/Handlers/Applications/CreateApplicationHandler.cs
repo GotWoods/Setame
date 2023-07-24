@@ -1,24 +1,26 @@
-﻿using ConfigMan.Data.Models;
+﻿using ConfigMan.Data.Data;
+using ConfigMan.Data.Models;
 using ConfigMan.Data.Projections;
-using Marten;
 using MediatR;
 
 namespace ConfigMan.Data.Handlers.Applications;
 
 public record CreateApplication(Guid ApplicationId, string Name, string Token, Guid EnvironmentSetId) : IRequest<CommandResponse>;
 
+
+
 public class CreateApplicationHandler : IRequestHandler<CreateApplication, CommandResponse>
 {
     private readonly IDocumentSessionHelper<Application> _applicationSession;
     private readonly IDocumentSessionHelper<EnvironmentSet> _environmentSetSession;
-    private readonly IQuerySession _querySession;
-    
+    private readonly IApplicationRepository _activeApplicationRepository;
 
-    public CreateApplicationHandler(IDocumentSessionHelper<Application> applicationSession, IDocumentSessionHelper<EnvironmentSet> environmentSetSession, IQuerySession querySession)
+
+    public CreateApplicationHandler(IDocumentSessionHelper<Application> applicationSession, IDocumentSessionHelper<EnvironmentSet> environmentSetSession, IApplicationRepository activeApplicationRepository)
     {
         _applicationSession = applicationSession;
         _environmentSetSession = environmentSetSession;
-        _querySession = querySession;
+        _activeApplicationRepository = activeApplicationRepository;
     }
 
     public async Task<CommandResponse> Handle(CreateApplication command, CancellationToken cancellationToken)
@@ -28,7 +30,7 @@ public class CreateApplicationHandler : IRequestHandler<CreateApplication, Comma
         if (environment == null)
             throw new NullReferenceException("Could not find an environment set with an id of " + command.EnvironmentSetId);
 
-        var matchingName = _querySession.Query<ActiveApplication>().FirstOrDefault(x => x.Name == command.Name);
+        var matchingName = _activeApplicationRepository.GetByName(command.Name);
         if (matchingName != null)
         {
             response.Errors.Add(Errors.DuplicateName(command.Name));
@@ -36,8 +38,7 @@ public class CreateApplicationHandler : IRequestHandler<CreateApplication, Comma
         }
 
 
-        var applicationEvents = new List<object>
-            { new ApplicationCreated(command.ApplicationId, command.Name, command.Token, command.EnvironmentSetId) };
+        var applicationEvents = new List<object> { new ApplicationCreated(command.ApplicationId, command.Name, command.Token, command.EnvironmentSetId) };
         response.NewVersion = 1;
         foreach (var deploymentEnvironment in environment.DeploymentEnvironments)
         {

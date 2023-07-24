@@ -18,12 +18,6 @@ namespace ConfigMan.Data.Handlers.Applications
         public Task<List<ActiveApplication>> Handle(GetActiveApplications request, CancellationToken cancellationToken)
         {
             var allActivateApplications = _querySession.Query<ActiveApplication>().ToList();
-            // var items = new List<Application>();
-            // foreach (var activeApplication in allActivateApplications)
-            // {
-            //     var aggregateStreamAsync = await _querySession.Events.AggregateStreamAsync<Application>(activeApplication.Id);
-            //     items.Add(aggregateStreamAsync);
-            // }
             return Task.FromResult(allActivateApplications);
         }
     }
