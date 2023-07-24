@@ -69,7 +69,8 @@ public class EnvironmentSetsController : ControllerBase
     [HttpDelete("{environmentSetId}/environment/{environmentName}")]
     public async Task<IActionResult> DeleteEnvironment(Guid environmentSetId, string environmentName)
     {
-        await _mediator.Send(new DeleteEnvironmentFromEnvironmentSet(environmentSetId, environmentName));
+        var version = Request.GetIfMatchRequestHeader();
+        await _mediator.Send(new DeleteEnvironmentFromEnvironmentSet(environmentSetId, version, environmentName));
         return NoContent();
     }
 

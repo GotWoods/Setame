@@ -1,37 +1,36 @@
-﻿using ConfigMan.Data.Models;
+﻿using ConfigMan.Data.Data;
+using ConfigMan.Data.Models;
 using JasperFx.Core;
 using Marten;
 using MediatR;
 
 namespace ConfigMan.Data.Handlers.EnvironmentSets;
 
-//TODO: change to Request<Guid, ValidationFailed>
-public record CreateEnvironmentSet(string Name) : IRequest<Guid>;
+public record CreateEnvironmentSet(string Name) : IRequest<CommandResponse>;
 
-public class CreateEnvironmentSetHandler : IRequestHandler<CreateEnvironmentSet, Guid>
+public class CreateEnvironmentSetHandler : IRequestHandler<CreateEnvironmentSet, CommandResponse>
 {
     private readonly IDocumentSessionHelper<EnvironmentSet> _documentSession;
-    
+    private readonly IEnvironmentSetRepository _environmentSetRepository;
 
-    public CreateEnvironmentSetHandler(IDocumentSessionHelper<EnvironmentSet> documentSession)
+
+    public CreateEnvironmentSetHandler(IDocumentSessionHelper<EnvironmentSet> documentSession, IEnvironmentSetRepository environmentSetRepository)
     {
         _documentSession = documentSession;
+        _environmentSetRepository = environmentSetRepository;
     }
 
-    public async Task<Guid> Handle(CreateEnvironmentSet command, CancellationToken cancellationToken)
+    public async Task<CommandResponse> Handle(CreateEnvironmentSet command, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(command.Name)) throw new ArgumentNullException(nameof(command.Name));
+      var matchingName = _environmentSetRepository.GetByName(command.Name);
+        if (matchingName != null)
+        {
+            return CommandResponse.FromError(Errors.DuplicateName(command.Name));
+        }
 
-        // var summaryDocument = _querySession.Query<ActiveEnvironmentSet>();
-        // if (summaryDocument != null)
-        // {
-        //     var foundWithSameName = summaryDocument.Environments.Any(x => x.Value == command.Name);
-        //     if (foundWithSameName) throw new DuplicateNameException($"The name {command.Name} is already in use");
-        // }
-        //
         var id = CombGuidIdGeneration.NewGuid();
         _documentSession.Start(id, new EnvironmentSetCreated(id, command.Name));
         await _documentSession.SaveChangesAsync();
-        return id;
+        return CommandResponse.FromSuccess(1);
     }
 }

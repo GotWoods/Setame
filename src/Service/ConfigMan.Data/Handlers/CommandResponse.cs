@@ -12,6 +12,17 @@ namespace ConfigMan.Data.Handlers
         public bool WasSuccessful => !Errors.Any();
         public List<Errors> Errors { get; set; } = new();
         public long NewVersion { get; set; }
+
+
+        public static CommandResponse FromError(Errors error)
+        {
+            return new CommandResponse { Errors = new List<Errors>() { error } };
+        }
+
+        public static CommandResponse FromSuccess(long newVersion)
+        {
+            return new CommandResponse { NewVersion = newVersion };
+        }
     }
 }
 

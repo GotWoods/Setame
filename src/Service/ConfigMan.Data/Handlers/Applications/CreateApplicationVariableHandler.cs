@@ -39,8 +39,7 @@ public class CreateApplicationVariableHandler : IRequestHandler<CreateApplicatio
             if (setting.Name == command.VariableName)
             {
                 result.Errors.Add(Errors.DuplicateName(setting.Name));
-                return
-                    result; //exit on the first error (as the variable name will exist for each environment so we don't want to see this multiple times)
+                return result; //exit on the first error (as the variable name will exist for each environment so we don't want to see this multiple times)
             }
 
         await _documentSession.AppendToStream(command.ApplicationId, command.ExpectedVersion,
