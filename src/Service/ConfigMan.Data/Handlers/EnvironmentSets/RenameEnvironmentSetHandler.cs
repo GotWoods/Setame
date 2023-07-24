@@ -21,5 +21,6 @@ public class RenameEnvironmentSetHandler : IRequestHandler<RenameEnvironmentSet>
         //var foundWithSameName = allActiveEnvironments.Environments.Any(x => x.Value == command.newName);
         //if (foundWithSameName) throw new DuplicateNameException($"The name {command.newName} is already in use");
         await _documentSession.AppendToStream(command.EnvironmentSetId, command.ExpectedVersion, new EnvironmentSetRenamed(command.EnvironmentSetId, command.NewName));
+        await _documentSession.SaveChangesAsync();
     }
 }

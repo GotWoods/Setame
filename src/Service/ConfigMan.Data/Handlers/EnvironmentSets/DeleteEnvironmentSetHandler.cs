@@ -18,5 +18,6 @@ public class DeleteEnvironmentSetHandler : IRequestHandler<DeleteEnvironmentSet>
     public async Task Handle(DeleteEnvironmentSet command, CancellationToken cancellationToken)
     {
         await _documentSession.AppendToStream(command.EnvironmentSetId, -1, new EnvironmentSetDeleted(command.EnvironmentSetId));
+        await _documentSession.SaveChangesAsync();
     }
 }

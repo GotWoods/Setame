@@ -17,5 +17,6 @@ public class RenameEnvironmentSetVariableHandler : IRequestHandler<RenameEnviron
     public async Task Handle(RenameEnvironmentSetVariable command, CancellationToken cancellationToken)
     {
         await _documentSession.AppendToStream(command.EnvironmentSetId, command.ExpectedVersion, new EnvironmentSetVariableRenamed(command.OldName, command.NewName));
+        await _documentSession.SaveChangesAsync();
     }
 }

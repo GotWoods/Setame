@@ -19,5 +19,6 @@ public class AddEnvironmentToEnvironmentSetHandler : IRequestHandler<AddEnvironm
         //TODO: Add environment to all Children Applications?
         //TODO: ensure no duplicates
         await _documentSession.AppendToStream(command.EnvironmentSetId, command.ExpectedVersion, new EnvironmentAdded(command.Name));
+        await _documentSession.SaveChangesAsync();
     }
 }

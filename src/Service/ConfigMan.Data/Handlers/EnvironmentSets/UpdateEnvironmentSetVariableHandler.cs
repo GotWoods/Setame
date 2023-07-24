@@ -17,5 +17,6 @@ public class UpdateEnvironmentSetVariableHandler : IRequestHandler<UpdateEnviron
     public async Task Handle(UpdateEnvironmentSetVariable command, CancellationToken cancellationToken)
     {
         await _documentSession.AppendToStream(command.EnvironmentSetId, command.ExpectedVersion, new EnvironmentSetVariableChanged(command.Environment, command.VariableName, command.VariableValue));
+        await _documentSession.SaveChangesAsync();
     }
 }
