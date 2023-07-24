@@ -40,7 +40,7 @@ public class ApplicationsController : ControllerBase
     public async Task<IActionResult> CreateApplication(Application application, CancellationToken ct)
     {
         var id = CombGuidIdGeneration.NewGuid();
-        await _mediator.Send(new CreateApplication(id, application.Name, application.Token, application.EnvironmentSetId));
+        var result = await _mediator.Send(new CreateApplication(id, application.Name, application.Token, application.EnvironmentSetId), ct);
         return NoContent();
     }
 

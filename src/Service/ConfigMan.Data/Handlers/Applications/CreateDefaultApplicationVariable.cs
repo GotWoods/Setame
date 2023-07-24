@@ -1,29 +1,39 @@
 ﻿using ConfigMan.Data.Models;
 using Marten;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ConfigMan.Data.Handlers.Applications;
 
-public record CreateDefaultApplicationVariable(Guid ApplicationId, string VariableName) : IRequest;
+public record CreateDefaultApplicationVariable(Guid ApplicationId, int ExpectedVersion, string VariableName) : IRequest<CommandResponse>;
 
-public class CreateDefaultApplicationVariableHandler : IRequestHandler<CreateDefaultApplicationVariable>
+public class CreateDefaultApplicationVariableHandler : IRequestHandler<CreateDefaultApplicationVariable, CommandResponse>
 {
-    private readonly IDocumentSession _documentSession;
-    private readonly IUserInfo _userInfo;
+    private readonly IDocumentSessionHelper<Application> _documentSession;
+    private readonly IQuerySession _querySession;
 
-    public CreateDefaultApplicationVariableHandler(IDocumentSession documentSession, IUserInfo userInfo)
+    public CreateDefaultApplicationVariableHandler(IDocumentSessionHelper<Application> documentSession, IQuerySession querySession)
     {
         _documentSession = documentSession;
-        _userInfo = userInfo;
+        _querySession = querySession;
     }
 
-    public async Task Handle(CreateDefaultApplicationVariable command, CancellationToken cancellationToken)
+    public async Task<CommandResponse> Handle(CreateDefaultApplicationVariable command, CancellationToken cancellationToken)
     {
-        await _documentSession.AppendToStreamAndSave<Application>(command.ApplicationId, new ApplicationDefaultVariableAdded(command.VariableName), _userInfo.GetCurrentUserId());
+        var result = new CommandResponse();
+        var app = await _querySession.Events.AggregateStreamAsync<Application>(command.ApplicationId, token: cancellationToken);
+        if (app == null)
+            throw new NullReferenceException("Application could not be found");
+
+        if (app.ApplicationDefaults.Any(x => x.Name == command.VariableName))
+        {
+        
+            result.Errors.Add(Errors.DuplicateName(command.VariableName));
+            return result;
+        }
+        
+        await _documentSession.AppendToStream(command.ApplicationId, command.ExpectedVersion,
+            new ApplicationDefaultVariableAdded(command.VariableName));
+        await _documentSession.SaveChangesAsync();
+        return result;
     }
 }

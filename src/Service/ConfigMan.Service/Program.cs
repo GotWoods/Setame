@@ -1,13 +1,17 @@
 using System.Text;
 using ConfigMan.Data;
+using ConfigMan.Data.Handlers.Applications;
 using ConfigMan.Data.Handlers.EnvironmentSets;
 using ConfigMan.Data.Models;
 using ConfigMan.Data.Projections;
 using ConfigMan.Service;
 using ConfigMan.Service.Models;
+using FluentValidation;
+using JasperFx.Core.Reflection;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
@@ -26,6 +30,8 @@ builder.Services.AddScoped<IUserInfo, ClaimsUserInfo>();
 builder.Services.AddScoped<IEmailService, EMailService>();
 builder.Services.AddOptions<MailSettings>().BindConfiguration("MailSettings");
 builder.Services.AddScoped(typeof(IDocumentSessionHelper<>), typeof(DocumentSessionHelper<>));
+builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehavior<,>));
+builder.Services.AddValidatorsFromAssemblyContaining<CreateApplicationValidator>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {

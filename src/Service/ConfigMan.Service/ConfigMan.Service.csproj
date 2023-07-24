@@ -10,6 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.6.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.6.0" />
     <PackageReference Include="Marten" Version="6.0.4" />
     <PackageReference Include="Marten.AspNetCore" Version="6.0.4" />
     <PackageReference Include="MediatR" Version="12.1.1" />

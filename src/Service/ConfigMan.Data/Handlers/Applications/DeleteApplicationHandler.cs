@@ -13,17 +13,16 @@ public record DeleteApplication(Guid ApplicationId) : IRequest;
 
 public class DeleteApplicationHandler : IRequestHandler<DeleteApplication>
 {
-    private readonly IDocumentSession _documentSession;
-    private readonly IUserInfo _userInfo;
+    private readonly IDocumentSessionHelper<Application> _documentSession;
 
-    public DeleteApplicationHandler(IDocumentSession documentSession, IUserInfo userInfo)
+    public DeleteApplicationHandler(IDocumentSessionHelper<Application> documentSession)
     {
         _documentSession = documentSession;
-        _userInfo = userInfo;
     }
 
     public async Task Handle(DeleteApplication command, CancellationToken cancellationToken)
     {
-        await _documentSession.AppendToStreamAndSave<Application>(command.ApplicationId, new ApplicationDeleted(command.ApplicationId), _userInfo.GetCurrentUserId());
+        await _documentSession.AppendToStream(command.ApplicationId, -1, new ApplicationDeleted(command.ApplicationId));
+        await _documentSession.SaveChangesAsync();
     }
 }

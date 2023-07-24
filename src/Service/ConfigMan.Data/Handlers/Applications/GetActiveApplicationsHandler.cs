@@ -15,7 +15,7 @@ namespace ConfigMan.Data.Handlers.Applications
             _querySession = querySession;
         }
 
-        public async Task<List<ActiveApplication>> Handle(GetActiveApplications request, CancellationToken cancellationToken)
+        public Task<List<ActiveApplication>> Handle(GetActiveApplications request, CancellationToken cancellationToken)
         {
             var allActivateApplications = _querySession.Query<ActiveApplication>().ToList();
             // var items = new List<Application>();
@@ -24,7 +24,7 @@ namespace ConfigMan.Data.Handlers.Applications
             //     var aggregateStreamAsync = await _querySession.Events.AggregateStreamAsync<Application>(activeApplication.Id);
             //     items.Add(aggregateStreamAsync);
             // }
-            return allActivateApplications;
+            return Task.FromResult(allActivateApplications);
         }
     }
 }

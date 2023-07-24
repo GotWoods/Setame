@@ -23,14 +23,14 @@ namespace ConfigMan.Service.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             
             var user = _userService.GetUserByUsernameAsync(request.Username);
 
             if (user == null || !_userService.VerifyPassword(user, request.Password))
             {
-                return Unauthorized();
+                return Task.FromResult<IActionResult>(Unauthorized());
             }
 
             // var mailRequest = new MailRequest();
@@ -41,7 +41,7 @@ namespace ConfigMan.Service.Controllers
             // await _emailService.SendEmailAsync(mailRequest);
 
             var token = _authService.GenerateJwtToken(user.Id.ToString(), "Administrator");
-            return Ok(new { token });
+            return Task.FromResult<IActionResult>(Ok(new { token }));
         }
 
         [HttpPost("AppLogin")]

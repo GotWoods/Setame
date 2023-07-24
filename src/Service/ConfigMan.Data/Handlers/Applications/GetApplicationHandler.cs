@@ -17,7 +17,7 @@ public class GetApplicationHandler : IRequestHandler<GetApplication, Application
 
     public async Task<Application> Handle(GetApplication request, CancellationToken cancellationToken)
     {
-        return await _querySession.Events.AggregateStreamAsync<Application>(request.ApplicationId);
+        return await _querySession.Events.AggregateStreamAsync<Application>(request.ApplicationId, token: cancellationToken) ?? throw new NullReferenceException("Application could not be found");
     }
 }
 

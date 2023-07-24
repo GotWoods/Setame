@@ -1,29 +1,51 @@
 ﻿using ConfigMan.Data.Models;
 using Marten;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ConfigMan.Data.Handlers.Applications;
 
-public record UpdateApplicationVariable(Guid ApplicationId, int ExpectedVersion, string Environment, string VariableName, string NewValue) : IRequest;
+public record UpdateApplicationVariable(Guid ApplicationId, int ExpectedVersion, string Environment,
+    string VariableName, string NewValue) : IRequest<CommandResponse>;
 
-public class UpdateApplicationVariableHandler : IRequestHandler<UpdateApplicationVariable>
+public class UpdateApplicationVariableHandler : IRequestHandler<UpdateApplicationVariable, CommandResponse>
 {
-    private readonly IDocumentSession _documentSession;
-    private readonly IUserInfo _userInfo;
+    private readonly IDocumentSessionHelper<Application> _documentSession;
+    private readonly IQuerySession _querySession;
 
-    public UpdateApplicationVariableHandler(IDocumentSession documentSession, IUserInfo userInfo)
+    public UpdateApplicationVariableHandler(IDocumentSessionHelper<Application> documentSession, IQuerySession querySession)
     {
         _documentSession = documentSession;
-        _userInfo = userInfo;
+        _querySession = querySession;
     }
 
-    public async Task Handle(UpdateApplicationVariable command, CancellationToken cancellationToken)
+    public async Task<CommandResponse> Handle(UpdateApplicationVariable command, CancellationToken cancellationToken)
     {
-        await _documentSession.AppendToStreamAndSave<Application>(command.ExpectedVersion, command.ApplicationId, new ApplicationVariableChanged(command.Environment, command.VariableName, command.NewValue), _userInfo.GetCurrentUserId());
+        var response = new CommandResponse();
+
+        var existing = await _querySession.Events.AggregateStreamAsync<Application>(command.ApplicationId, token: cancellationToken);
+        if (existing == null)
+        {
+            response.Errors.Add(Errors.ApplicationNotFound(command.ApplicationId));
+            return response;
+        }
+
+        var environmentSetting = existing.EnvironmentSettings.FirstOrDefault(x=>x.Name == command.Environment);
+        if (environmentSetting == null)
+        {
+            response.Errors.Add(Errors.EnvironmentNotFound(command.Environment));
+            return response;
+        }
+
+        if (environmentSetting.Settings.FirstOrDefault(x => x.Name == command.VariableName) == null)
+        {
+            response.Errors.Add(Errors.VariableNotFound(command.VariableName));
+            return response;
+        }
+       
+
+        await _documentSession.AppendToStream(command.ApplicationId, command.ExpectedVersion, new ApplicationVariableChanged(command.Environment, command.VariableName, command.NewValue));
+        await _documentSession.SaveChangesAsync();
+        response.NewVersion = command.ExpectedVersion + 1;
+        return response;
     }
 }

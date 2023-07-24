@@ -5,30 +5,28 @@ using MediatR;
 
 namespace ConfigMan.Data.Handlers.Applications;
 
-public record CreateApplication(Guid ApplicationId, string Name, string Token, Guid EnvironmentSetId) : IRequest<HandlerResponse>;
+public record CreateApplication(Guid ApplicationId, string Name, string Token, Guid EnvironmentSetId) : IRequest<CommandResponse>;
 
-public class CreateApplicationHandler : IRequestHandler<CreateApplication, HandlerResponse>
+public class CreateApplicationHandler : IRequestHandler<CreateApplication, CommandResponse>
 {
     private readonly IDocumentSessionHelper<Application> _applicationSession;
     private readonly IDocumentSessionHelper<EnvironmentSet> _environmentSetSession;
     private readonly IQuerySession _querySession;
     
 
-    public CreateApplicationHandler(IDocumentSessionHelper<Application> applicationSession,
-        IDocumentSessionHelper<EnvironmentSet> environmentSetSession, IQuerySession querySession)
+    public CreateApplicationHandler(IDocumentSessionHelper<Application> applicationSession, IDocumentSessionHelper<EnvironmentSet> environmentSetSession, IQuerySession querySession)
     {
         _applicationSession = applicationSession;
         _environmentSetSession = environmentSetSession;
         _querySession = querySession;
     }
 
-    public async Task<HandlerResponse> Handle(CreateApplication command, CancellationToken cancellationToken)
+    public async Task<CommandResponse> Handle(CreateApplication command, CancellationToken cancellationToken)
     {
-        var response = new HandlerResponse();
+        var response = new CommandResponse();
         var environment = await _environmentSetSession.GetFromEventStream(command.EnvironmentSetId);
         if (environment == null)
-            throw new NullReferenceException("Could not find an environment set with an id of " +
-                                             command.EnvironmentSetId);
+            throw new NullReferenceException("Could not find an environment set with an id of " + command.EnvironmentSetId);
 
         var matchingName = _querySession.Query<ActiveApplication>().FirstOrDefault(x => x.Name == command.Name);
         if (matchingName != null)
@@ -45,8 +43,7 @@ public class CreateApplicationHandler : IRequestHandler<CreateApplication, Handl
         {
             response.NewVersion++;
             applicationEvents.Add(new ApplicationEnvironmentAdded(deploymentEnvironment.Name));
-            await _environmentSetSession.AppendToStream<EnvironmentSet>(command.EnvironmentSetId,
-                new ApplicationAssociatedToEnvironmentSet(command.ApplicationId, command.EnvironmentSetId));
+            await _environmentSetSession.AppendToStream(command.EnvironmentSetId, new ApplicationAssociatedToEnvironmentSet(command.ApplicationId, command.EnvironmentSetId));
         }
 
         _applicationSession.Start(command.ApplicationId, applicationEvents.ToArray());

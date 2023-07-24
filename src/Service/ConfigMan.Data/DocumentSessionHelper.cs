@@ -7,7 +7,8 @@ public interface IDocumentSessionHelper<T> where T : class
 {
     void Start(Guid id, params object[] @event);
     Task<T?> GetFromEventStream(Guid id);
-    Task AppendToStream<T>(Guid streamId, object @event) where T : class;
+    Task AppendToStream(Guid streamId, object @event);
+    Task AppendToStream(Guid streamId, int expectedVersion, object @event);
     Task SaveChangesAsync();
 }
 
@@ -35,18 +36,19 @@ public class DocumentSessionHelper<T> : IDocumentSessionHelper<T> where T : clas
         return await _documentSession.Events.AggregateStreamAsync<T>(id);
     }
     
-    public async Task AppendToStream<T>(Guid streamId, object @event) where T : class
+    public Task AppendToStream(Guid streamId, object @event)
     {
-        _documentSession.SetHeader("user-id", _userInfo);
+        _documentSession.SetHeader("user-id", _userInfo.GetCurrentUserId());
         _documentSession.Events.Append(streamId, @event);
+        return Task.CompletedTask;
         //await _documentSession.Events.WriteToAggregate<T>(streamId, stream => stream.AppendOne(@event));
 //        await _documentSession.SaveChangesAsync();
     }
 
-    public static async Task AppendToStreamAndSave<T>(IDocumentSession documentSession, int expectedVersion, Guid streamId, object @event, Guid performedBy) where T : class
+    public async Task AppendToStream(Guid streamId, int expectedVersion, object @event)
     {
-        documentSession.SetHeader("user-id", performedBy);
-        await documentSession.Events.WriteToAggregate<T>(streamId, expectedVersion, stream => stream.AppendOne(@event));
+        _documentSession.SetHeader("user-id", _userInfo.GetCurrentUserId());
+        await _documentSession.Events.WriteToAggregate<T>(streamId, expectedVersion, stream => stream.AppendOne(@event));
   //      await documentSession.SaveChangesAsync();
     }
 
