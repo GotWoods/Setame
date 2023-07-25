@@ -8,7 +8,6 @@ using ConfigMan.Data.Projections;
 using ConfigMan.Service;
 using ConfigMan.Service.Models;
 using FluentValidation;
-using JasperFx.Core.Reflection;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;
@@ -86,15 +85,10 @@ builder.Services.AddMediatR(x => { x.RegisterServicesFromAssemblyContaining<Crea
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-// Add Prometheus
-//builder.Services.AddHttpMetrics();
 
 //Configure Serilog
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
-    //.Enrich.FromLogContext()
-    //.WriteTo.Console()
-    //.WriteTo.Seq(builder.Configuration["Seq:ServerUrl"])
     .CreateLogger();
 
 builder.Host.UseSerilog();
@@ -143,6 +137,12 @@ app.MapWhen(x => !x.Request.Path.Value!.StartsWith("/api"), config =>
         if (builder.Environment.IsDevelopment()) spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
     });
 });
+
+Log.Logger.Information("Application started");
+
 app.Run();
+
+Log.Logger.Information("Application exiting");
+Log.CloseAndFlush();
 
 public partial class Program { }

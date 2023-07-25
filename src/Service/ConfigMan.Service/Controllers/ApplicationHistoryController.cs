@@ -28,13 +28,13 @@ public class ApplicationHistoryController : ControllerBase
         var results = new List<ChangeHistory>();
         foreach (var history in changeHistories)
         {
+            //TODO, may need to cache this if Marten is not doing it for us
             var user = _querySession.Query<UserSummary>().FirstOrDefault(x => x.Id == history.User);
             if (user == null)
                 throw new NullReferenceException("User could not be found!");
 
             results.Add(new ChangeHistory(history.EventTime, history.ApplicationActionType.ToString(), history.Description, user.Username));
         }
-
         return Ok(results);
     }
 }

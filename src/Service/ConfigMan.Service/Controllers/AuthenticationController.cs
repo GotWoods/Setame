@@ -14,22 +14,31 @@ namespace ConfigMan.Service.Controllers
         private readonly IUserService _userService;
         private readonly AuthService _authService;
         private readonly IEmailService _emailService;
+        private readonly ILogger<AuthenticationController> _logger;
 
-        public AuthenticationController(IUserService userService, AuthService authService, IEmailService emailService)
+        public AuthenticationController(IUserService userService, AuthService authService, IEmailService emailService, ILogger<AuthenticationController> logger)
         {
             _userService = userService;
             _authService = authService;
             _emailService = emailService;
+            _logger = logger;
         }
 
         [HttpPost("login")]
         public Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            
+            _logger.LogDebug("Login requested for {Username}", request.Username);
             var user = _userService.GetUserByUsernameAsync(request.Username);
 
-            if (user == null || !_userService.VerifyPassword(user, request.Password))
+            if (user == null)
             {
+                _logger.LogDebug("User not found");
+                return Task.FromResult<IActionResult>(Unauthorized());
+            }
+
+            if (!_userService.VerifyPassword(user, request.Password))
+            {
+                _logger.LogDebug("Password verification failed");
                 return Task.FromResult<IActionResult>(Unauthorized());
             }
 
@@ -39,7 +48,7 @@ namespace ConfigMan.Service.Controllers
             // mailRequest.Body = "Someone logged in";
             //
             // await _emailService.SendEmailAsync(mailRequest);
-
+            _logger.LogDebug("User credentials verified, generating token");
             var token = _authService.GenerateJwtToken(user.Id.ToString(), "Administrator");
             return Task.FromResult<IActionResult>(Ok(new { token }));
         }

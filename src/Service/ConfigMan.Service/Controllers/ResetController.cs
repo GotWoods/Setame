@@ -1,8 +1,6 @@
 ﻿using Marten;
 using Microsoft.AspNetCore.Mvc;
 
-
-//TODO: Remove this before prod
 namespace ConfigMan.Service.Controllers;
 
 [Route("api/[controller]")]
@@ -19,7 +17,12 @@ public class ResetController : ControllerBase
     [HttpGet]
     public async Task Reset()
     {
-        //TODO: remove this before prod
+        //this is only for testing
+        if (!HttpContext.RequestServices.GetService<IWebHostEnvironment>().IsDevelopment())
+        {
+            throw new InvalidOperationException("Reset endpoint is only available in development environment.");
+        }
+
         await _documentStore.Advanced.Clean.CompletelyRemoveAllAsync();
     }
 }

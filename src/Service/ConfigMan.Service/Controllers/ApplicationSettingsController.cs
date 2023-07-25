@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Security.Claims;
 using ConfigMan.Data.Handlers.Applications;
+using ConfigMan.Data.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +14,13 @@ namespace ConfigMan.Service.Controllers;
 public class ApplicationSettingsController : ControllerBase
 {
     private readonly IMediator _mediator;
-    
+    private readonly ILogger<ApplicationSettingsController> _logger;
 
-    public ApplicationSettingsController(IMediator mediator)
+
+    public ApplicationSettingsController(IMediator mediator, ILogger<ApplicationSettingsController> logger)
     {
         _mediator = mediator;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -27,7 +30,7 @@ public class ApplicationSettingsController : ControllerBase
         var claim = User.FindFirst(ClaimTypes.NameIdentifier);
         if (claim == null)
         {
-    //        _logger.LogWarning("Can not find application @{Claims}", User.Claims);
+            _logger.LogWarning("Can not find application @{Claims}", User.Claims);
             return NotFound("Claim not found");
         }
 
@@ -39,10 +42,15 @@ public class ApplicationSettingsController : ControllerBase
     {
         var version = Request.GetIfMatchRequestHeader();
         if (environment == "default")
-            await _mediator.Send(new CreateDefaultApplicationVariable(applicationId, version, variable));
-
+        {
+            _logger.LogDebug("Adding default {Variable} to Application {ApplicationId}", variable, applicationId);
+            await _mediator.Send(new CreateDefaultApplicationVariable(applicationId, version, variable), ct);
+        }
         else
-            await _mediator.Send(new CreateApplicationVariable(applicationId, version, environment, variable));
+        {
+            _logger.LogDebug("Adding {Environment} {Variable} to Application {ApplicationId}", environment, variable, applicationId);
+            await _mediator.Send(new CreateApplicationVariable(applicationId, version, environment, variable), ct);
+        }
         Response.TrySetETagResponseHeader(version + 1);
         return CreatedAtAction(nameof(CreateNew), null);
     }
@@ -50,20 +58,18 @@ public class ApplicationSettingsController : ControllerBase
     [HttpPut("{applicationId}/{environment}/{variable}")]
     public async Task<ActionResult> Update(Guid applicationId, string environment, string variable, [FromBody] string value, CancellationToken ct)
     {
-        if (applicationId == Guid.Empty)
-            throw new ArgumentNullException("applicationId");
-        if (string.IsNullOrEmpty(environment))
-            throw new ArgumentNullException("environment");
-        if (string.IsNullOrEmpty(variable))
-            throw new ArgumentNullException("variable");
-        if (string.IsNullOrEmpty(value))
-            throw new ArgumentNullException("value");
-
         var version = Request.GetIfMatchRequestHeader();
         if (environment == "default")
-            await _mediator.Send(new UpdateDefaultApplicationVariable(applicationId, version,variable, value));
+        {
+            _logger.LogDebug("Updating default {Variable} for Application {ApplicationId}. Set to {Value}", variable, applicationId, value);
+            await _mediator.Send(new UpdateDefaultApplicationVariable(applicationId, version, variable, value));
+        }
         else
+        {
+            _logger.LogDebug("Updating {Environment} {Variable} for Application {ApplicationId}. Set to {Value}", environment, variable, applicationId, value);
             await _mediator.Send(new UpdateApplicationVariable(applicationId, version, environment, variable, value));
+        }
+
         Response.TrySetETagResponseHeader(version + 1);
         return Ok();
     }
@@ -73,6 +79,7 @@ public class ApplicationSettingsController : ControllerBase
     {
         var version = Request.GetIfMatchRequestHeader();
         await _mediator.Send(new RenameApplicationVariable(applicationId, version, variable, newName));
+        _logger.LogDebug("For Application {ApplicationId}, {Variable} renamed to {NewName}", applicationId, variable, newName);
         Response.TrySetETagResponseHeader(version + 1);
         return Ok();
     }
