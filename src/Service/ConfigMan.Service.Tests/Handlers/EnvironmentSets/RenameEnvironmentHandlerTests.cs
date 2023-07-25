@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using ConfigMan.Data;
+﻿using ConfigMan.Data;
 using ConfigMan.Data.Data;
 using ConfigMan.Data.Handlers.EnvironmentSets;
 using ConfigMan.Data.Models;
 using ConfigMan.Data.Projections;
-using Marten;
-using MediatR;
 using Moq;
-using Xunit;
+
+namespace ConfigMan.Service.Tests.Handlers.EnvironmentSets;
 
 public class RenameEnvironmentHandlerTests
 {
