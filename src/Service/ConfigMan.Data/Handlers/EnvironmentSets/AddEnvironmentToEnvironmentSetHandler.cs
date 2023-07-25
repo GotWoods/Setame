@@ -2,6 +2,7 @@
 using ConfigMan.Data.Models;
 using Marten;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace ConfigMan.Data.Handlers.EnvironmentSets;
 
@@ -10,11 +11,13 @@ public class AddEnvironmentToEnvironmentSetHandler : IRequestHandler<AddEnvironm
 {
     private readonly IDocumentSessionHelper<EnvironmentSet> _documentSession;
     private readonly IEnvironmentSetRepository _environmentSetRepository;
+    private readonly ILogger<AddEnvironmentToEnvironmentSet> _logger;
 
-    public AddEnvironmentToEnvironmentSetHandler(IDocumentSessionHelper<EnvironmentSet> documentSession, IEnvironmentSetRepository environmentSetRepository)
+    public AddEnvironmentToEnvironmentSetHandler(IDocumentSessionHelper<EnvironmentSet> documentSession, IEnvironmentSetRepository environmentSetRepository, ILogger<AddEnvironmentToEnvironmentSet> logger)
     {
         _documentSession = documentSession;
         _environmentSetRepository = environmentSetRepository;
+        _logger = logger;
     }
     
     public async Task<CommandResponse> Handle(AddEnvironmentToEnvironmentSet command, CancellationToken cancellationToken)

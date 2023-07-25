@@ -18,7 +18,7 @@ public class ResetController : ControllerBase
     public async Task Reset()
     {
         //this is only for testing
-        if (!HttpContext.RequestServices.GetService<IWebHostEnvironment>().IsDevelopment())
+        if (!(HttpContext.RequestServices.GetService<IWebHostEnvironment>() ?? throw new InvalidOperationException()).IsDevelopment())
         {
             throw new InvalidOperationException("Reset endpoint is only available in development environment.");
         }

@@ -1,7 +1,9 @@
 ﻿using ConfigMan.Data;
 using ConfigMan.Data.Data;
+using ConfigMan.Data.Handlers.Applications;
 using ConfigMan.Data.Handlers.EnvironmentSets;
 using ConfigMan.Data.Models;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace ConfigMan.Service.Tests.Handlers.EnvironmentSets;
@@ -16,7 +18,7 @@ public class AddVariableToEnvironmentSetHandlerTests
     {
         _documentSession = new Mock<IDocumentSessionHelper<EnvironmentSet>>();
         _environmentSetRepository = new Mock<IEnvironmentSetRepository>();
-        _subject = new AddVariableToEnvironmentSetHandler(_documentSession.Object, _environmentSetRepository.Object);
+        _subject = new AddVariableToEnvironmentSetHandler(_documentSession.Object, _environmentSetRepository.Object, new Mock<ILogger<AddVariableToEnvironmentSetHandler>>().Object);
     }
 
     [Fact]

@@ -9,24 +9,19 @@ namespace ConfigMan.Service.Tests.Functional;
 
 public class EnvironmentSetIntegrationTests : IClassFixture<ApiTestWebApplicationFactory>
 {
-    private readonly ApiTestWebApplicationFactory _factory;
-    private HttpClient _client;
+    private readonly HttpClient _client;
 
 
     public EnvironmentSetIntegrationTests(ApiTestWebApplicationFactory factory)
     {
-        _factory = factory;
-        _client = _factory.CreateAuthorizedClientAsync().Result;
+        _client = factory.CreateAuthorizedClientAsync().Result;
     }
 
     [Fact]
     public async Task HappyPath_EnvironmentSet()
     {
         var originalName = "Test Environment Set" + DateTime.Now.Ticks.ToString();
-        var createResponse = await _client.PostAsync("/api/EnvironmentSets", SerializeContent(new 
-        {
-            Name = originalName,
-        }));
+        var createResponse = await _client.PostAsync("/api/EnvironmentSets", SerializeContent(originalName));
         createResponse.EnsureSuccessStatusCode();
         
         var environmentSetId = await createResponse.Content.ReadAsStringAsync();
@@ -143,5 +138,5 @@ public class EnvironmentSetIntegrationTests : IClassFixture<ApiTestWebApplicatio
 
 public class LoginResult
 {
-    public string Token { get; set; }
+    public string Token { get; set; } = string.Empty;
 }

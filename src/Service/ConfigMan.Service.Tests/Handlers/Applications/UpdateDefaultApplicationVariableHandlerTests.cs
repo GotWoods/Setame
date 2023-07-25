@@ -2,6 +2,7 @@
 using ConfigMan.Data.Data;
 using ConfigMan.Data.Handlers.Applications;
 using ConfigMan.Data.Models;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace ConfigMan.Service.Tests.Handlers.Applications;
@@ -16,7 +17,7 @@ public class UpdateDefaultApplicationVariableHandlerTests
     {
         _documentSession = new Mock<IDocumentSessionHelper<Application>>();
         _querySession = new Mock<IApplicationRepository>();
-        _subject = new UpdateDefaultApplicationVariableHandler(_documentSession.Object, _querySession.Object);
+        _subject = new UpdateDefaultApplicationVariableHandler(_documentSession.Object, _querySession.Object, new Mock<ILogger<UpdateDefaultApplicationVariableHandler>>().Object);
     }
 
     [Fact]

@@ -1,6 +1,7 @@
 ﻿using ConfigMan.Data;
 using ConfigMan.Data.Handlers.Applications;
 using ConfigMan.Data.Models;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace ConfigMan.Service.Tests.Handlers.Applications;
@@ -13,7 +14,7 @@ public class DeleteApplicationHandlerTests
     public DeleteApplicationHandlerTests()
     {
         _documentSession = new Mock<IDocumentSessionHelper<Application>>();
-        _subject = new DeleteApplicationHandler(_documentSession.Object);
+        _subject = new DeleteApplicationHandler(_documentSession.Object, new Mock<ILogger<DeleteApplicationHandler>>().Object);
     }
 
     [Fact]

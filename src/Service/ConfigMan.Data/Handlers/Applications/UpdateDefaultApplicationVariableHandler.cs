@@ -1,6 +1,7 @@
 ﻿using ConfigMan.Data.Data;
 using ConfigMan.Data.Models;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace ConfigMan.Data.Handlers.Applications;
 
@@ -12,12 +13,14 @@ public class
 {
     private readonly IDocumentSessionHelper<Application> _documentSession;
     private readonly IApplicationRepository _querySession;
+    private readonly ILogger<UpdateDefaultApplicationVariableHandler> _logger;
 
     public UpdateDefaultApplicationVariableHandler(IDocumentSessionHelper<Application> documentSession,
-        IApplicationRepository querySession)
+        IApplicationRepository querySession, ILogger<UpdateDefaultApplicationVariableHandler> logger)
     {
         _documentSession = documentSession;
         _querySession = querySession;
+        _logger = logger;
     }
 
     public async Task<CommandResponse> Handle(UpdateDefaultApplicationVariable command,

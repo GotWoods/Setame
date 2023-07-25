@@ -1,17 +1,20 @@
 ﻿using ConfigMan.Data.Models;
 using Marten;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace ConfigMan.Data.Handlers.EnvironmentSets;
 public record UpdateEnvironmentSetVariable(Guid EnvironmentSetId, int ExpectedVersion, string Environment, string VariableName, string VariableValue) : IRequest<CommandResponse>;
 
 public class UpdateEnvironmentSetVariableHandler : IRequestHandler<UpdateEnvironmentSetVariable, CommandResponse>
 {
-    private readonly IDocumentSessionHelper<EnvironmentSet> _documentSession;   
+    private readonly IDocumentSessionHelper<EnvironmentSet> _documentSession;
+    private readonly ILogger<UpdateEnvironmentSetVariableHandler> _logger;
 
-    public UpdateEnvironmentSetVariableHandler(IDocumentSessionHelper<EnvironmentSet> documentSession)
+    public UpdateEnvironmentSetVariableHandler(IDocumentSessionHelper<EnvironmentSet> documentSession, ILogger<UpdateEnvironmentSetVariableHandler> logger)
     {
         _documentSession = documentSession;
+        _logger = logger;
     }
 
     public async Task<CommandResponse> Handle(UpdateEnvironmentSetVariable command, CancellationToken cancellationToken)

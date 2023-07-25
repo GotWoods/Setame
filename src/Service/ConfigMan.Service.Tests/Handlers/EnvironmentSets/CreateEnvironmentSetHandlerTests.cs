@@ -3,6 +3,7 @@ using ConfigMan.Data.Data;
 using ConfigMan.Data.Handlers.EnvironmentSets;
 using ConfigMan.Data.Models;
 using JasperFx.Core;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace ConfigMan.Service.Tests.Handlers.EnvironmentSets;
@@ -17,7 +18,7 @@ public class CreateEnvironmentSetHandlerTests
     {
         _documentSession = new Mock<IDocumentSessionHelper<EnvironmentSet>>();
         _environmentSetRepository = new Mock<IEnvironmentSetRepository>();
-        _subject = new CreateEnvironmentSetHandler(_documentSession.Object, _environmentSetRepository.Object);
+        _subject = new CreateEnvironmentSetHandler(_documentSession.Object, _environmentSetRepository.Object, new Mock<ILogger<CreateEnvironmentSetHandler>>().Object);
     }
 
     [Fact]

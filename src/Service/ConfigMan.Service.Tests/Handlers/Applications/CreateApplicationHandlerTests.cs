@@ -3,6 +3,7 @@ using ConfigMan.Data.Data;
 using ConfigMan.Data.Handlers.Applications;
 using ConfigMan.Data.Models;
 using ConfigMan.Data.Projections;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace ConfigMan.Service.Tests.Handlers.Applications;
@@ -22,7 +23,8 @@ public class CreateApplicationHandlerTests
         _subject = new CreateApplicationHandler(
             _applicationDocumentSession.Object,
             _environmentSetDocumentSession.Object,
-            _activeApplicationRepository.Object
+            _activeApplicationRepository.Object,
+            new Mock<ILogger<CreateApplicationHandler>>().Object
         );
     }
 

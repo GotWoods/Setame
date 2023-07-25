@@ -2,6 +2,7 @@
 using ConfigMan.Data.Data;
 using ConfigMan.Data.Handlers.Applications;
 using ConfigMan.Data.Models;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace ConfigMan.Service.Tests.Handlers.Applications;
@@ -16,7 +17,7 @@ public class RenameApplicationHandlerTests
     {
         _documentSession = new Mock<IDocumentSessionHelper<Application>>();
         _querySession = new Mock<IApplicationRepository>();
-        _subject = new RenameApplicationHandler(_documentSession.Object, _querySession.Object);
+        _subject = new RenameApplicationHandler(_documentSession.Object, _querySession.Object, new Mock<ILogger<RenameApplicationHandler>>().Object);
     }
 
     [Fact]

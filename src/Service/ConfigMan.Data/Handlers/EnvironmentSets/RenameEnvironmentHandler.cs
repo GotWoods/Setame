@@ -1,6 +1,7 @@
 ﻿using ConfigMan.Data.Data;
 using ConfigMan.Data.Models;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace ConfigMan.Data.Handlers.EnvironmentSets;
 
@@ -12,16 +13,18 @@ public class RenameEnvironmentHandler : IRequestHandler<RenameEnvironment, Comma
     private readonly IDocumentSessionHelper<Application> _applicationSession;
     private readonly IDocumentSessionHelper<EnvironmentSet> _documentSession;
     private readonly IEnvironmentSetApplicationAssociationRepository _environmentSetApplicationAssociationRepository;
+    private readonly ILogger<RenameEnvironmentHandler> _logger;
     private readonly IEnvironmentSetRepository _environmentSetRepository;
 
     public RenameEnvironmentHandler(IDocumentSessionHelper<EnvironmentSet> documentSession,
         IDocumentSessionHelper<Application> applicationSession, IEnvironmentSetRepository environmentSetRepository,
-        IEnvironmentSetApplicationAssociationRepository environmentSetApplicationAssociationRepository)
+        IEnvironmentSetApplicationAssociationRepository environmentSetApplicationAssociationRepository, ILogger<RenameEnvironmentHandler> logger)
     {
         _documentSession = documentSession;
         _applicationSession = applicationSession;
         _environmentSetRepository = environmentSetRepository;
         _environmentSetApplicationAssociationRepository = environmentSetApplicationAssociationRepository;
+        _logger = logger;
     }
 
 

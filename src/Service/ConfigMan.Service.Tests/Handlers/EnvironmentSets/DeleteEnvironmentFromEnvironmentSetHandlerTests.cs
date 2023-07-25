@@ -1,8 +1,10 @@
 ﻿using ConfigMan.Data;
 using ConfigMan.Data.Data;
+using ConfigMan.Data.Handlers.Applications;
 using ConfigMan.Data.Handlers.EnvironmentSets;
 using ConfigMan.Data.Models;
 using ConfigMan.Data.Projections;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace ConfigMan.Service.Tests.Handlers.EnvironmentSets;
@@ -22,7 +24,8 @@ public class DeleteEnvironmentFromEnvironmentSetHandlerTests
         _subject = new DeleteEnvironmentFromEnvironmentSetHandler(
             _documentSession.Object,
             _applicationDocumentSession.Object,
-            _environmentSetApplicationAssociationRepository.Object
+            _environmentSetApplicationAssociationRepository.Object,
+            new Mock<ILogger<DeleteEnvironmentFromEnvironmentSetHandler>>().Object
         );
     }
 

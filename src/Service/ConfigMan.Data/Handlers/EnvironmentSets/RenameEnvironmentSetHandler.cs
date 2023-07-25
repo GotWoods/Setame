@@ -1,7 +1,9 @@
 ﻿using ConfigMan.Data.Data;
+using ConfigMan.Data.Handlers.Applications;
 using ConfigMan.Data.Models;
 using Marten;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace ConfigMan.Data.Handlers.EnvironmentSets;
 
@@ -11,11 +13,13 @@ public class RenameEnvironmentSetHandler : IRequestHandler<RenameEnvironmentSet,
 {
     private readonly IDocumentSessionHelper<EnvironmentSet> _documentSession;
     private readonly IEnvironmentSetRepository _environmentSetRepository;
+    private readonly ILogger<RenameEnvironmentSetHandler> _logger;
 
-    public RenameEnvironmentSetHandler(IDocumentSessionHelper<EnvironmentSet> documentSession, IEnvironmentSetRepository environmentSetRepository)
+    public RenameEnvironmentSetHandler(IDocumentSessionHelper<EnvironmentSet> documentSession, IEnvironmentSetRepository environmentSetRepository, ILogger<RenameEnvironmentSetHandler> logger)
     {
         _documentSession = documentSession;
         _environmentSetRepository = environmentSetRepository;
+        _logger = logger;
     }
 
     public async Task<CommandResponse> Handle(RenameEnvironmentSet command, CancellationToken cancellationToken)

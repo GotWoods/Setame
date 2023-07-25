@@ -1,6 +1,7 @@
 ﻿using ConfigMan.Data.Data;
 using ConfigMan.Data.Models;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace ConfigMan.Data.Handlers.Applications;
 
@@ -11,12 +12,14 @@ public class RenameApplicationVariableHandler : IRequestHandler<RenameApplicatio
 {
     private readonly IDocumentSessionHelper<Application> _documentSession;
     private readonly IApplicationRepository _querySession;
+    private readonly ILogger<RenameApplicationVariableHandler> _logger;
 
     public RenameApplicationVariableHandler(IDocumentSessionHelper<Application> documentSession,
-        IApplicationRepository querySession)
+        IApplicationRepository querySession, ILogger<RenameApplicationVariableHandler> logger)
     {
         _documentSession = documentSession;
         _querySession = querySession;
+        _logger = logger;
     }
 
     public async Task<CommandResponse> Handle(RenameApplicationVariable command, CancellationToken cancellationToken)

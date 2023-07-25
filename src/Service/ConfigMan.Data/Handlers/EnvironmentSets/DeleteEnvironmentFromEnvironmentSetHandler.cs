@@ -1,7 +1,9 @@
 ﻿using ConfigMan.Data.Data;
+using ConfigMan.Data.Handlers.Applications;
 using ConfigMan.Data.Models;
 using ConfigMan.Data.Projections;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace ConfigMan.Data.Handlers.EnvironmentSets;
 
@@ -14,13 +16,15 @@ public class
     private readonly IDocumentSessionHelper<Application> _applicationDocumentSessionHelper;
     private readonly IDocumentSessionHelper<EnvironmentSet> _documentSession;
     private readonly IEnvironmentSetApplicationAssociationRepository _environmentSetApplicationAssociationRepository;
+    private readonly ILogger<DeleteEnvironmentFromEnvironmentSetHandler> _logger;
 
 
-    public DeleteEnvironmentFromEnvironmentSetHandler(IDocumentSessionHelper<EnvironmentSet> documentSession, IDocumentSessionHelper<Application> applicationDocumentSessionHelper, IEnvironmentSetApplicationAssociationRepository environmentSetApplicationAssociationRepository)
+    public DeleteEnvironmentFromEnvironmentSetHandler(IDocumentSessionHelper<EnvironmentSet> documentSession, IDocumentSessionHelper<Application> applicationDocumentSessionHelper, IEnvironmentSetApplicationAssociationRepository environmentSetApplicationAssociationRepository, ILogger<DeleteEnvironmentFromEnvironmentSetHandler> logger)
     {
         _documentSession = documentSession;
         _applicationDocumentSessionHelper = applicationDocumentSessionHelper;
         _environmentSetApplicationAssociationRepository = environmentSetApplicationAssociationRepository;
+        _logger = logger;
     }
 
 

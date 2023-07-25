@@ -2,6 +2,7 @@
 using ConfigMan.Data.Models;
 using Marten;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace ConfigMan.Data.Handlers.Applications;
 
@@ -11,11 +12,13 @@ public class CreateDefaultApplicationVariableHandler : IRequestHandler<CreateDef
 {
     private readonly IDocumentSessionHelper<Application> _documentSession;
     private readonly IApplicationRepository _querySession;
+    private readonly ILogger<CreateDefaultApplicationVariableHandler> _logger;
 
-    public CreateDefaultApplicationVariableHandler(IDocumentSessionHelper<Application> documentSession, IApplicationRepository querySession)
+    public CreateDefaultApplicationVariableHandler(IDocumentSessionHelper<Application> documentSession, IApplicationRepository querySession, ILogger<CreateDefaultApplicationVariableHandler> logger)
     {
         _documentSession = documentSession;
         _querySession = querySession;
+        _logger = logger;
     }
 
     public async Task<CommandResponse> Handle(CreateDefaultApplicationVariable command, CancellationToken cancellationToken)

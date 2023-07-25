@@ -1,7 +1,9 @@
 ﻿using ConfigMan.Data.Data;
+using ConfigMan.Data.Handlers.Applications;
 using ConfigMan.Data.Models;
 using JasperFx.Core;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace ConfigMan.Data.Handlers.EnvironmentSets;
 
@@ -11,13 +13,15 @@ public class CreateEnvironmentSetHandler : IRequestHandler<CreateEnvironmentSet,
 {
     private readonly IDocumentSessionHelper<EnvironmentSet> _documentSession;
     private readonly IEnvironmentSetRepository _environmentSetRepository;
+    private readonly ILogger<CreateEnvironmentSetHandler> _logger;
 
 
     public CreateEnvironmentSetHandler(IDocumentSessionHelper<EnvironmentSet> documentSession,
-        IEnvironmentSetRepository environmentSetRepository)
+        IEnvironmentSetRepository environmentSetRepository, ILogger<CreateEnvironmentSetHandler> logger)
     {
         _documentSession = documentSession;
         _environmentSetRepository = environmentSetRepository;
+        _logger = logger;
     }
 
     public async Task<CommandResponseData<Guid>> Handle(CreateEnvironmentSet command,

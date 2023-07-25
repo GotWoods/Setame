@@ -2,6 +2,7 @@
 using ConfigMan.Data.Models;
 using ConfigMan.Data.Projections;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace ConfigMan.Data.Handlers.Applications;
 
@@ -14,13 +15,15 @@ public class CreateApplicationHandler : IRequestHandler<CreateApplication, Comma
     private readonly IDocumentSessionHelper<Application> _applicationSession;
     private readonly IDocumentSessionHelper<EnvironmentSet> _environmentSetSession;
     private readonly IApplicationRepository _activeApplicationRepository;
+    private readonly ILogger<CreateApplicationHandler> _logger;
 
 
-    public CreateApplicationHandler(IDocumentSessionHelper<Application> applicationSession, IDocumentSessionHelper<EnvironmentSet> environmentSetSession, IApplicationRepository activeApplicationRepository)
+    public CreateApplicationHandler(IDocumentSessionHelper<Application> applicationSession, IDocumentSessionHelper<EnvironmentSet> environmentSetSession, IApplicationRepository activeApplicationRepository, ILogger<CreateApplicationHandler> logger)
     {
         _applicationSession = applicationSession;
         _environmentSetSession = environmentSetSession;
         _activeApplicationRepository = activeApplicationRepository;
+        _logger = logger;
     }
 
     public async Task<CommandResponse> Handle(CreateApplication command, CancellationToken cancellationToken)

@@ -1,69 +1,65 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
-using ConfigMan.Data.Handlers.EnvironmentSets;
+﻿using System.Security;
 using ConfigMan.Data.Models;
 using Marten;
 using MediatR;
-using Microsoft.Extensions.Primitives;
+using Microsoft.Extensions.Logging;
 
-namespace ConfigMan.Data.Handlers
+namespace ConfigMan.Data.Handlers;
+
+public record InitializeApplication(string AdminEmailAddress, string Password) : IRequest;
+
+public class InitializeHandler : IRequestHandler<InitializeApplication>
 {
-    public record InitializeApplication(string AdminEmailAddress, string Password) : IRequest;
-    public class InitializeHandler : IRequestHandler<InitializeApplication>
+    private readonly IDocumentSession _documentSession;
+    private readonly ILogger<InitializeApplication> _logger;
+    private readonly IQuerySession _querySession;
+    private readonly IUserService _userService;
+
+    public InitializeHandler(IUserService userService, IDocumentSession documentSession, IQuerySession querySession,
+        ILogger<InitializeApplication> logger)
     {
-        private readonly IUserService _userService;
-        private readonly IDocumentSession _documentSession;
-        private readonly IQuerySession _querySession;
+        _userService = userService;
+        _documentSession = documentSession;
+        _querySession = querySession;
+        _logger = logger;
+    }
 
-        public InitializeHandler(IUserService userService, IDocumentSession documentSession, IQuerySession querySession)
+    public async Task Handle(InitializeApplication request, CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Application is being initialized");
+        var currentStatus =
+            await _querySession.Events.AggregateStreamAsync<ServiceStatus>(ServiceStatus.ServiceId,
+                token: cancellationToken);
+        if (CheckIfInitialized(currentStatus)) throw new SecurityException("Application can not be initialized twice");
+
+        var newAdminUser = new User
         {
-            _userService = userService;
-            _documentSession = documentSession;
-            _querySession = querySession;
-        }
+            Username = request.AdminEmailAddress,
+            Id = Guid.NewGuid()
+        };
+        await _userService.CreateUserAsync(newAdminUser, request.Password);
 
-        public async Task Handle(InitializeApplication request, CancellationToken cancellationToken)
+        _documentSession.Events.StartStream<ServiceStatus>(ServiceStatus.ServiceId, new ApplicationInitialized());
+        await _documentSession.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("Application is initialized. New administrative account is now {Email}",
+            request.AdminEmailAddress);
+    }
+
+    private bool CheckIfInitialized(ServiceStatus? currentStatus)
+    {
+        if (currentStatus == null)
         {
-            
-            var currentStatus = await _querySession.Events.AggregateStreamAsync<ServiceStatus>(ServiceStatus.ServiceId, token: cancellationToken);
-            if (CheckIfInitialized(currentStatus)) 
-                throw new SecurityException("Application can not be initialized twice");
-
-            var newAdminUser = new User
-            {
-                Username = request.AdminEmailAddress,
-                Id = Guid.NewGuid()
-            };
-            await _userService.CreateUserAsync(newAdminUser, request.Password); 
-
-            _documentSession.Events.StartStream<ServiceStatus>(ServiceStatus.ServiceId, new ApplicationInitialized());
-            await _documentSession.SaveChangesAsync(cancellationToken);
-
-        }
-
-        private bool CheckIfInitialized(ServiceStatus? currentStatus)
-        {
-            if (currentStatus == null)
-            {
-                // Code continues execution if currentStatus is null
-                //Console.WriteLine("Current Status is null. Code execution continues.");
-                return false;
-            }
-
-            if (currentStatus.IsInitialized)
-            {
-                // Do not allow code execution if IsInitialized is true
-                //Console.WriteLine("Current Status is initialized. Code execution not allowed.");
-                return true;
-            }
-
-            // Code continues execution if IsInitialized is false
-            //Console.WriteLine("Current Status is not initialized. Code execution continues.");
+            _logger.LogDebug("There is no current service status entry");
             return false;
         }
+
+        if (currentStatus.IsInitialized)
+        {
+            _logger.LogDebug("service status entry shows the application as initialized");
+            return true;
+        }
+
+        _logger.LogDebug("service status entry exists but application is not set to Initialized yet");
+        return false;
     }
 }

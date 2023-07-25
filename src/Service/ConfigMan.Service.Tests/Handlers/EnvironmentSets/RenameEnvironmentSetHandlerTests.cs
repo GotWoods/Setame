@@ -1,7 +1,9 @@
 ﻿using ConfigMan.Data;
 using ConfigMan.Data.Data;
+using ConfigMan.Data.Handlers.Applications;
 using ConfigMan.Data.Handlers.EnvironmentSets;
 using ConfigMan.Data.Models;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace ConfigMan.Service.Tests.Handlers.EnvironmentSets;
@@ -18,7 +20,8 @@ public class RenameEnvironmentSetHandlerTests
         _environmentSetRepository = new Mock<IEnvironmentSetRepository>();
         _subject = new RenameEnvironmentSetHandler(
             _documentSession.Object,
-            _environmentSetRepository.Object
+            _environmentSetRepository.Object,
+            new Mock<ILogger<RenameEnvironmentSetHandler>>().Object
         );
     }
 
