@@ -30,14 +30,17 @@ public class EnvironmentSetsController : ControllerBase
     public async Task<ActionResult<EnvironmentSet>> GetOne(Guid environmentSetId)
     {
         var deploymentEnvironment = await _mediator.Send(new GetEnvironment(environmentSetId));
+        Response.TrySetETagResponseHeader(deploymentEnvironment.Version.ToString());
         return Ok(deploymentEnvironment);
     }
 
     [HttpPost]
     public async Task<ActionResult> Create(EnvironmentSet environmentSet)
     {
-        await _mediator.Send(new CreateEnvironmentSet(environmentSet.Name));
-        return NoContent();
+        var result = await _mediator.Send(new CreateEnvironmentSet(environmentSet.Name));
+        if (!result.WasSuccessful) 
+            return new BadRequestObjectResult(result);
+        return Ok(result.Data);
     }
 
     [HttpDelete("{environmentSetId}")]

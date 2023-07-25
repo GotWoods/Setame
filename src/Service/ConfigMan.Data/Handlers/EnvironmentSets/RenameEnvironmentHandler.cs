@@ -39,7 +39,7 @@ public class RenameEnvironmentHandler : IRequestHandler<RenameEnvironment, Comma
 
         var associations = _environmentSetApplicationAssociationRepository.Get(command.EnvironmentSetId);
         foreach (var application in associations.Applications)
-            await _applicationSession.AppendToStream(application.Id, -1, new EnvironmentRenamed(command.OldName, command.NewName));
+            await _applicationSession.AppendToStream(application.Id, new EnvironmentRenamed(command.OldName, command.NewName));
 
         await _documentSession.SaveChangesAsync();
         await _applicationSession.SaveChangesAsync();

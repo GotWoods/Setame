@@ -22,7 +22,7 @@ public class DeleteApplicationHandler : IRequestHandler<DeleteApplication>
 
     public async Task Handle(DeleteApplication command, CancellationToken cancellationToken)
     {
-        await _documentSession.AppendToStream(command.ApplicationId, -1, new ApplicationDeleted(command.ApplicationId));
+        await _documentSession.AppendToStream(command.ApplicationId, new ApplicationDeleted(command.ApplicationId));
         await _documentSession.SaveChangesAsync();
     }
 }

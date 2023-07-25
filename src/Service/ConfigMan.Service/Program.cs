@@ -1,5 +1,6 @@
 using System.Text;
 using ConfigMan.Data;
+using ConfigMan.Data.Data;
 using ConfigMan.Data.Handlers.Applications;
 using ConfigMan.Data.Handlers.EnvironmentSets;
 using ConfigMan.Data.Models;
@@ -28,6 +29,9 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserInfo, ClaimsUserInfo>();
 builder.Services.AddScoped<IEmailService, EMailService>();
+builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
+builder.Services.AddScoped<IEnvironmentSetRepository, EnvironmentSetRepository>();
+builder.Services.AddScoped<IEnvironmentSetApplicationAssociationRepository, EnvironmentSetApplicationAssociationRepository>();
 builder.Services.AddOptions<MailSettings>().BindConfiguration("MailSettings");
 builder.Services.AddScoped(typeof(IDocumentSessionHelper<>), typeof(DocumentSessionHelper<>));
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehavior<,>));
@@ -61,7 +65,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddMarten(opts =>
 {
-    opts.Connection(builder.Configuration.GetConnectionString("DefaultConnection"));
+    opts.Connection(builder.Configuration.GetConnectionString("DefaultConnection")!);
     opts.Events.MetadataConfig.HeadersEnabled = true;
     opts.Schema.For<EnvironmentSet>().SoftDeleted();
     opts.Projections.Add<ActiveEnvironmentSetProjection>(ProjectionLifecycle.Inline);
@@ -140,3 +144,5 @@ app.MapWhen(x => !x.Request.Path.Value!.StartsWith("/api"), config =>
     });
 });
 app.Run();
+
+public partial class Program { }

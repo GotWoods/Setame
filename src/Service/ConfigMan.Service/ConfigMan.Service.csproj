@@ -33,4 +33,9 @@
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo Include="ConfigMan.Service.Tests.Functional" />
+	</ItemGroup>
+
+
 </Project>

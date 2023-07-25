@@ -57,7 +57,7 @@ public class DeleteEnvironmentFromEnvironmentSetHandlerTests
 
         foreach (var application in associations.Applications)
         {
-            _applicationDocumentSession.Verify(x => x.AppendToStream(application.Id, -1, It.IsAny<EnvironmentRemoved>()), Times.Once); // Check that AppendToStream is called once with the correct parameters for each application
+            _applicationDocumentSession.Verify(x => x.AppendToStream(application.Id, It.IsAny<EnvironmentRemoved>()), Times.Once); // Check that AppendToStream is called once with the correct parameters for each application
             _applicationDocumentSession.Verify(x => x.SaveChangesAsync(), Times.Once); // Check that SaveChangesAsync is called once for each application
         }
     }

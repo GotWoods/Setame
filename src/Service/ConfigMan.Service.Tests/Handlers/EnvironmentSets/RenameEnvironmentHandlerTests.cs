@@ -72,7 +72,7 @@ public class RenameEnvironmentHandlerTests
 
         foreach (var application in associations.Applications)
         {
-            _applicationSession.Verify(x => x.AppendToStream(application.Id, -1, It.IsAny<EnvironmentRenamed>()), Times.Once); // Check that AppendToStream is called once with the correct parameters for each application
+            _applicationSession.Verify(x => x.AppendToStream(application.Id, It.IsAny<EnvironmentRenamed>()), Times.Once); // Check that AppendToStream is called once with the correct parameters for each application
             
         }
         _applicationSession.Verify(x => x.SaveChangesAsync(), Times.Once); // Check that SaveChangesAsync is called once for each application
@@ -120,7 +120,7 @@ public class RenameEnvironmentHandlerTests
             "NewEnvironment" // Provide the new name for the environment
         );
 
-        _environmentSetRepository.Setup(x => x.GetById(command.EnvironmentSetId)).ReturnsAsync((EnvironmentSet)null); // Return null to simulate environment set not found
+        _environmentSetRepository.Setup(x => x.GetById(command.EnvironmentSetId)).ReturnsAsync((EnvironmentSet)null!); // Return null to simulate environment set not found
 
         // Act and Assert
         await Assert.ThrowsAsync<NullReferenceException>(async () => await _subject.Handle(command, CancellationToken.None));

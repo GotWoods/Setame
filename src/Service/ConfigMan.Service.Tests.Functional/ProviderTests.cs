@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestPlatform.TestHost;
 
 namespace ConfigMan.Service.Tests.Functional;
 
-public class UnitTest1
+public class ProviderTests
 {
     // [Fact]
     // public async Task Test1()
@@ -60,11 +60,11 @@ public class UnitTest1
         Assert.Equal("https://seq.localhost.com", configValue);
     }
 
-    private class TestHttpClientFactory : IHttpClientFactory
-    {
-        public HttpClient CreateClient(string name = null)
-        {
-            return new HttpClient();
-        }
-    }
+    // private class TestHttpClientFactory : IHttpClientFactory
+    // {
+    //     public HttpClient CreateClient(string name = null)
+    //     {
+    //         return new HttpClient();
+    //     }
+    // }
 }

@@ -32,7 +32,7 @@ public class
 
         var associations = _environmentSetApplicationAssociationRepository.Get(command.EnvironmentSetId);
         foreach (var application in associations.Applications)
-            await _applicationDocumentSessionHelper.AppendToStream(application.Id, -1, environmentRemoved);
+            await _applicationDocumentSessionHelper.AppendToStream(application.Id, environmentRemoved);
 
         await _documentSession.SaveChangesAsync();
         await _applicationDocumentSessionHelper.SaveChangesAsync();

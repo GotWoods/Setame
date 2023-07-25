@@ -26,7 +26,7 @@ public class DeleteApplicationHandlerTests
         await _subject.Handle(command, CancellationToken.None);
 
         // Assert
-        _documentSession.Verify(x => x.AppendToStream(command.ApplicationId, -1, It.IsAny<ApplicationDeleted>()), Times.Once); // Check that AppendToStream is called once with the correct parameters
+        _documentSession.Verify(x => x.AppendToStream(command.ApplicationId, It.IsAny<ApplicationDeleted>()), Times.Once); // Check that AppendToStream is called once with the correct parameters
         _documentSession.Verify(x => x.SaveChangesAsync(), Times.Once); // Check that SaveChangesAsync is called once
     }
 }

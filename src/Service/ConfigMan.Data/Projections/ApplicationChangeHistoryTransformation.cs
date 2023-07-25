@@ -1,12 +1,14 @@
 ﻿using ConfigMan.Data.Models;
 using JasperFx.Core;
 using Marten.Events;
+using Marten.Events.CodeGeneration;
 using Marten.Events.Projections;
 
 namespace ConfigMan.Data.Projections;
 
 public class ApplicationChangeHistoryTransformation : EventProjection
 {
+    [MartenIgnore]
     public Guid GetId<T>(IEvent<T> input) where T : notnull
     {
         var header = input.GetHeader("user-id");
