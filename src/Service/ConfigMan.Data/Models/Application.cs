@@ -1,15 +1,25 @@
 ﻿namespace ConfigMan.Data.Models;
 
-public interface IApplicationEvent {}
+public interface IApplicationEvent
+{
+}
 
 public record ApplicationCreated(Guid Id, string Name, string Token, Guid EnvironmentSetId) : IApplicationEvent;
+
 public record ApplicationEnvironmentAdded(string Name) : IApplicationEvent;
+
 public record ApplicationRenamed(string NewName) : IApplicationEvent;
+
 public record ApplicationVariableAdded(string Environment, string Name) : IApplicationEvent;
+
 public record ApplicationVariableChanged(string Environment, string VariableName, string NewValue) : IApplicationEvent;
+
 public record ApplicationDefaultVariableAdded(string VariableName) : IApplicationEvent;
+
 public record ApplicationDefaultVariableChanged(string VariableName, string NewValue) : IApplicationEvent;
+
 public record ApplicationVariableRenamed(string VariableName, string NewName) : IApplicationEvent;
+
 public record ApplicationDeleted(Guid ApplicationId) : IApplicationEvent;
 
 public class Application
@@ -43,26 +53,24 @@ public class Application
 
     public void Apply(ApplicationVariableChanged e)
     {
-        EnvironmentSettings.First(x => x.Name == e.Environment).Settings.Find(x => x.Name == e.VariableName).Value = e.NewValue;
-        //EnvironmentSettings[e.Environment].First(x => x.Name == e.VariableName).Value = e.NewValue;
+        EnvironmentSettings.First(x => x.Name == e.Environment).Settings.Find(x => x.Name == e.VariableName)!.Value =
+            e.NewValue;
     }
 
     public void Apply(ApplicationVariableRenamed e)
     {
         foreach (var env in EnvironmentSettings) env.Settings.First(x => x.Name == e.VariableName).Name = e.NewName;
-        //foreach (var env in EnvironmentSettings.Keys) EnvironmentSettings[env].First(x => x.Name == e.VariableName).Name = e.NewName;
     }
 
     public void Apply(ApplicationEnvironmentAdded e)
     {
-        EnvironmentSettings.Add(new Environment() { Name=e.Name });
-        //EnvironmentSettings.Add(e.Name, new List<Setting>());
+        EnvironmentSettings.Add(new Environment { Name = e.Name });
     }
 
 
     public void Apply(ApplicationDefaultVariableAdded e)
     {
-        ApplicationDefaults.Add(new Setting() { Name=e.VariableName });
+        ApplicationDefaults.Add(new Setting { Name = e.VariableName });
     }
 
     public void Apply(ApplicationDefaultVariableChanged e)
@@ -78,9 +86,7 @@ public class Application
     public void Apply(EnvironmentRemoved e)
     {
         foreach (var environmentSetting in EnvironmentSettings)
-        {
             environmentSetting.Settings.RemoveAll(x => x.Name == e.Name);
-        }
     }
 
     // public Dictionary<string, string> GetAppliedSettings(DeploymentEnvironment environment)

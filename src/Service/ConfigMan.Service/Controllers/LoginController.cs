@@ -45,7 +45,7 @@ namespace ConfigMan.Service.Controllers
         }
 
         [HttpPost("AppLogin")]
-        public async Task<IActionResult> AppLogin([FromBody] AppLoginRequest request)
+        public IActionResult AppLogin([FromBody] AppLoginRequest request)
         {
             //TODO: hash this token with the secret key? Then the calling app needs the key too though
             //  var application = await _applicationService.GetApplicationByIdAsync(request.ApplicaitonName);

@@ -73,8 +73,9 @@ public class RenameEnvironmentHandlerTests
         foreach (var application in associations.Applications)
         {
             _applicationSession.Verify(x => x.AppendToStream(application.Id, -1, It.IsAny<EnvironmentRenamed>()), Times.Once); // Check that AppendToStream is called once with the correct parameters for each application
-            _applicationSession.Verify(x => x.SaveChangesAsync(), Times.Once); // Check that SaveChangesAsync is called once for each application
+            
         }
+        _applicationSession.Verify(x => x.SaveChangesAsync(), Times.Once); // Check that SaveChangesAsync is called once for each application
     }
 
     [Fact]

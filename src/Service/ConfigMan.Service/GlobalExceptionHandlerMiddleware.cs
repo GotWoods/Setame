@@ -37,9 +37,9 @@ namespace ConfigMan.Service
 
             return context.Response.WriteAsync(new
             {
-                StatusCode = context.Response.StatusCode,
+                context.Response.StatusCode,
                 Message = "An unexpected error occurred. Please try again later."
-            }.ToString());
+            }.ToString() ?? string.Empty);
         }
     }
 }

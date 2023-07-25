@@ -64,7 +64,7 @@ public class UpdateDefaultApplicationVariableHandlerTests
             "New Value"
         );
 
-        _querySession.Setup(x => x.GetById(command.ApplicationId)).ReturnsAsync((Application)null); // Return null to simulate that the application is not found
+        _querySession.Setup(x => x.GetById(command.ApplicationId)).ReturnsAsync((Application)null!); // Return null to simulate that the application is not found
 
         // Act
         var response = await _subject.Handle(command, CancellationToken.None);

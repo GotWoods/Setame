@@ -32,7 +32,7 @@ public class RenameEnvironmentSetHandlerTests
             "NewEnvironmentSet" // Provide a unique NewName
         );
 
-        _environmentSetRepository.Setup(x => x.GetByName(command.NewName)).Returns((EnvironmentSet)null); // Return null to simulate a unique NewName
+        _environmentSetRepository.Setup(x => x.GetByName(command.NewName)).Returns((EnvironmentSet)null!); // Return null to simulate a unique NewName
 
         // Act
         var response = await _subject.Handle(command, CancellationToken.None);

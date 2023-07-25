@@ -34,9 +34,9 @@ public class AddVariableToEnvironmentSetHandler : IRequestHandler<AddVariableToE
                 break;
             }
 
-        if (!found)
+        if (found)
         {
-            return CommandResponse.FromError(Errors.VariableNotFound(command.VariableName));
+            return CommandResponse.FromError(Errors.DuplicateName(command.VariableName));
         }
 
         foreach (var environment in existing.DeploymentEnvironments)

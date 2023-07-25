@@ -132,7 +132,7 @@ app.UseSpaStaticFiles();
 //     }
 // });
 
-app.MapWhen(x => !x.Request.Path.Value.StartsWith("/api"), config =>
+app.MapWhen(x => !x.Request.Path.Value!.StartsWith("/api"), config =>
 {
     config.UseSpa(spa =>
     {

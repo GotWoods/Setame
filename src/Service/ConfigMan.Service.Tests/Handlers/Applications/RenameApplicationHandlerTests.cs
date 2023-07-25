@@ -50,7 +50,7 @@ public class RenameApplicationHandlerTests
         // Arrange
         var command = new RenameApplication(Guid.NewGuid(), 1, "New Application Name"); // Provide a valid ApplicationId and ExpectedVersion
 
-        _querySession.Setup(x => x.GetById(command.ApplicationId)).ReturnsAsync((Application)null); // Return null to simulate that the application is not found
+        _querySession.Setup(x => x.GetById(command.ApplicationId)).ReturnsAsync((Application)null!); // Return null to simulate that the application is not found
 
         // Act
         var response = await _subject.Handle(command, CancellationToken.None);

@@ -63,7 +63,7 @@ public class CreateDefaultApplicationVariableHandlerTests
         );
 
         _applicationRepository.Setup(x => x.GetById(command.ApplicationId))
-            .ReturnsAsync((Application)null); // Return null to simulate an invalid application
+            .ReturnsAsync((Application)null!); // Return null to simulate an invalid application
 
         // Act
         var ex = await Assert.ThrowsAsync<NullReferenceException>(async () => await _subject.Handle(command, CancellationToken.None));

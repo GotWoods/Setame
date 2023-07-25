@@ -26,7 +26,7 @@ public class AddVariableToEnvironmentSetHandlerTests
         var command = new AddVariableToEnvironmentSet(
             Guid.NewGuid(), // Provide a valid EnvironmentSetId
             1, // Provide the expected version
-            "Variable Name2" // Provide a variable name that does not exist in one of the deployment environments
+            "New Variable"
         );
 
         var existingEnvironmentSet = new EnvironmentSet
@@ -74,43 +74,7 @@ public class AddVariableToEnvironmentSetHandlerTests
         // Act
         await Assert.ThrowsAsync<NullReferenceException>(async () => await _subject.Handle(command, CancellationToken.None));
     }
-
-    [Fact]
-    public async Task Handle_VariableNotFound_FailureResponse()
-    {
-        // Arrange
-        var command = new AddVariableToEnvironmentSet(
-            Guid.NewGuid(), // Provide a valid EnvironmentSetId
-            1, // Provide the expected version
-            "Variable Name" // Provide a variable name that does not exist in any of the deployment environments
-        );
-
-        var existingEnvironmentSet = new EnvironmentSet
-        {
-            Id = command.EnvironmentSetId,
-            DeploymentEnvironments = new List<DeploymentEnvironment>
-            {
-                new DeploymentEnvironment
-                {
-                    Name = "Dev",
-                    EnvironmentSettings = new Dictionary<string, string>
-                    {
-                        { "Some Other Variable", "Value" } // Add a different variable to the deployment environment
-                    }
-                }
-            },
-            Version = command.ExpectedVersion - 1 // The expected version should be one less than the current version
-        };
-
-        _environmentSetRepository.Setup(x => x.GetById(command.EnvironmentSetId)).ReturnsAsync(existingEnvironmentSet);
-
-        // Act
-        var response = await _subject.Handle(command, CancellationToken.None);
-
-        // Assert
-        Assert.NotEmpty(response.Errors); // Check that there are errors in the response
-        Assert.Contains(response.Errors, e => e.ErrorCode == Errors.VariableNotFound(command.VariableName).ErrorCode); // Check that the error message matches the expected error message for variable not found
-    }
+    
 
     [Fact]
     public async Task Handle_DuplicateVariable_FailureResponse()

@@ -7,13 +7,16 @@ namespace ConfigMan.Data.Projections;
 
 public class ApplicationChangeHistoryTransformation : EventProjection
 {
+    public Guid GetId<T>(IEvent<T> input) where T : notnull
+    {
+        var header = input.GetHeader("user-id");
+        if (header == null)
+            return Guid.Empty;
+        return Guid.Parse(header.ToString()!);
+    }
+
     public ApplicationChangeHistory Transform(IEvent<ApplicationCreated> input)
     {
-        var userHeader = input.GetHeader("user-id");
-        var userId = Guid.Empty;
-        if (userHeader != null)
-            userId = Guid.Parse(userHeader.ToString() ?? string.Empty);
-
         return new ApplicationChangeHistory(
 
             CombGuidIdGeneration.NewGuid(),
@@ -21,7 +24,7 @@ public class ApplicationChangeHistoryTransformation : EventProjection
             input.Timestamp,
             ApplicationActionType.Create,
             $"Created: '{input.Data.Name}'",
-            userId
+            GetId(input)
         );
     }
 
@@ -34,7 +37,7 @@ public class ApplicationChangeHistoryTransformation : EventProjection
             input.Timestamp,
             ApplicationActionType.Create,
             $"Renamed: '{input.Data.NewName}'",
-            Guid.Parse(input.GetHeader("user-id").ToString())
+            GetId(input)
         );
     }
 
@@ -47,7 +50,7 @@ public class ApplicationChangeHistoryTransformation : EventProjection
             input.Timestamp,
             ApplicationActionType.VariableCreate,
             $"Application Variable Created: '{input.Data.Name}'",
-            Guid.Parse(input.GetHeader("user-id").ToString())
+            GetId(input)
         );
     }
 
@@ -60,7 +63,7 @@ public class ApplicationChangeHistoryTransformation : EventProjection
             input.Timestamp,
             ApplicationActionType.VariableChange,
             $"Application Variable {input.Data.VariableName} changed to {input.Data.NewValue} for {input.Data.Environment}",
-            Guid.Parse(input.GetHeader("user-id").ToString())
+            GetId(input)
         );
     }
 
@@ -73,7 +76,7 @@ public class ApplicationChangeHistoryTransformation : EventProjection
             input.Timestamp,
             ApplicationActionType.VariableRename,
             $"Application Variable {input.Data.VariableName} renamed to {input.Data.NewName}",
-            Guid.Parse(input.GetHeader("user-id").ToString())
+            GetId(input)
         );
     }
 
@@ -86,7 +89,7 @@ public class ApplicationChangeHistoryTransformation : EventProjection
             input.Timestamp,
             ApplicationActionType.VariableRename,
             $"Application Default {input.Data.VariableName} added",
-            Guid.Parse(input.GetHeader("user-id").ToString())
+            GetId(input)
         );
     }
 
@@ -99,7 +102,7 @@ public class ApplicationChangeHistoryTransformation : EventProjection
             input.Timestamp,
             ApplicationActionType.VariableRename,
             $"Application Default {input.Data.VariableName} changed to {input.Data.NewValue}",
-            Guid.Parse(input.GetHeader("user-id").ToString())
+            GetId(input)
         );
     }
 }

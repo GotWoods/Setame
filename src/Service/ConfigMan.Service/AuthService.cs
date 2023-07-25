@@ -37,7 +37,7 @@ namespace ConfigMan.Service
             return tokenString;
         }
 
-        public async Task<string> GenerateApplicationTokenAsync(string applicationName)
+        public Task<string> GenerateApplicationTokenAsync(string applicationName)
         {
             // // Retrieve the token associated with the application
             // var application = await _applicationService.GetApplicationByIdAsync(applicationName);
@@ -63,7 +63,7 @@ namespace ConfigMan.Service
             //
             // var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
             // return tokenString;
-            return "";
+            return Task.FromResult("");
         }
     }
 }
