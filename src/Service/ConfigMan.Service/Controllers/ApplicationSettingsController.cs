@@ -22,7 +22,7 @@ public class ApplicationSettingsController : ControllerBase
 
     [HttpGet]
     [Authorize(Roles = "Application")]
-    public async Task<ActionResult> Get()
+    public ActionResult Get()
     {
         var claim = User.FindFirst(ClaimTypes.NameIdentifier);
         if (claim == null)

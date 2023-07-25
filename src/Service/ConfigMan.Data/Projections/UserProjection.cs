@@ -11,9 +11,9 @@ namespace ConfigMan.Data.Projections
     public class UserSummary
     {
         public Guid Id { get; set; }
-        public string Username { get; set; }
-        public string PasswordHash { get; set; }
-        public string Salt { get; set; }
+        public string Username { get; set; } = string.Empty;
+        public string PasswordHash { get; set; } = string.Empty;
+        public string Salt { get; set; } = string.Empty;
     }
 
     public class UsersProjection : MultiStreamProjection<UserSummary, Guid>

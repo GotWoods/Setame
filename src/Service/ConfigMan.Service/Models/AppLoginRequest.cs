@@ -2,6 +2,6 @@
 
 public class AppLoginRequest
 {
-    public string ApplicaitonName{ get; set; }
-    public string Token { get; set; }
+    public string ApplicationName { get; set; } = string.Empty;
+    public string Token { get; set; } = string.Empty;
 }

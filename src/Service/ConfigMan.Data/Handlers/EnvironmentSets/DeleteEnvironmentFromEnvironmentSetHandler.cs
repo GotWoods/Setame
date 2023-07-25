@@ -1,6 +1,6 @@
-﻿using ConfigMan.Data.Models;
+﻿using ConfigMan.Data.Data;
+using ConfigMan.Data.Models;
 using ConfigMan.Data.Projections;
-using Marten;
 using MediatR;
 
 namespace ConfigMan.Data.Handlers.EnvironmentSets;
@@ -13,15 +13,14 @@ public class
 {
     private readonly IDocumentSessionHelper<Application> _applicationDocumentSessionHelper;
     private readonly IDocumentSessionHelper<EnvironmentSet> _documentSession;
-    private readonly IQuerySession _querySession;
+    private readonly IEnvironmentSetApplicationAssociationRepository _environmentSetApplicationAssociationRepository;
 
 
-    public DeleteEnvironmentFromEnvironmentSetHandler(IDocumentSessionHelper<EnvironmentSet> documentSession,
-        IDocumentSessionHelper<Application> applicationDocumentSessionHelper, IQuerySession querySession)
+    public DeleteEnvironmentFromEnvironmentSetHandler(IDocumentSessionHelper<EnvironmentSet> documentSession, IDocumentSessionHelper<Application> applicationDocumentSessionHelper, IEnvironmentSetApplicationAssociationRepository environmentSetApplicationAssociationRepository)
     {
         _documentSession = documentSession;
         _applicationDocumentSessionHelper = applicationDocumentSessionHelper;
-        _querySession = querySession;
+        _environmentSetApplicationAssociationRepository = environmentSetApplicationAssociationRepository;
     }
 
 
@@ -31,8 +30,7 @@ public class
 
         await _documentSession.AppendToStream(command.EnvironmentSetId, command.ExpectedVersion, environmentRemoved);
 
-        var associations = _querySession.Query<EnvironmentSetApplicationAssociation>()
-            .First(x => x.Id == command.EnvironmentSetId);
+        var associations = _environmentSetApplicationAssociationRepository.Get(command.EnvironmentSetId);
         foreach (var application in associations.Applications)
             await _applicationDocumentSessionHelper.AppendToStream(application.Id, -1, environmentRemoved);
 

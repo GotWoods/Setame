@@ -24,7 +24,15 @@ public class AddEnvironmentToEnvironmentSetHandler : IRequestHandler<AddEnvironm
             throw new NullReferenceException("Environment Set could not be found with Id of " + command.EnvironmentSetId);
 
         //TODO: Add environment to all Children Applications?
-        //TODO: ensure no duplicates
+        
+        foreach (var deploymentEnvironment in existing.DeploymentEnvironments)
+        {
+            if (deploymentEnvironment.Name == command.Name)
+            {
+                return CommandResponse.FromError(Errors.DuplicateName(command.Name));
+            }
+        }
+
         await _documentSession.AppendToStream(command.EnvironmentSetId, command.ExpectedVersion, new EnvironmentAdded(command.Name));
         await _documentSession.SaveChangesAsync();
         return CommandResponse.FromSuccess(command.ExpectedVersion+1);

@@ -43,7 +43,7 @@ public class UserService : IUserService
 
     private string GenerateSalt()
     {
-        var rng = new RNGCryptoServiceProvider();
+        var rng = RandomNumberGenerator.Create();
         var salt = new byte[32];
         rng.GetBytes(salt);
         return Convert.ToBase64String(salt);

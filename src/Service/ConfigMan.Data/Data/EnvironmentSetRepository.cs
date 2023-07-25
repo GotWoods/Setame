@@ -1,5 +1,4 @@
 ﻿using ConfigMan.Data.Models;
-using ConfigMan.Data.Projections;
 using Marten;
 
 namespace ConfigMan.Data.Data;

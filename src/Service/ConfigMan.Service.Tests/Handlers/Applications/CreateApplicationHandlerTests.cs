@@ -66,7 +66,7 @@ public class CreateApplicationHandlerTests
             Guid.NewGuid()
         );
 
-        _environmentSetDocumentSession.Setup(x => x.GetFromEventStream(command.EnvironmentSetId)).ReturnsAsync((EnvironmentSet)null); // Return null to simulate an invalid EnvironmentSet
+        _environmentSetDocumentSession.Setup(x => x.GetFromEventStream(command.EnvironmentSetId)).ReturnsAsync((EnvironmentSet)null!); // Return null to simulate an invalid EnvironmentSet
 
         var ex = await Assert.ThrowsAsync<NullReferenceException>(async () => await _subject.Handle(command, CancellationToken.None));
 

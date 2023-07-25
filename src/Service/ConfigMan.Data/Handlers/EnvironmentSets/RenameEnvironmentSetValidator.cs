@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace ConfigMan.Data.Handlers.EnvironmentSets;
 
-public class RenameEnvironmentValidator : AbstractValidator<RenameEnvironment>
+public class RenameEnvironmentSetValidator : AbstractValidator<RenameEnvironmentSet>
 {
-    public RenameEnvironmentValidator()
+    public RenameEnvironmentSetValidator()
     {
         RuleFor(x => x.EnvironmentSetId)
             .NotEmpty().WithMessage("{PropertyName} is required.").WithErrorCode("Vx1000");

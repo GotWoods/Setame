@@ -22,6 +22,9 @@ public class EnvironmentSetApplicationsProjection : EventProjection
     public async Task Project(ApplicationAssociatedToEnvironmentSet e, IDocumentOperations operations)
     {
         var app = await operations.Events.AggregateStreamAsync<Application>(e.ApplicationId);
+        if (app == null)
+            throw new NullReferenceException("Application could not be found");
+
         var existingAssociation = await operations.LoadAsync<EnvironmentSetApplicationAssociation>(e.EnvironmentSetId);
         if (existingAssociation == null)
             return;

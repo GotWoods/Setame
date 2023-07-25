@@ -24,6 +24,8 @@ public class RenameEnvironmentSetHandler : IRequestHandler<RenameEnvironmentSet,
         if (environmentSet != null)
             return CommandResponse.FromError(Errors.DuplicateName(command.NewName));
 
+
+
         await _documentSession.AppendToStream(command.EnvironmentSetId, command.ExpectedVersion, new EnvironmentSetRenamed(command.EnvironmentSetId, command.NewName));
         await _documentSession.SaveChangesAsync();
         return CommandResponse.FromSuccess(command.ExpectedVersion +1);

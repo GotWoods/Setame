@@ -7,7 +7,7 @@ namespace ConfigMan.Data.Projections;
 public class ActiveEnvironmentSet
 {
     public Guid Id { get; set; } 
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     public int Version { get; set; }
 }
 

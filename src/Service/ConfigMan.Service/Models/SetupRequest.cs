@@ -2,7 +2,7 @@
 {
     public class SetupRequest
     {
-        public string AdminEmailAddress { get; set; }
-        public string NewPassword { get; set; }
+        public string AdminEmailAddress { get; set; } = string.Empty;
+        public string NewPassword { get; set; } = string.Empty;
     }
 }

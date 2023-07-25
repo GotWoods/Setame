@@ -7,6 +7,14 @@ namespace ConfigMan.Data.Projections;
 
 public class EnvironmentSetHistoryTransformation : EventProjection
 {
+    public Guid GetId<T>(IEvent<T> input) where T : notnull
+    {
+        var header = input.GetHeader("user-id");
+        if (header == null)
+            return Guid.Empty;
+        return Guid.Parse(header.ToString()!);
+    }
+
     public EnvironmentSetChangeHistory Transform(IEvent<EnvironmentSetRenamed> input)
     {
         return new EnvironmentSetChangeHistory(
@@ -16,7 +24,7 @@ public class EnvironmentSetHistoryTransformation : EventProjection
             input.Timestamp,
             EnvironmentActionType.Rename,
             $"Renamed To: '{input.Data.NewName}'",
-            Guid.Parse(input.GetHeader("user-id").ToString())
+            GetId(input)
         );
     }
 
@@ -28,7 +36,7 @@ public class EnvironmentSetHistoryTransformation : EventProjection
             input.Timestamp,
             EnvironmentActionType.Create,
             $"Created: '{input.Data.Name}'",
-            Guid.Parse(input.GetHeader("user-id").ToString())
+            GetId(input)
         );
     }
 
@@ -40,7 +48,7 @@ public class EnvironmentSetHistoryTransformation : EventProjection
             input.Timestamp,
             EnvironmentActionType.Delete,
             $"Deleted: ",
-            Guid.Parse(input.GetHeader("user-id").ToString())
+            GetId(input)
         );
     }
 
@@ -52,7 +60,7 @@ public class EnvironmentSetHistoryTransformation : EventProjection
             input.Timestamp,
             EnvironmentActionType.EnvironmentAdded,
             $"Environment Added: {input.Data.Name}",
-            Guid.Parse(input.GetHeader("user-id").ToString())
+            GetId(input)
         );
     }
 
@@ -64,7 +72,7 @@ public class EnvironmentSetHistoryTransformation : EventProjection
             input.Timestamp,
             EnvironmentActionType.Rename,
             $"Environment Renamed from {input.Data.OldName} to {input.Data.NewName}",
-            Guid.Parse(input.GetHeader("user-id").ToString())
+            GetId(input)
         );
     }
 }
