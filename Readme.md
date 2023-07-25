@@ -15,6 +15,7 @@ on startup and be changed without requiring an application to be redeployed for 
 1. On the setup page enter a valid email address and your password
 1. Now login and you are ready to start configurating!
  
+https://github.com/serilog/serilog-settings-configuration
 
 ## Upcoming Feature Possibilities
 This is a rough roadmap of features we want to have but not a guarantee

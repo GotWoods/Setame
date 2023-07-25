@@ -80,7 +80,7 @@ builder.Services.AddMarten(opts =>
     //opts.Projections.LiveStreamAggregation<EnvironmentSet>(); //live can only be used with AggregateStream
 
     //LoadAsync will actually load the document from the table
-}).AddAsyncDaemon(DaemonMode.Solo); //TODO: adjust this for prod?
+}).AddAsyncDaemon(DaemonMode.Solo).UseLightweightSessions(); //TODO: adjust this for prod?
 
 builder.Services.AddMediatR(x => { x.RegisterServicesFromAssemblyContaining<CreateEnvironmentSetHandler>(); });
 
@@ -91,9 +91,9 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 //Configure Serilog
 Log.Logger = new LoggerConfiguration()
-    //  .ReadFrom.Configuration(builder.Configuration)
-    .Enrich.FromLogContext()
-    .WriteTo.Console()
+    .ReadFrom.Configuration(builder.Configuration)
+    //.Enrich.FromLogContext()
+    //.WriteTo.Console()
     //.WriteTo.Seq(builder.Configuration["Seq:ServerUrl"])
     .CreateLogger();
 

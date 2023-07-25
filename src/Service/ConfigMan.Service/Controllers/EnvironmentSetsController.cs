@@ -13,33 +13,46 @@ namespace ConfigMan.Service.Controllers;
 public class EnvironmentSetsController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly ILogger<EnvironmentSetsController> _logger;
 
-    public EnvironmentSetsController(IMediator mediator)
+    public EnvironmentSetsController(IMediator mediator, ILogger<EnvironmentSetsController> logger)
     {
         _mediator = mediator;
+        _logger = logger;
+
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<EnvironmentSet>>> GetAll()
     {
+        _logger.LogDebug("Getting all");
         var results = await _mediator.Send(new GetActiveEnvironmentSets());
+        _logger.LogDebug("Found {Count} Environment Sets", results.Count);
         return Ok(results);
     }
 
     [HttpGet("{environmentSetId}")]
     public async Task<ActionResult<EnvironmentSet>> GetOne(Guid environmentSetId)
     {
+        _logger.LogDebug("Getting Environment Set {Id}", environmentSetId);
         var deploymentEnvironment = await _mediator.Send(new GetEnvironment(environmentSetId));
         Response.TrySetETagResponseHeader(deploymentEnvironment.Version.ToString());
+        _logger.LogDebug("Found Environment Set");
         return Ok(deploymentEnvironment);
     }
 
     [HttpPost]
-    public async Task<ActionResult> Create(EnvironmentSet environmentSet)
+    public async Task<ActionResult> Create([FromBody] string name)
     {
-        var result = await _mediator.Send(new CreateEnvironmentSet(environmentSet.Name));
-        if (!result.WasSuccessful) 
+        _logger.LogDebug("Creating a new environment set {Name}", name);
+        var result = await _mediator.Send(new CreateEnvironmentSet(name));
+        if (!result.WasSuccessful)
+        {
+            _logger.LogWarning("Creation failed. {@Errors}", result.Errors);
             return new BadRequestObjectResult(result);
+        }
+
+        _logger.LogDebug("Environment Set Created. New id is {Id}", result.Data);
         return Ok(result.Data);
     }
 
@@ -47,6 +60,7 @@ public class EnvironmentSetsController : ControllerBase
     public async Task<IActionResult> Delete(Guid environmentSetId)
     {
         await _mediator.Send(new DeleteEnvironmentSet(environmentSetId));
+        _logger.LogDebug("Environment set {Id} was deleted", environmentSetId);
         return NoContent();
     }
 
@@ -56,6 +70,7 @@ public class EnvironmentSetsController : ControllerBase
         var version = Request.GetIfMatchRequestHeader();
         await _mediator.Send(new RenameEnvironmentSet(environmentSetId, version, newName));
         Response.TrySetETagResponseHeader(version+1);
+        _logger.LogDebug("Environment set {Id} was renamed to {NewName}", environmentSetId, newName);
         return NoContent();
     }
 
@@ -66,6 +81,7 @@ public class EnvironmentSetsController : ControllerBase
         var version = Request.GetIfMatchRequestHeader();
         await _mediator.Send(new AddEnvironmentToEnvironmentSet(environmentSetId, version, environmentName));
         Response.TrySetETagResponseHeader(version + 1);
+        _logger.LogDebug("Environment set {Id} added a new environment named {EnvironmentName}", environmentSetId, environmentName);
         return NoContent();
     }
 
@@ -74,6 +90,7 @@ public class EnvironmentSetsController : ControllerBase
     {
         var version = Request.GetIfMatchRequestHeader();
         await _mediator.Send(new DeleteEnvironmentFromEnvironmentSet(environmentSetId, version, environmentName));
+        _logger.LogDebug("Environment set {Id} had the environment {EnvironmentName} removed", environmentSetId, environmentName);
         return NoContent();
     }
 
@@ -83,6 +100,7 @@ public class EnvironmentSetsController : ControllerBase
         var version = Request.GetIfMatchRequestHeader();
         await _mediator.Send(new RenameEnvironment(environmentSetId, version, environmentName, newName));
         Response.TrySetETagResponseHeader(version + 1);
+        _logger.LogDebug("Environment set {Id} had the environment {OldName} renamed to {NewName}", environmentSetId, environmentName, newName);
         return NoContent();
     }
 
@@ -92,6 +110,7 @@ public class EnvironmentSetsController : ControllerBase
         var version = Request.GetIfMatchRequestHeader();
         await _mediator.Send(new AddVariableToEnvironmentSet(environmentSetId, version, variableName));
         Response.TrySetETagResponseHeader(version + 1);
+        _logger.LogDebug("Environment set {Id} had the {VariableName} variable added", environmentSetId, variableName);
         return NoContent();
     }
 
@@ -101,6 +120,7 @@ public class EnvironmentSetsController : ControllerBase
         var version = Request.GetIfMatchRequestHeader();
         await _mediator.Send(new UpdateEnvironmentSetVariable(environmentSetId, version, environment, variableName, variableValue));
         Response.TrySetETagResponseHeader(version + 1);
+        _logger.LogDebug("Environment set {Id} had the {VariableName} set to {VariableValue} for environment {Environment}", environmentSetId, variableName, variableValue, environment);
         return NoContent();
     }
 
@@ -110,6 +130,7 @@ public class EnvironmentSetsController : ControllerBase
         var version = Request.GetIfMatchRequestHeader();
         await _mediator.Send(new RenameEnvironmentSetVariable(environmentSetId, version, variableName, newName));
         Response.TrySetETagResponseHeader(version + 1);
+        _logger.LogDebug("Environment set {Id} had the {VariableName} variable renamed to {NewName}", environmentSetId, variableName, newName);
         return NoContent();
     }
 }
