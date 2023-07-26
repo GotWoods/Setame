@@ -27,8 +27,6 @@ public class RenameApplicationVariableHandler : IRequestHandler<RenameApplicatio
         _logger.LogDebug("Renaming Variable {Variable} to {NewName} for {Application}", command.OldName, command.NewName, command.ApplicationId);
         var response = new CommandResponse();
         var existing = await _querySession.GetById(command.ApplicationId);
-        if (existing == null)
-            throw new NullReferenceException("Application not found");
 
         var found = false;
         foreach (var environmentSetting in existing.EnvironmentSettings)

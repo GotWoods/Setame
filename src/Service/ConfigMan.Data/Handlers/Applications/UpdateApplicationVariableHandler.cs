@@ -28,10 +28,6 @@ public class UpdateApplicationVariableHandler : IRequestHandler<UpdateApplicatio
         var response = new CommandResponse();
 
         var existing = await _querySession.GetById(command.ApplicationId);
-        if (existing == null)
-        {
-            throw new NullReferenceException("Application could not be found");
-        }
 
         var environmentSetting = existing.EnvironmentSettings.FirstOrDefault(x=>x.Name == command.Environment);
         if (environmentSetting == null)

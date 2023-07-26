@@ -2,6 +2,7 @@
 using ConfigMan.Data.Data;
 using ConfigMan.Data.Handlers.Applications;
 using ConfigMan.Data.Models;
+using ConfigMan.Data.Projections;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -26,14 +27,14 @@ public class RenameApplicationHandlerTests
         // Arrange
         var command = new RenameApplication(Guid.NewGuid(), 1, "New Application Name"); // Provide a valid ApplicationId and ExpectedVersion
 
-        var existingApplication = new Application
+        var existingApplication = new ActiveApplication()
         {
             Id = command.ApplicationId,
             Name = "Old Application Name",
             Version = command.ExpectedVersion - 1 // The expected version should be one less than the current version
         };
 
-        _querySession.Setup(x => x.GetById(command.ApplicationId)).ReturnsAsync(existingApplication);
+        _querySession.Setup(x => x.GetByName(command.NewName)).Returns(existingApplication);
 
         // Act
         var response = await _subject.Handle(command, CancellationToken.None);

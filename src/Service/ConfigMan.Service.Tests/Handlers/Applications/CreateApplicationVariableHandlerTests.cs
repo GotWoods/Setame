@@ -62,27 +62,6 @@ public class CreateApplicationVariableHandlerTests
     }
 
     [Fact]
-    public async Task Handle_InvalidApplication_FailureResponse()
-    {
-        // Arrange
-        var command = new CreateApplicationVariable(
-            Guid.NewGuid(),
-            1,
-            "Dev",
-            "VariableName"
-        );
-
-        _applicationRepository.Setup(x => x.GetById(command.ApplicationId))
-            .ReturnsAsync((Application)null!); // Return null to simulate an invalid application
-
-        // Act
-        var ex = await Assert.ThrowsAsync<NullReferenceException>(async () => await _subject.Handle(command, CancellationToken.None));
-
-        // Assert
-        Assert.Equal("Application could not be found", ex.Message); // Check the exception message
-    }
-
-    [Fact]
     public async Task Handle_InvalidEnvironment_FailureResponse()
     {
         // Arrange

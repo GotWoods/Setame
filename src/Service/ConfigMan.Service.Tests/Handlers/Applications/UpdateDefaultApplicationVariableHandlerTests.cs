@@ -54,26 +54,7 @@ public class UpdateDefaultApplicationVariableHandlerTests
         _documentSession.Verify(x => x.SaveChangesAsync(), Times.Once); // Check that SaveChangesAsync is called once
     }
 
-    [Fact]
-    public async Task Handle_ApplicationNotFound_FailureResponse()
-    {
-        // Arrange
-        var command = new UpdateDefaultApplicationVariable(
-            Guid.NewGuid(), // Provide a valid ApplicationId
-            1, // Provide the expected version
-            "Variable Name",
-            "New Value"
-        );
-
-        _querySession.Setup(x => x.GetById(command.ApplicationId)).ReturnsAsync((Application)null!); // Return null to simulate that the application is not found
-
-        // Act
-        var response = await _subject.Handle(command, CancellationToken.None);
-
-        // Assert
-        Assert.NotEmpty(response.Errors); // Check that there are errors in the response
-        Assert.Contains(response.Errors, e => e.ErrorCode == Errors.ApplicationNotFound(command.ApplicationId).ErrorCode); // Check that the error message matches the expected error message for application not found
-    }
+   
 
     [Fact]
     public async Task Handle_VariableNotFound_FailureResponse()

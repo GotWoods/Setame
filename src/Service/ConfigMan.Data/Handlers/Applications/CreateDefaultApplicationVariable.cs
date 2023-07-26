@@ -27,9 +27,6 @@ public class CreateDefaultApplicationVariableHandler : IRequestHandler<CreateDef
 
         var result = new CommandResponse();
         var app = await   _querySession.GetById(command.ApplicationId);
-        if (app == null)
-            throw new NullReferenceException("Application could not be found");
-
         if (app.ApplicationDefaults.Any(x => x.Name == command.VariableName))
         {
             _logger.LogWarning("Duplicate variable name of {Variable}", command.VariableName);
