@@ -1,5 +1,5 @@
-## ConfigMan
-ConfigMan is a configuration management server designed to have a central location to store configuration. Applications can be configured to load their configuration
+## Setame
+Setame is a configuration management server designed to have a central location to store configuration. Applications can be configured to load their configuration
 on startup and be changed without requiring an application to be redeployed for a config change.
 
 ## Features
