@@ -1,5 +1,5 @@
-## ConfigMan
-ConfigMan is a configuration management server designed to have a central location to store configuration. Applications can be configured to load their configuration
+## Setame
+Setame is a configuration management server designed to have a central location to store configuration. Applications can be configured to load their configuration
 on startup and be changed without requiring an application to be redeployed for a config change.
 
 ## Features
@@ -14,44 +14,33 @@ on startup and be changed without requiring an application to be redeployed for 
 1. Open the application and login with "admin@admin.com" and a password of "admin". This will open the setup page
 1. On the setup page enter a valid email address and your password
 1. Now login and you are ready to start configurating!
- 
 
 ## Upcoming Feature Possibilities
-This is a rough roadmap of features we want to have but not a guarantee
+This is a rough roadmap of features we want to have (but not a guarantee)
 
+- Secret storage
+- Add custom environment to an application in addition of what comes from environment set (this will then require ordering of environments)
+- Environment Groups. A set of environment variables tied to an environment set that can be applied to multiple applications. This allows the user to attach commonly re-used variables to an application that may not be used for ALL applications (That is where you would use the environment set method)
+- Ability to Duplicate Environment Set
+- Ability to Duplicate Application
+- Filter/Search applications
+- Attach/Detach application from Environment Set
 - Case Sensitive/Insensitive Configuration flag (or just detection of case mismatches between sets/groups/applications)
 - Per Application Access (read/write/Whatever people want)
-- Secret storage
 - Variable version pinning so that you always get the version of config that you want (may help with environment renames as well)
 - Live variables changes (May be .NET provider only)
 - Tracking of variable usages (may be .NET only)
 - Host Based or Percentage Based Config. A certain percentage of clients can get a specific setting (this could be used for A/B testing)
-- Environment Groups. A set of environment variables tied to an environment set that can be applied to multiple applications. This allows the user to attach commonly re-used variables to an application that may not be used for ALL applications (That is where you would use the environment set method)
-- Host Based or Percentage Based Config. A certain percentage of clients can get a specific setting (this could be used for A/B testing)
-- Ability to Duplicate Environment Set
-- Ability to Duplicate Application
 - History screens to have searching/paging
-- Attach/Detach application from Environment Set
-- Add custom environment to an application in addition of what comes from environment set (this will then require ordering of environments)
 - Visual of applied config and why a given setting is being overriden
 - Internationalization
-- Filter/Search applications
 
 ## TODO
 Items that are still pending before this is considered a Beta:
 
 - Forgot Password
 - Showing errors to user instead of console
-- Build and deploy 
-	- Generate the settings file (prod can just be /
-	- Compile react app in prod mode
-	- take output of the bundling and place it into the .net app
-	- compile the .net app
-	- create a zip of that for release
-	- create a docker container of it as well
-
-- Logging
-- More server side validation
+- Docker image
 
 ### Environment Sets
 - When a new variable is created (it is blank), loose focus, regain focus, and name, the Rename endpoint is being called and not the new endpoint

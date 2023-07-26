@@ -21,7 +21,7 @@ services:
     ports:
       - "5050:80"
   configman.service:
-    image: ${DOCKER_REGISTRY-}configmanservice
+    image: ${DOCKER_REGISTRY-}setame_web
     build:
       context: .
-      dockerfile: ConfigMan.Service/Dockerfile
+      dockerfile: Setame.Web/Dockerfile

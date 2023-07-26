@@ -80,11 +80,21 @@ jobs:
           npm run build
 
       - name: Copy release to .NET project folder
-        run: cp -r src/UserInterface/build src/Service/ConfigMan.Service/www
+        run: cp -r src/UserInterface/build src/Service/Setame.Web/www
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Update assembly versions
+        run: |
+          dotnet msbuild /p:Version=${{ env.VERSION }} /t:UpdateAssemblyInfo
+          dotnet build
       
       - name: Build and publish .NET application
-        working-directory: src/Service/ConfigMan.Service
-        run: dotnet publish -c Release -o ../../../release /p:Version=${{ env.VERSION }}
+        working-directory: src/Service/Setame.Web
+        run: dotnet publish -c Release -o publish
 
       - uses: meeDamian/github-release@2.0
         with:

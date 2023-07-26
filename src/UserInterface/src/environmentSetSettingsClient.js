@@ -71,7 +71,7 @@ class EnvironmentSetSettingsClient extends SettingsClient {
         const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets`, {
             method: 'POST',
             headers: this.getHeaders(),
-            body: JSON.stringify({ name }),
+            body: JSON.stringify(name),
         });
         return this.handleResponse(response);
     }

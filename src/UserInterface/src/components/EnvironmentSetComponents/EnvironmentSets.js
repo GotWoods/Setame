@@ -13,7 +13,7 @@ const EnvironmentSets = () => {
 
   useEffect(() => {
     fetchEnvironmentSets();
-  });
+  }, []);
 
   const fetchEnvironmentSets = async () => {
     const data = await settingsClient.getEnvironmentSets();
