@@ -44,8 +44,6 @@ Items that are still pending before this is considered a Beta:
 - Forgot Password
 - Showing errors to user instead of console
 - Docker image
-- Logging
-
 
 ### Environment Sets
 - When a new variable is created (it is blank), loose focus, regain focus, and name, the Rename endpoint is being called and not the new endpoint
