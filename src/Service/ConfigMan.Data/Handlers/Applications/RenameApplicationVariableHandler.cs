@@ -24,13 +24,11 @@ public class RenameApplicationVariableHandler : IRequestHandler<RenameApplicatio
 
     public async Task<CommandResponse> Handle(RenameApplicationVariable command, CancellationToken cancellationToken)
     {
+        _logger.LogDebug("Renaming Variable {Variable} to {NewName} for {Application}", command.OldName, command.NewName, command.ApplicationId);
         var response = new CommandResponse();
         var existing = await _querySession.GetById(command.ApplicationId);
         if (existing == null)
-        {
-            response.Errors.Add(Errors.ApplicationNotFound(command.ApplicationId));
-            return response;
-        }
+            throw new NullReferenceException("Application not found");
 
         var found = false;
         foreach (var environmentSetting in existing.EnvironmentSettings)
@@ -42,14 +40,15 @@ public class RenameApplicationVariableHandler : IRequestHandler<RenameApplicatio
 
         if (!found)
         {
+            _logger.LogWarning("Could not rename {Variable} to {NewName} as the variable was not found", command.OldName, command.NewName);
             response.Errors.Add(Errors.VariableNotFoundRename(command.OldName));
             return response;
         }
 
-        await _documentSession.AppendToStream(command.ApplicationId, command.ExpectedVersion,
-            new ApplicationVariableRenamed(command.OldName, command.NewName));
+        await _documentSession.AppendToStream(command.ApplicationId, command.ExpectedVersion, new ApplicationVariableRenamed(command.OldName, command.NewName));
         await _documentSession.SaveChangesAsync();
         response.NewVersion = command.ExpectedVersion + 1;
+        _logger.LogDebug("Rename variable completed");
         return response;
     }
 }

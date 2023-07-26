@@ -22,13 +22,18 @@ public class RenameApplicationHandler : IRequestHandler<RenameApplication, Comma
 
     public async Task<CommandResponse> Handle(RenameApplication command, CancellationToken cancellationToken)
     {
+        _logger.LogDebug("Renaming {Application} to {NewName}", command.ApplicationId, command.NewName);
         var response = new CommandResponse();
-        var existing =  await _querySession.GetById(command.ApplicationId);
+        var existing =  _querySession.GetByName(command.NewName);
         if (existing == null)
-           response.Errors.Add(Errors.ApplicationNotFound(command.ApplicationId));
+        {
+            _logger.LogWarning("Could not rename to {NewName} as an application already has that name", command.NewName);
+            response.Errors.Add(Errors.ApplicationNotFound(command.ApplicationId));
+        }
 
         await _documentSession.AppendToStream(command.ApplicationId, command.ExpectedVersion, new ApplicationRenamed(command.NewName));
         await _documentSession.SaveChangesAsync();
+        _logger.LogDebug("Application renamed");
         return response;
     }
 }

@@ -1,24 +1,24 @@
 ﻿using ConfigMan.Data.Data;
 using ConfigMan.Data.Models;
-using ConfigMan.Data.Projections;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace ConfigMan.Data.Handlers.Applications;
 
-public record CreateApplication(Guid ApplicationId, string Name, string Token, Guid EnvironmentSetId) : IRequest<CommandResponse>;
-
-
+public record CreateApplication
+    (Guid ApplicationId, string Name, string Token, Guid EnvironmentSetId) : IRequest<CommandResponse>;
 
 public class CreateApplicationHandler : IRequestHandler<CreateApplication, CommandResponse>
 {
+    private readonly IApplicationRepository _activeApplicationRepository;
     private readonly IDocumentSessionHelper<Application> _applicationSession;
     private readonly IDocumentSessionHelper<EnvironmentSet> _environmentSetSession;
-    private readonly IApplicationRepository _activeApplicationRepository;
     private readonly ILogger<CreateApplicationHandler> _logger;
 
 
-    public CreateApplicationHandler(IDocumentSessionHelper<Application> applicationSession, IDocumentSessionHelper<EnvironmentSet> environmentSetSession, IApplicationRepository activeApplicationRepository, ILogger<CreateApplicationHandler> logger)
+    public CreateApplicationHandler(IDocumentSessionHelper<Application> applicationSession,
+        IDocumentSessionHelper<EnvironmentSet> environmentSetSession,
+        IApplicationRepository activeApplicationRepository, ILogger<CreateApplicationHandler> logger)
     {
         _applicationSession = applicationSession;
         _environmentSetSession = environmentSetSession;
@@ -36,10 +36,10 @@ public class CreateApplicationHandler : IRequestHandler<CreateApplication, Comma
         var matchingName = _activeApplicationRepository.GetByName(command.Name);
         if (matchingName != null)
         {
+            _logger.LogWarning("There is already an application named {Name}", command.Name);
             response.Errors.Add(Errors.DuplicateName(command.Name));
             return response;
         }
-
 
         var applicationEvents = new List<object> { new ApplicationCreated(command.ApplicationId, command.Name, command.Token, command.EnvironmentSetId) };
         response.NewVersion = 1;
@@ -47,14 +47,15 @@ public class CreateApplicationHandler : IRequestHandler<CreateApplication, Comma
         {
             response.NewVersion++;
             applicationEvents.Add(new ApplicationEnvironmentAdded(deploymentEnvironment.Name));
-            await _environmentSetSession.AppendToStream(command.EnvironmentSetId, new ApplicationAssociatedToEnvironmentSet(command.ApplicationId, command.EnvironmentSetId));
+            _logger.LogDebug("Adding {Environment} to application", deploymentEnvironment.Name);
         }
 
+        await _environmentSetSession.AppendToStream(command.EnvironmentSetId, new ApplicationAssociatedToEnvironmentSet(command.ApplicationId, command.EnvironmentSetId));
         _applicationSession.Start(command.ApplicationId, applicationEvents.ToArray());
 
         await _applicationSession.SaveChangesAsync();
         await _environmentSetSession.SaveChangesAsync();
-
+        _logger.LogDebug("Application created");
         return response;
     }
 }

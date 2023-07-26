@@ -26,26 +26,21 @@ public class
     public async Task<CommandResponse> Handle(UpdateDefaultApplicationVariable command,
         CancellationToken cancellationToken)
     {
+        _logger.LogDebug("Updating Default value for {Application}. Setting {Variable} to {NewValue}", command.ApplicationId, command.VariableName, command.NewValue);
         var response = new CommandResponse();
 
-        var existing =
-            await _querySession.GetById(command.ApplicationId);
-        if (existing == null)
-        {
-            response.Errors.Add(Errors.ApplicationNotFound(command.ApplicationId));
-            return response;
-        }
-
+        var existing = await _querySession.GetById(command.ApplicationId);
         if (existing.ApplicationDefaults.FirstOrDefault(x => x.Name == command.VariableName) == null)
         {
+            _logger.LogWarning("Variable {Variable} not found", command.VariableName);
             response.Errors.Add(Errors.VariableNotFound(command.VariableName));
             return response;
         }
 
-        await _documentSession.AppendToStream(command.ApplicationId, command.ExpectedVersion,
-            new ApplicationDefaultVariableChanged(command.VariableName, command.NewValue));
+        await _documentSession.AppendToStream(command.ApplicationId, command.ExpectedVersion, new ApplicationDefaultVariableChanged(command.VariableName, command.NewValue));
         await _documentSession.SaveChangesAsync();
         response.NewVersion = command.ExpectedVersion + 1;
+        _logger.LogDebug("Update Default value completed");
         return response;
     }
 }

@@ -7,7 +7,7 @@ namespace ConfigMan.Data.Data;
 public interface IApplicationRepository
 {
     ActiveApplication? GetByName(string name);
-    Task<Application?> GetById(Guid id);
+    Task<Application> GetById(Guid id);
 }
 
 public class ApplicationRepository : IApplicationRepository
@@ -24,8 +24,11 @@ public class ApplicationRepository : IApplicationRepository
         return _querySession.Query<ActiveApplication>().FirstOrDefault(x => x.Name == name);
     }
 
-    public async Task<Application?> GetById(Guid id)
+    public async Task<Application> GetById(Guid id)
     {
-        return await _querySession.Events.AggregateStreamAsync<Application>(id);
+        var application = await _querySession.Events.AggregateStreamAsync<Application>(id);
+        if (application == null)
+            throw new NullReferenceException("Application could not be found via Id of " + id);
+        return application;
     }
 }

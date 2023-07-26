@@ -23,6 +23,8 @@ public class CreateDefaultApplicationVariableHandler : IRequestHandler<CreateDef
 
     public async Task<CommandResponse> Handle(CreateDefaultApplicationVariable command, CancellationToken cancellationToken)
     {
+        _logger.LogDebug("Creating defaule variable {Variable} for {Application}", command.VariableName, command.ApplicationId);
+
         var result = new CommandResponse();
         var app = await   _querySession.GetById(command.ApplicationId);
         if (app == null)
@@ -30,7 +32,7 @@ public class CreateDefaultApplicationVariableHandler : IRequestHandler<CreateDef
 
         if (app.ApplicationDefaults.Any(x => x.Name == command.VariableName))
         {
-        
+            _logger.LogWarning("Duplicate variable name of {Variable}", command.VariableName);
             result.Errors.Add(Errors.DuplicateName(command.VariableName));
             return result;
         }
@@ -38,6 +40,7 @@ public class CreateDefaultApplicationVariableHandler : IRequestHandler<CreateDef
         await _documentSession.AppendToStream(command.ApplicationId, command.ExpectedVersion,
             new ApplicationDefaultVariableAdded(command.VariableName));
         await _documentSession.SaveChangesAsync();
+        _logger.LogDebug("Created default variable");
         return result;
     }
 }

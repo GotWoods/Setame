@@ -27,5 +27,6 @@ public class DeleteApplicationHandler : IRequestHandler<DeleteApplication>
     {
         await _documentSession.AppendToStream(command.ApplicationId, new ApplicationDeleted(command.ApplicationId));
         await _documentSession.SaveChangesAsync();
+        _logger.LogDebug("Deleted application {Application}", command.ApplicationId);
     }
 }
