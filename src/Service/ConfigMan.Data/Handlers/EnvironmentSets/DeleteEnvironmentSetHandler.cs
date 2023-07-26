@@ -23,5 +23,6 @@ public class DeleteEnvironmentSetHandler : IRequestHandler<DeleteEnvironmentSet>
     {
         await _documentSession.AppendToStream(command.EnvironmentSetId, new EnvironmentSetDeleted(command.EnvironmentSetId));
         await _documentSession.SaveChangesAsync();
+        _logger.LogDebug("Deleted environment set {EnvironmentSet}", command.EnvironmentSetId);
     }
 }

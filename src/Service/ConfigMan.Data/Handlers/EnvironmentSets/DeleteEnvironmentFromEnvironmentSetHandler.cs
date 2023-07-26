@@ -30,16 +30,21 @@ public class
 
     public async Task<CommandResponse> Handle(DeleteEnvironmentFromEnvironmentSet command, CancellationToken cancellationToken)
     {
+        _logger.LogDebug("Deleting environment {EnvironmentName} from {EnvironmentSetId}", command.EnvironmentName, command.EnvironmentSetId);
         var environmentRemoved = new EnvironmentRemoved(command.EnvironmentName);
 
         await _documentSession.AppendToStream(command.EnvironmentSetId, command.ExpectedVersion, environmentRemoved);
 
         var associations = _environmentSetApplicationAssociationRepository.Get(command.EnvironmentSetId);
         foreach (var application in associations.Applications)
+        {
+            _logger.LogDebug("Deleting environment {EnvironmentName} from {ApplicationId}", command.EnvironmentName, application.Id);
             await _applicationDocumentSessionHelper.AppendToStream(application.Id, environmentRemoved);
+        }
 
         await _documentSession.SaveChangesAsync();
         await _applicationDocumentSessionHelper.SaveChangesAsync();
+        _logger.LogDebug("Environment deleted");
         return CommandResponse.FromSuccess(command.ExpectedVersion + 1);
     }
 }

@@ -27,12 +27,18 @@ public class CreateEnvironmentSetHandler : IRequestHandler<CreateEnvironmentSet,
     public async Task<CommandResponseData<Guid>> Handle(CreateEnvironmentSet command,
         CancellationToken cancellationToken)
     {
+        _logger.LogDebug("Creating environment set {Name}", command.Name);
         var matchingName = _environmentSetRepository.GetByName(command.Name);
-        if (matchingName != null) return CommandResponseData<Guid>.FromError(Errors.DuplicateName(command.Name));
+        if (matchingName != null)
+        {
+            _logger.LogWarning("Could not create environment set {Name} as an environment set already has that name", command.Name);
+            return CommandResponseData<Guid>.FromError(Errors.DuplicateName(command.Name));
+        }
 
         var id = CombGuidIdGeneration.NewGuid();
         _documentSession.Start(id, new EnvironmentSetCreated(id, command.Name));
         await _documentSession.SaveChangesAsync();
+        _logger.LogDebug("Environment set created");
         return CommandResponseData<Guid>.FromSuccess(id, 1);
     }
 }

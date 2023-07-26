@@ -19,8 +19,10 @@ public class UpdateEnvironmentSetVariableHandler : IRequestHandler<UpdateEnviron
 
     public async Task<CommandResponse> Handle(UpdateEnvironmentSetVariable command, CancellationToken cancellationToken)
     {
+        _logger.LogDebug("Updating variable {VariableName} in environment {Environment} in environment set {EnvironmentSetId}", command.VariableName, command.Environment, command.EnvironmentSetId);
         await _documentSession.AppendToStream(command.EnvironmentSetId, command.ExpectedVersion, new EnvironmentSetVariableChanged(command.Environment, command.VariableName, command.VariableValue));
         await _documentSession.SaveChangesAsync();
+        _logger.LogDebug("Updated variable");
         return CommandResponse.FromSuccess(command.ExpectedVersion +1);
     }
 }

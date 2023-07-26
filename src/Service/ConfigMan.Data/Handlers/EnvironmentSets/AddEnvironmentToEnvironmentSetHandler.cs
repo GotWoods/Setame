@@ -22,9 +22,9 @@ public class AddEnvironmentToEnvironmentSetHandler : IRequestHandler<AddEnvironm
     
     public async Task<CommandResponse> Handle(AddEnvironmentToEnvironmentSet command, CancellationToken cancellationToken)
     {
+        _logger.LogDebug("Adding environment {Name} to {EnvironmentSetId}", command.Name, command.EnvironmentSetId);
         var existing = await _environmentSetRepository.GetById(command.EnvironmentSetId);
-        if (existing == null)
-            throw new NullReferenceException("Environment Set could not be found with Id of " + command.EnvironmentSetId);
+      
 
         //TODO: Add environment to all Children Applications?
         
@@ -32,12 +32,14 @@ public class AddEnvironmentToEnvironmentSetHandler : IRequestHandler<AddEnvironm
         {
             if (deploymentEnvironment.Name == command.Name)
             {
+                _logger.LogWarning("Duplicate environment name of {Name}", command.Name);
                 return CommandResponse.FromError(Errors.DuplicateName(command.Name));
             }
         }
 
         await _documentSession.AppendToStream(command.EnvironmentSetId, command.ExpectedVersion, new EnvironmentAdded(command.Name));
         await _documentSession.SaveChangesAsync();
+        _logger.LogDebug("Environment added");
         return CommandResponse.FromSuccess(command.ExpectedVersion+1);
     }
 }

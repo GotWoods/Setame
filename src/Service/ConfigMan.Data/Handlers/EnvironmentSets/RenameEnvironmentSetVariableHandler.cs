@@ -23,21 +23,23 @@ public class RenameEnvironmentSetVariableHandler : IRequestHandler<RenameEnviron
 
     public async Task<CommandResponse> Handle(RenameEnvironmentSetVariable command, CancellationToken cancellationToken)
     {
+        _logger.LogDebug("Renaming {EnvironmentSetId} variable {OldName} to {NewName}", command.EnvironmentSetId, command.OldName, command.NewName);
         var environmentSet = await _environmentSetRepository.GetById(command.EnvironmentSetId);
-        if (environmentSet == null)
-            throw new NullReferenceException("Environment Set could not be found");
-
         foreach (var deploymentEnvironment in environmentSet.DeploymentEnvironments)
         {
             foreach (var environmentSetting in deploymentEnvironment.EnvironmentSettings)
             {
                 if (environmentSetting.Key == command.NewName)
+                {
+                    _logger.LogWarning("Cannot rename {OldName} to {NewName} as the new name already exists", command.OldName, command.NewName);
                     return CommandResponse.FromError(Errors.DuplicateName(command.NewName));
+                }
             }
         }
         
         await _documentSession.AppendToStream(command.EnvironmentSetId, command.ExpectedVersion, new EnvironmentSetVariableRenamed(command.OldName, command.NewName));
         await _documentSession.SaveChangesAsync();
+        _logger.LogDebug("EnvironmentSet variable renamed");
         return CommandResponse.FromSuccess(command.ExpectedVersion + 1);
     }
 }

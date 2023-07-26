@@ -18,7 +18,7 @@ on startup and be changed without requiring an application to be redeployed for 
 https://github.com/serilog/serilog-settings-configuration
 
 ## Upcoming Feature Possibilities
-This is a rough roadmap of features we want to have but not a guarantee
+This is a rough roadmap of features we want to have (but not a guarantee)
 
 - Case Sensitive/Insensitive Configuration flag (or just detection of case mismatches between sets/groups/applications)
 - Per Application Access (read/write/Whatever people want)

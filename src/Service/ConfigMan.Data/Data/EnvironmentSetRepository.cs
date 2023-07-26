@@ -5,7 +5,7 @@ namespace ConfigMan.Data.Data;
 
 public interface IEnvironmentSetRepository
 {
-    Task<EnvironmentSet?> GetById(Guid id);
+    Task<EnvironmentSet> GetById(Guid id);
     EnvironmentSet? GetByName(string name);
 }
 
@@ -18,9 +18,12 @@ public class EnvironmentSetRepository : IEnvironmentSetRepository
         _querySession = querySession;
     }
 
-    public async Task<EnvironmentSet?> GetById(Guid id)
+    public async Task<EnvironmentSet> GetById(Guid id)
     {
-        return await _querySession.Events.AggregateStreamAsync<EnvironmentSet>(id);
+        var environmentSet = await _querySession.Events.AggregateStreamAsync<EnvironmentSet>(id);
+        if (environmentSet == null)
+            throw new NullReferenceException("Environment Set could not be found with Id of " + id);
+        return environmentSet;
     }
 
     public EnvironmentSet? GetByName(string name)

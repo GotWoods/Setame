@@ -30,23 +30,27 @@ public class RenameEnvironmentHandler : IRequestHandler<RenameEnvironment, Comma
 
     public async Task<CommandResponse> Handle(RenameEnvironment command, CancellationToken cancellationToken)
     {
+        _logger.LogDebug("Renaming {EnvironmentSet} to {NewName}", command.EnvironmentSetId, command.NewName);
         var environmentSet = await _environmentSetRepository.GetById(command.EnvironmentSetId);
-        if (environmentSet == null)
-            throw new NullReferenceException("Environment Set could not be found");
 
         if (environmentSet.DeploymentEnvironments.Any(x => x.Name == command.NewName))
+        {
+            _logger.LogWarning("Could not rename {EnvironmentSet} to {NewName} as the environment already exists", command.EnvironmentSetId, command.NewName);
             return CommandResponse.FromError(Errors.DuplicateName(command.NewName));
+        }
 
-        await _documentSession.AppendToStream(command.EnvironmentSetId, command.ExpectedVersion,
-            new EnvironmentRenamed(command.OldName, command.NewName));
+        await _documentSession.AppendToStream(command.EnvironmentSetId, command.ExpectedVersion, new EnvironmentRenamed(command.OldName, command.NewName));
 
         var associations = _environmentSetApplicationAssociationRepository.Get(command.EnvironmentSetId);
         foreach (var application in associations.Applications)
+        {
+            _logger.LogDebug("Renaming {EnvironmentSet} to {NewName} for {Application}", command.EnvironmentSetId, command.NewName, application.Id);
             await _applicationSession.AppendToStream(application.Id, new EnvironmentRenamed(command.OldName, command.NewName));
+        }
 
         await _documentSession.SaveChangesAsync();
         await _applicationSession.SaveChangesAsync();
-
+        _logger.LogDebug("Rename environment completed");
         return CommandResponse.FromSuccess(command.ExpectedVersion + 1);
     }
 }
