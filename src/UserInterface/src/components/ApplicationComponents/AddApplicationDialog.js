@@ -15,7 +15,6 @@ const AddApplicationDialog = ({ open, onClose, onApplicationAdded }) => {
   const [applicationName, setApplicationName] = useState('');
   const [token, setToken] = useState('');
   const settingsClient = new ApplicationSettingsClient();
-  const environmentSetSettingsClient = new EnvironmentSetSettingsClient();
   const [environmentSets, setEnvironmentSets] = useState([]);
   const [selectedEnvironmentSet, setSelectedEnvironmentSet] = useState('');
 
@@ -26,16 +25,20 @@ const AddApplicationDialog = ({ open, onClose, onApplicationAdded }) => {
       onApplicationAdded();
     }
   };
-  const fetchEnvironmentSets = async () => {
-    const result = await environmentSetSettingsClient.getEnvironmentSets(); // replace this with your function
-    setEnvironmentSets(result);
-  };
 
+
+  
+  const fetchEnvironmentSets = React.useCallback(async () => {
+    const client = new EnvironmentSetSettingsClient();
+    const result = await client.getEnvironmentSets(); 
+    setEnvironmentSets(result);
+  }, []);
+  
   useEffect(() => {
     if (open) {
       fetchEnvironmentSets();
     }
-  }, [open]);
+  }, [open, fetchEnvironmentSets]);
 
   const generateToken = () => {
     // Generate a random token (change this according to your requirements)

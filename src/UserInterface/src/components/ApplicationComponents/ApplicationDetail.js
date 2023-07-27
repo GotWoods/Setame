@@ -22,13 +22,10 @@ const ApplicationDetail = ({applicationId}) => {
     //const [environmentSetVariableNames, setEnvironmentSetVariableNames] = useState([]);
     const [transformedSettings, setTransformedSettings] = useState([]);
     const settingsClient = new ApplicationSettingsClient();
-    const environmentSetSettingsClient = new EnvironmentSetSettingsClient();
-
-    useEffect(() => {
-        fetchEnvironments();
-    }, []);
-
-    const fetchEnvironments = async () => {
+    
+    const fetchEnvironments = React.useCallback(async () => {
+        let  settingsClient = new ApplicationSettingsClient();
+        let  environmentSetSettingsClient = new EnvironmentSetSettingsClient();
         const application = await settingsClient.getApplication(applicationId);
         setApplication(application);
         const environmentSet = await environmentSetSettingsClient.getEnvironmentSet(application.environmentSetId);
@@ -45,7 +42,13 @@ const ApplicationDetail = ({applicationId}) => {
             });
         });
       //  setEnvironmentSetVariableNames([...uniqueKeys]);
-    };
+      }, [applicationId, ]);
+
+    useEffect(() => {
+        fetchEnvironments();
+    }, [fetchEnvironments]);
+
+
 
     // const fetchApplication = async (environments) => {
     //     try {

@@ -8,23 +8,27 @@ import EnvironmentSetDetail from './EnvironmentSetDetail';
 const EnvironmentSets = () => {
   const [environments, setEnvironmentSets] = useState([]);
   const [environmentSetDialogOpen, setEnvironmentSetDialogOpen] = useState(false);
-  
-  const settingsClient = new EnvironmentSetSettingsClient();
+
+  const fetchEnvironmentSets = React.useCallback(async () => {
+    let settingsClient = new EnvironmentSetSettingsClient();
+    let data = await settingsClient.getEnvironmentSets();
+    setEnvironmentSets(data);
+  }, []);
 
   useEffect(() => {
     fetchEnvironmentSets();
-  }, []);
+  }, [fetchEnvironmentSets]);
 
-  const fetchEnvironmentSets = async () => {
-    const data = await settingsClient.getEnvironmentSets();
-    setEnvironmentSets(data);
-  };
+  // const fetchEnvironmentSets = async () => {
+  //   const data = await settingsClient.getEnvironmentSets();
+  //   setEnvironmentSets(data);
+  // };
 
   const handleAddEnvironmentSetDialogClose = () => {
     setEnvironmentSetDialogOpen(false);
   };
 
- 
+
 
 
   return (

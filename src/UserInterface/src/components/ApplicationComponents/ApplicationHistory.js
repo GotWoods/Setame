@@ -15,16 +15,21 @@ import ApplicationSettingsClient from '../../applicationSettingsClient';
 const ApplicationHistory = () => {
   const { applicationId } = useParams();
   const [history, setHistory] = useState([]);
-  const settingsClient = new ApplicationSettingsClient();
+  
+  const fetchApplicationHistory = React.useCallback(async () => {
+    let client = new ApplicationSettingsClient();
+    let data = await client.getApplicationHistory(applicationId);
+    setHistory(data);
+  }, [applicationId]);
 
   useEffect(() => {
     fetchApplicationHistory();
-  }, []);
+  }, [fetchApplicationHistory]);
 
-  const fetchApplicationHistory = async () => {
-    const data = await settingsClient.getApplicationHistory(applicationId);
-    setHistory(data);
-  };
+  // const fetchApplicationHistory = async () => {
+  //   const data = await settingsClient.getApplicationHistory(applicationId);
+  //   setHistory(data);
+  // };
 
 
   return (

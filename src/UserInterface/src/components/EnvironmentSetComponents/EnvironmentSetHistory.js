@@ -12,22 +12,23 @@ import {
 import EnvironmentSetSettingsClient from '../../environmentSetSettingsClient';
 
 const EnvironmentSetHistory = () => {
-    const { environmentSetId } = useParams();
+  const { environmentSetId } = useParams();
   const [history, setHistory] = useState([]);
-  const settingsClient = new EnvironmentSetSettingsClient();
+
+
+  const fetchEnvironmentSetHistory = React.useCallback(async () => {
+    let settingsClient = new EnvironmentSetSettingsClient();
+    let data = await settingsClient.getHistory(environmentSetId);
+    setHistory(data);
+  }, [environmentSetId]);
 
   useEffect(() => {
-      fetchEnvironmentSetHistory();
-  }, []);
-
-  const fetchEnvironmentSetHistory = async () => {
-      const data = await settingsClient.getHistory(environmentSetId);
-      setHistory(data);
-  };
+    fetchEnvironmentSetHistory();
+  }, [fetchEnvironmentSetHistory]);
 
 
   return (
-      <TableContainer component={Paper}>
+    <TableContainer component={Paper}>
       <Table>
         <TableHead>
           <TableRow>

@@ -1,0 +1,25 @@
+# Base image for .NET runtime
+FROM mcr.microsoft.com/dotnet/aspnet:6.0
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the published output from the publish folder to the container
+COPY publish .
+
+# Set environment variables for the configuration values
+ENV ConnectionStrings__DefaultConnection="Host=localhost;Database=configman;Username=root;Password=root"
+ENV MailSettings__MailFrom="<fromemail>"
+ENV MailSettings__DisplayName="<displayname>"
+ENV MailSettings__Password="<yourpasswordhere>"
+ENV MailSettings__Host="smtp.server.com"
+ENV MailSettings__Port="587"
+
+# Set the ASP.NET Core environment to "Production"
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+# Expose the port on which the application will listen
+EXPOSE 80
+
+# Start the application using the dotnet executable
+ENTRYPOINT ["dotnet", "YourProjectName.dll"]

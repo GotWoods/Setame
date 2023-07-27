@@ -100,3 +100,11 @@ jobs:
             Release version ${{ env.VERSION }} of the application.
           draft: true
           prerelease: true
+
+      - name: Build Docker image
+        run: |
+            docker build -t setame:v${{ env.VERSION }} -f Dockerfile.Release .
+            docker login --username=${{ secrets.DOCKERHUB_USERNAME }} --password=${{ secrets.DOCKERHUB_PASSWORD }}
+            docker push ${{ secrets.DOCKERHUB_USERNAME }}/setame:v${{ env.VERSION }}
+        env:
+          DOCKER_CLI_ASK_PASS: 1

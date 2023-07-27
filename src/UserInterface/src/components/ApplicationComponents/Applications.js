@@ -17,14 +17,15 @@ const Applications = () => {
   const [selectedApplicationId, setSelectedApplicationId] = useState(null);
   const [editingApplicationId, setEditingApplicationId] = useState(null);
 
-  useEffect(() => {
-    fetchApplications();
+  const fetchApplications = React.useCallback(async () => {
+    let client = new ApplicationSettingsClient();
+    let data = await client.getAllApplications();
+    setApplications(data);
   }, []);
 
-  const fetchApplications = async () => {
-    const data = await settingsClient.getAllApplications();
-    setApplications(data);
-  };
+  useEffect(() => {
+    fetchApplications();
+  }, [fetchApplications]);
 
   const handleDeleteApplication = async (applicationId) => {
     await settingsClient.deleteApplication(applicationId);
