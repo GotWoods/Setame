@@ -87,11 +87,6 @@ jobs:
         with:
           dotnet-version: 6.0.x
 
-      - name: Update assembly versions
-        run: |
-          dotnet msbuild /p:Version=${{ env.VERSION }} /t:UpdateAssemblyInfo
-          dotnet build
-      
       - name: Build and publish .NET application
         working-directory: src/Service/Setame.Web
         run: dotnet publish -c Release -o publish
