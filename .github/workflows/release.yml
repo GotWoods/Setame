@@ -96,12 +96,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ env.VERSION }}
           files: release/
-          tag_name: v${{ env.VERSION }}
-          release_name: Release v${{ env.VERSION }}
-          body: |
-            Release version ${{ env.VERSION }} of the application.
-          draft: true
-          prerelease: true
 
       - name: Build Docker image
         run: |
