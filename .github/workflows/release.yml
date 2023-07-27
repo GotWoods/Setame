@@ -10,9 +10,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout source
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 1000
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+      
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0
         with:
@@ -60,7 +67,7 @@ jobs:
   
       - name: Set VERSION environment variable
         run: |
-          echo "VERSION=${{ steps.gitversion.outputs.fullSemVer }}" >> $GITHUB_ENV
+          echo "VERSION=${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.${{ steps.gitversion.outputs.BuildMetaData }}" >> $GITHUB_ENV
 
       - name: Replace settings.js file
         run: |
@@ -89,11 +96,11 @@ jobs:
         working-directory: src/Service/Setame.Web
         run: dotnet publish -c Release -o publish
 
-      - name: Publish Application
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: meeDamian/github-release@2.0
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ env.VERSION }}
+          files: release/
           tag_name: v${{ env.VERSION }}
           release_name: Release v${{ env.VERSION }}
           body: |
