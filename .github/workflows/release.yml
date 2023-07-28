@@ -91,12 +91,6 @@ jobs:
         working-directory: src/Service/Setame.Web
         run: dotnet publish -c Release -o publish
 
-      - uses: meeDamian/github-release@2.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ env.VERSION }}
-          files: release/
-
       - name: Build Docker image
         run: |
             docker build -t setame:v${{ env.VERSION }} -f Dockerfile.Release .
