@@ -98,3 +98,4 @@ jobs:
             docker push ${{ secrets.DOCKERHUB_USERNAME }}/setame:v${{ env.VERSION }}
         env:
           DOCKER_CLI_ASK_PASS: 1
+        working-directory: src/Service/Setame.Web/
