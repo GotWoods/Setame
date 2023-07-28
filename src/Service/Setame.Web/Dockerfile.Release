@@ -8,7 +8,7 @@ WORKDIR /app
 COPY publish .
 
 # Set environment variables for the configuration values
-ENV ConnectionStrings__DefaultConnection="Host=localhost;Database=configman;Username=root;Password=root"
+ENV ConnectionStrings__DefaultConnection="Host=localhost;Database=setame;Username=root;Password=root"
 ENV MailSettings__MailFrom="<fromemail>"
 ENV MailSettings__DisplayName="<displayname>"
 ENV MailSettings__Password="<yourpasswordhere>"
