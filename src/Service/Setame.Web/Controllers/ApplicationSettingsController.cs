@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Setame.Data.Handlers;
 using Setame.Data.Handlers.Applications;
 
 namespace Setame.Web.Controllers;
@@ -39,17 +40,18 @@ public class ApplicationSettingsController : ControllerBase
     public async Task<ActionResult> CreateNew(Guid applicationId, string environment, [FromBody] string variable, CancellationToken ct)
     {
         var version = Request.GetIfMatchRequestHeader();
+        CommandResponse? response = null;
         if (environment == "default")
         {
             _logger.LogDebug("Adding default {Variable} to Application {ApplicationId}", variable, applicationId);
-            await _mediator.Send(new CreateDefaultApplicationVariable(applicationId, version, variable), ct);
+            response = await _mediator.Send(new CreateDefaultApplicationVariable(applicationId, version, variable), ct);
         }
         else
         {
             _logger.LogDebug("Adding {Environment} {Variable} to Application {ApplicationId}", environment, variable, applicationId);
-            await _mediator.Send(new CreateApplicationVariable(applicationId, version, environment, variable), ct);
+            response = await _mediator.Send(new CreateApplicationVariable(applicationId, version, variable), ct);
         }
-        Response.TrySetETagResponseHeader(version + 1);
+        Response.TrySetETagResponseHeader(response.NewVersion);
         return CreatedAtAction(nameof(CreateNew), null);
     }
 
@@ -69,7 +71,7 @@ public class ApplicationSettingsController : ControllerBase
         }
 
         Response.TrySetETagResponseHeader(version + 1);
-        return Ok();
+        return NoContent();
     }
 
     [HttpPost("{applicationId}/{variable}/rename")]
@@ -79,6 +81,6 @@ public class ApplicationSettingsController : ControllerBase
         await _mediator.Send(new RenameApplicationVariable(applicationId, version, variable, newName));
         _logger.LogDebug("For Application {ApplicationId}, {Variable} renamed to {NewName}", applicationId, variable, newName);
         Response.TrySetETagResponseHeader(version + 1);
-        return Ok();
+        return NoContent();
     }
 }

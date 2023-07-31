@@ -26,7 +26,7 @@ This is a rough roadmap of features we want to have (but not a guarantee)
 - Filter/Search applications
 - Attach/Detach application from Environment Set
 - Case Sensitive/Insensitive Configuration flag (or just detection of case mismatches between sets/groups/applications)
-- Per Application Access (read/write/Whatever people want)
+- Per Application Security Access (read/write/secrets/etc)
 - Variable version pinning so that you always get the version of config that you want (may help with environment renames as well)
 - Live variables changes (May be .NET provider only)
 - Tracking of variable usages (may be .NET only)
@@ -34,19 +34,18 @@ This is a rough roadmap of features we want to have (but not a guarantee)
 - History screens to have searching/paging
 - Visual of applied config and why a given setting is being overriden
 - Internationalization
-
+- Rename environment when no apps are associated, should just proceed without the warning dialog
+- 
 ## TODO
 Items that are still pending before this is considered a Beta:
 
 - Forgot Password
-- Showing errors to user instead of console
-- Docker image
+- Showing errors (both unexpected and validation errors) to user instead of console
 
 ### Environment Sets
 - When a new variable is created (it is blank), loose focus, regain focus, and name, the Rename endpoint is being called and not the new endpoint
 - Order Environments
 - Duplicate Prevention (in progress)
-- Rename environment when no apps are associated, should just proceed without the dialog warning
 
 ### Applications
 - Versioning / Optomistic Concurrency (in progress. There is a de-sync between the list and detail view that needs to be addressed)

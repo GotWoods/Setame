@@ -78,7 +78,7 @@ builder.Services.AddMarten(opts =>
     //opts.Projections.LiveStreamAggregation<EnvironmentSet>(); //live can only be used with AggregateStream
 
     //LoadAsync will actually load the document from the table
-}).AddAsyncDaemon(DaemonMode.Solo).UseLightweightSessions(); //TODO: adjust this for prod?
+}).AddAsyncDaemon(DaemonMode.HotCold).UseLightweightSessions();
 
 builder.Services.AddMediatR(x => { x.RegisterServicesFromAssemblyContaining<CreateEnvironmentSetHandler>(); });
 
@@ -120,14 +120,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseCors("ReactAppPolicy");
 app.UseSpaStaticFiles();
-// app.UseSpa(spa =>
-// {
-//     //spa.Options.
-//     if (builder.Environment.IsDevelopment())
-//     {
-//        spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
-//     }
-// });
+
 
 app.MapWhen(x => !x.Request.Path.Value!.StartsWith("/api"), config =>
 {

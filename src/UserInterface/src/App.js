@@ -43,9 +43,9 @@ function App() {
             <Route path="/applicationHistory/:applicationId" element={<ProtectedOutlet />}>
               <Route index element={<ApplicationHistory />} />
             </Route>
-            <Route path="/environmentGroups" element={<ProtectedOutlet />}>
+            {/* <Route path="/environmentGroups" element={<ProtectedOutlet />}>
               <Route index element={<EnvironmentGroups />} />
-            </Route>
+            </Route> */}
             <Route path="/settings" element={<ProtectedOutlet />}>
               <Route index element={<Settings />} />
             </Route>

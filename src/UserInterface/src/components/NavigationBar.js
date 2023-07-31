@@ -15,7 +15,7 @@ const NavigationBar = () => {
   return (
     <StyledAppBar position="static">
       <Toolbar>
-        <TitleTypography variant="h6" onClick={() => window.location.href = '/'}>ConfigMan</TitleTypography>
+        <TitleTypography variant="h6" onClick={() => window.location.href = '/'}>Setame</TitleTypography>
         {token && (
           <>
         <Button color="inherit" href="/environmentSets">

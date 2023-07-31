@@ -22,7 +22,7 @@ class SettingsClient {
             return await response.json();
         }
         
-        if (response.status === 204) { //no content
+        if (response.status === 204 || response.status === 201) { //no content || created 
             if (versionedObject) {
                 versionedObject.version = this.extractNumericValue(etag);
             }

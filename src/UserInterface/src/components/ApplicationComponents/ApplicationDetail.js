@@ -18,8 +18,6 @@ const ApplicationDetail = ({applicationId}) => {
     const [application, setApplication] = useState(null);
     const [newSettingName, setNewSettingName] = useState('');
     const [newSettingValue, setNewSettingValue] = useState('');
-    //const [environments, setEnvironmentSet] = useState([]);
-    //const [environmentSetVariableNames, setEnvironmentSetVariableNames] = useState([]);
     const [transformedSettings, setTransformedSettings] = useState([]);
     const settingsClient = new ApplicationSettingsClient();
     
@@ -29,11 +27,9 @@ const ApplicationDetail = ({applicationId}) => {
         const application = await settingsClient.getApplication(applicationId);
         setApplication(application);
         const environmentSet = await environmentSetSettingsClient.getEnvironmentSet(application.environmentSetId);
-        //setEnvironmentSet(environmentSet);
 
         const transformedSettings = loadGrid(application.environmentSettings, environmentSet.deploymentEnvironments);
         setTransformedSettings(transformedSettings);
-        // fetchApplication(environments);
 
         let uniqueKeys = new Set();
         environmentSet.deploymentEnvironments.forEach(env => {
@@ -41,25 +37,11 @@ const ApplicationDetail = ({applicationId}) => {
                 uniqueKeys.add(key);
             });
         });
-      //  setEnvironmentSetVariableNames([...uniqueKeys]);
       }, [applicationId, ]);
 
     useEffect(() => {
         fetchEnvironments();
     }, [fetchEnvironments]);
-
-
-
-    // const fetchApplication = async (environments) => {
-    //     try {
-    //         const data = await settingsClient.getApplication(applicationId);
-    //         setApplication(data);
-    //         const transformedSettings = loadGrid(data.environmentSettings, environments);
-    //         setTransformedSettings(transformedSettings);
-    //     } catch (error) {
-    //         console.error('Error fetching application:', error);
-    //     }
-    // };
 
     const loadGrid = (environmentSettings, environments) => {
         var result = new SettingGridData();
@@ -81,46 +63,8 @@ const ApplicationDetail = ({applicationId}) => {
                 result.settings[setting.name][environment.name] = setting.value;
             });
         })
-
-
-        // let keys = Object.keys(environmentSettings);
-        // keys.forEach((env) => {
-        //     environmentSettings[env].forEach((setting) => {
-        //         if (!result.settings[setting.name]) {
-        //             result.settings[setting.name] = [];
-        //         }
-
-        //         if (!result.settings[setting.name][env]) {
-        //             result.settings[setting.name][env] = "";
-        //         }
-        //         result.settings[setting.name][env] = setting.value;
-        //     });
-
-        // });
         return result;
     }
-
-    // const transformSettings = (environmentSettings) => {
-    //     const transformedSettings = [];
-
-    //     let environments = Object.keys(environmentSettings);
-    //     environments.forEach((env) => {
-    //         const settings = environmentSettings[env] || [];
-    //         settings.forEach((setting) => {
-    //             if (!transformedSettings[setting.name]) {
-    //                 transformedSettings[setting.name] = [];
-    //             }
-
-    //             if (!transformedSettings[setting.name][env]) {
-    //                 transformedSettings[setting.name][env] = [];
-    //             }
-
-    //             transformedSettings[setting.name][env] = setting.value;
-    //         });
-    //     });
-
-    //     return transformedSettings;
-    // };
 
     const handleAddEnvironmentSettings = async () => {
         console.log("Adding global setting", application)

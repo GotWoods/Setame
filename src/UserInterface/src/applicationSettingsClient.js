@@ -94,7 +94,7 @@ class ApplicationSettingsClient extends SettingsClient {
             body: JSON.stringify(newSettingName),
         });
 
-        return this.handleResponse(response);
+        return this.handleResponse(response, application);
     }
 
     
