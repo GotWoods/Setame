@@ -33,7 +33,8 @@ const ApplicationDetail = ({applicationId, updateVersion}) => {
 
         let uniqueKeys = new Set();
         environmentSet.environments.forEach(env => {
-            Object.keys(env.environmentSettings).forEach(key => {
+            console.log("Processing env", env);
+            Object.keys(env.settings).forEach(key => {
                 uniqueKeys.add(key);
             });
         });

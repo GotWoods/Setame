@@ -77,14 +77,14 @@ class ApplicationSettingsClient extends SettingsClient {
         return this.handleResponse(response, application);
     }
 
-    async renameApplicationSetting(applicationName, oldName, newName) {
-        const response = await this.apiRequest(`${this.apiUrl}/api/ApplicationSettings/${applicationName}/${oldName}/rename`, {
+    async renameApplicationSetting(application, oldName, newName) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/ApplicationSettings/${application.id}/${oldName}/rename`, {
             method: 'POST',
-            headers: this.getHeaders(),
+            headers: this.getHeaders(application.version),
             body: JSON.stringify(newName),
         });
 
-        return this.handleResponse(response);
+        return this.handleResponse(response, application);
     }
 
     async addGlobalApplicationSetting(application, newSettingName) {
@@ -99,6 +99,7 @@ class ApplicationSettingsClient extends SettingsClient {
 
     
     async updateGlobalApplicationSetting(application, settingName, value) {
+        console.log("Updating global", application)
         const response = await this.apiRequest(`${this.apiUrl}/api/ApplicationSettings/${application.id}/default/${settingName}`, {
             method: 'PUT',
             headers: this.getHeaders(application.version),

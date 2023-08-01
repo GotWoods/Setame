@@ -37,6 +37,7 @@ public class CreateDefaultApplicationVariableHandler : IRequestHandler<CreateDef
             new ApplicationDefaultVariableAdded(command.VariableName));
         await _documentSession.SaveChangesAsync();
         _logger.LogDebug("Created default variable");
+        result.NewVersion = command.ExpectedVersion + 1;
         return result;
     }
 }

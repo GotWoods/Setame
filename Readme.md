@@ -43,12 +43,10 @@ Items that are still pending before this is considered a Beta:
 - Showing errors (both unexpected and validation errors) to user instead of console
 
 ### Environment Sets
-- When a new variable is created (it is blank), loose focus, regain focus, and name, the Rename endpoint is being called and not the new endpoint
 - Order Environments
 - Duplicate Prevention (in progress)
 
 ### Applications
-- Versioning / Optomistic Concurrency (in progress. There is a de-sync between the list and detail view that needs to be addressed)
 - Duplicate Prevention (in progress)
 - Regenerate Token
  
