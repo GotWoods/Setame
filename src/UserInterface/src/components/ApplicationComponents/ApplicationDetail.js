@@ -14,7 +14,7 @@ import SettingsGrid from '../SettingGrid/SettingGrid';
 import ApplicationSettingsClient from '../../applicationSettingsClient';
 import EnvironmentSetSettingsClient from '../../environmentSetSettingsClient';
 
-const ApplicationDetail = ({applicationId}) => {
+const ApplicationDetail = ({applicationId, updateVersion}) => {
     const [application, setApplication] = useState(null);
     const [newSettingName, setNewSettingName] = useState('');
     const [newSettingValue, setNewSettingValue] = useState('');
@@ -78,12 +78,13 @@ const ApplicationDetail = ({applicationId}) => {
         });
         setNewSettingName('');
         setNewSettingValue('');
+        updateVersion(application.id, application.version);
     }
 
     const handleUpdateEnvironmentSettings = async (name, value) => {
         console.log("handleUpdateEnvironmentSettings", name, value);
         await settingsClient.updateGlobalApplicationSetting(application, name, value);
-
+        updateVersion(application.id, application.version);
         // update the application state with the updated setting
         // setApplication(prevApplication => {
         //     return {
@@ -96,6 +97,7 @@ const ApplicationDetail = ({applicationId}) => {
     }
     const handleSettingChange = async (settingName, environment, newValue) => {
         await settingsClient.updateApplicationSetting(application, environment, settingName, newValue);
+        updateVersion(application.id, application.version);
         //setTransformedSettings(updatedSettings);
         //var foundEnvironment = enviornmentSet.deploymentEnvironments.find(x=>x.name === environment);
         //foundEnvironment.environmentSettings[settingName] = newValue;
@@ -104,6 +106,7 @@ const ApplicationDetail = ({applicationId}) => {
 
     const handleSettingRename = async (oldSettingName, newSettingName) => {
         await settingsClient.renameApplicationSetting(application, oldSettingName, newSettingName);
+        updateVersion(application.id, application.version);
         //await settingsClient.updateApplicationSetting(applicationName, environment, settingName, newValue);
         //setTransformedSettings(updatedSettings);
         //var foundEnvironment = enviornmentSet.deploymentEnvironments.find(x=>x.name === environment);
@@ -123,6 +126,7 @@ const ApplicationDetail = ({applicationId}) => {
             return;
 
         await settingsClient.addApplicationSetting(application, "ALL", newValue);
+        updateVersion(application.id, application.version);
         // environments.deploymentEnvironments.forEach(async (env) => {
 
 

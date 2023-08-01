@@ -33,12 +33,14 @@ public class CreateApplicationVariableHandler : IRequestHandler<CreateApplicatio
         foreach (var environment in app.EnvironmentSettings)
         {
             foreach (var setting in environment.Settings)
+            {
                 if (setting.Name == command.VariableName)
                 {
                     _logger.LogWarning("Duplicate name of {Name}", setting.Name);
                     result.Errors.Add(Errors.DuplicateName(setting.Name));
                     return result; //exit on the first error (as the variable name will exist for each environment so we don't want to see this multiple times)
                 }
+            }
             await _documentSession.AppendToStream(command.ApplicationId, command.ExpectedVersion+envCount, new ApplicationVariableAdded(environment.Name, command.VariableName));
             envCount++; //need to increment the expected version each time we append to the stream
         }

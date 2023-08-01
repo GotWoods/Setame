@@ -23,6 +23,15 @@ const Applications = () => {
     setApplications(data);
   }, []);
 
+
+  const updateVersion = (applicationId, newVersion) => {
+    setApplications((prevApps) =>
+      prevApps.map((app) =>
+        app.id === applicationId ? { ...app, version: newVersion } : app
+      )
+    );
+  }
+
   useEffect(() => {
     fetchApplications();
   }, [fetchApplications]);
@@ -86,31 +95,31 @@ const Applications = () => {
         {applications.map((app) => (
           <Grid item xs={12} key={app.id}>
             <div>
-            {editingApplicationId === app.id ? (
-             <TextField
-             value={app.name}
-             onChange={(e) => {
-              const newName = e.target.value;
-              setApplications((prevApps) =>
-                prevApps.map((prevApp) =>
-                  prevApp.id === app.id ? { ...prevApp, name: newName } : prevApp
-                )
-              );
-            }}
-             onBlur={() => handleUpdateApplicationName(app, app.name)}
-             autoFocus
-            />
+              {editingApplicationId === app.id ? (
+                <TextField
+                  value={app.name}
+                  onChange={(e) => {
+                    const newName = e.target.value;
+                    setApplications((prevApps) =>
+                      prevApps.map((prevApp) =>
+                        prevApp.id === app.id ? { ...prevApp, name: newName } : prevApp
+                      )
+                    );
+                  }}
+                  onBlur={() => handleUpdateApplicationName(app, app.name)}
+                  autoFocus
+                />
 
-            ) : (
-              <Button
-                onClick={() => handleApplicationClick(app.id)}
-                startIcon={selectedApplicationId === app.id ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-              >
-                {app.name}
-              </Button>
+              ) : (
+                <Button
+                  onClick={() => handleApplicationClick(app.id)}
+                  startIcon={selectedApplicationId === app.id ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                >
+                  {app.name}
+                </Button>
               )}
               {selectedApplicationId === app.id && (
-              <>
+                <>
                   <Button color="secondary" onClick={() => handleEditApplicationName(app)}>
                     <i className="fa-regular fa-pen-to-square"></i>
                   </Button>
@@ -120,10 +129,10 @@ const Applications = () => {
                   <Button onClick={() => navigate(`/applicationHistory/${app.id}`)} color="secondary">
                     <i className="fa-solid fa-clock-rotate-left"></i>
                   </Button>
-                  </>
+                </>
               )}
             </div>
-            {selectedApplicationId === app.id && <ApplicationDetail applicationId={app.id} />}
+            {selectedApplicationId === app.id && <ApplicationDetail applicationId={app.id} updateVersion={updateVersion} />}
             {/* Conditional rendering of ApplicationDetail */}
           </Grid>
         ))}
