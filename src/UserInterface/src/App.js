@@ -11,7 +11,6 @@ import './App.css';
 import VariableGroups from './components/VariableGroups';
 import Main from './components/Main';
 import ProtectedOutlet from './components/ProtectedOutlet';
-import EnvironmentGroups from './components/EnvironmentGroups';
 import Settings from './components/Settings';
 import EnvironmentSetHistory from './components/EnvironmentSetComponents/EnvironmentSetHistory';
 import SetupPage from './components/SetupPage';

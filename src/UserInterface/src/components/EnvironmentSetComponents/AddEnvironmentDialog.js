@@ -13,7 +13,7 @@ const AddEnvironmentDialog = ({ open, onClose, onAdded, environmentSet }) => {
 
   const handleAddEnvironment = async () => {
     try {
-      environmentSet.deploymentEnvironments.push({ name: environmentName });
+      environmentSet.environments.push({ name: environmentName });
       await settingsClient.addEnvironmentToEnvironmentSet(environmentSet, environmentName);
     } catch (err) {
       console.error('Error updating environment set', err);

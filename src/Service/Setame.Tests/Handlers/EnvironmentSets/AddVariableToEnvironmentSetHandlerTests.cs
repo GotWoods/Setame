@@ -33,12 +33,12 @@ public class AddVariableToEnvironmentSetHandlerTests
         var existingEnvironmentSet = new EnvironmentSet
         {
             Id = command.EnvironmentSetId,
-            DeploymentEnvironments = new List<DeploymentEnvironment>
+            Environments = new List<DeploymentEnvironment>
             {
                 new DeploymentEnvironment
                 {
                     Name = "Dev",
-                    EnvironmentSettings = new Dictionary<string, string>
+                    Settings = new Dictionary<string, string>
                     {
                         { "Variable Name", "Value" } // Add the variable to one of the deployment environments
                     }
@@ -90,12 +90,12 @@ public class AddVariableToEnvironmentSetHandlerTests
         var existingEnvironmentSet = new EnvironmentSet
         {
             Id = command.EnvironmentSetId,
-            DeploymentEnvironments = new List<DeploymentEnvironment>
+            Environments = new List<DeploymentEnvironment>
             {
                 new DeploymentEnvironment
                 {
                     Name = "Dev",
-                    EnvironmentSettings = new Dictionary<string, string>
+                    Settings = new Dictionary<string, string>
                     {
                         { "Variable Name", "Value" } // Add the variable with the same name to the deployment environment
                     }

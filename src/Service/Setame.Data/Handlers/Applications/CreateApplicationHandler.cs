@@ -43,7 +43,7 @@ public class CreateApplicationHandler : IRequestHandler<CreateApplication, Comma
 
         var applicationEvents = new List<object> { new ApplicationCreated(command.ApplicationId, command.Name, command.Token, command.EnvironmentSetId) };
         response.NewVersion = 1;
-        foreach (var deploymentEnvironment in environment.DeploymentEnvironments)
+        foreach (var deploymentEnvironment in environment.Environments)
         {
             response.NewVersion++;
             applicationEvents.Add(new ApplicationEnvironmentAdded(deploymentEnvironment.Name));

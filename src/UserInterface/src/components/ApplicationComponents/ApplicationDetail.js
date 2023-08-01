@@ -28,11 +28,11 @@ const ApplicationDetail = ({applicationId, updateVersion}) => {
         setApplication(application);
         const environmentSet = await environmentSetSettingsClient.getEnvironmentSet(application.environmentSetId);
 
-        const transformedSettings = loadGrid(application.environmentSettings, environmentSet.deploymentEnvironments);
+        const transformedSettings = loadGrid(application.environmentSettings, environmentSet.environments);
         setTransformedSettings(transformedSettings);
 
         let uniqueKeys = new Set();
-        environmentSet.deploymentEnvironments.forEach(env => {
+        environmentSet.environments.forEach(env => {
             Object.keys(env.environmentSettings).forEach(key => {
                 uniqueKeys.add(key);
             });
@@ -85,41 +85,17 @@ const ApplicationDetail = ({applicationId, updateVersion}) => {
         console.log("handleUpdateEnvironmentSettings", name, value);
         await settingsClient.updateGlobalApplicationSetting(application, name, value);
         updateVersion(application.id, application.version);
-        // update the application state with the updated setting
-        // setApplication(prevApplication => {
-        //     return {
-        //         ...prevApplication,
-        //         applicationDefaults: prevApplication.applicationDefaults.map(s => 
-        //             s.id === id ? {...s, name, value} : s
-        //         )
-        //     }
-        // });
     }
     const handleSettingChange = async (settingName, environment, newValue) => {
         await settingsClient.updateApplicationSetting(application, environment, settingName, newValue);
         updateVersion(application.id, application.version);
-        //setTransformedSettings(updatedSettings);
-        //var foundEnvironment = enviornmentSet.deploymentEnvironments.find(x=>x.name === environment);
-        //foundEnvironment.environmentSettings[settingName] = newValue;
-        //await settingsClient.updateEnvironmentSet(enviornmentSet);
     };
 
     const handleSettingRename = async (oldSettingName, newSettingName) => {
         await settingsClient.renameApplicationSetting(application, oldSettingName, newSettingName);
         updateVersion(application.id, application.version);
-        //await settingsClient.updateApplicationSetting(applicationName, environment, settingName, newValue);
-        //setTransformedSettings(updatedSettings);
-        //var foundEnvironment = enviornmentSet.deploymentEnvironments.find(x=>x.name === environment);
-        //foundEnvironment.environmentSettings[settingName] = newValue;
-        //await settingsClient.updateEnvironmentSet(enviornmentSet);
     };
 
-    // const handleAddSetting = async () => {
-    //     await settingsClient.addGlobalApplicationSetting(applicationId, newSettingName, newSettingValue);
-    //     setNewSettingName('');
-    //     setNewSettingValue('');
-    //     fetchApplication();
-    // };
 
     const handleAddEnvironmentSetting = async (newValue) => {
         if (newValue.trim() === "")
@@ -127,22 +103,6 @@ const ApplicationDetail = ({applicationId, updateVersion}) => {
 
         await settingsClient.addApplicationSetting(application, "ALL", newValue);
         updateVersion(application.id, application.version);
-        // environments.deploymentEnvironments.forEach(async (env) => {
-
-
-        //     // if (application.environmentSettings[env.name] == null) {
-        //     //     let newEnv = {};
-        //     //     newEnv[env.name] = {};
-        //     //     application.environmentSettings[env.name] = newEnv;
-        //     // }
-
-        //     // let obj = {};
-        //     // obj[newValue] = "";
-        //     // application.environmentSettings[env.name] = obj;
-        // });
-
-
-        //await settingsClient.updateEnvironmentSet(enviornmentSet);
     };
 
 
@@ -217,7 +177,7 @@ const ApplicationDetail = ({applicationId, updateVersion}) => {
                     <TableHead>
                         <TableRow>
                             <TableCell>Setting Name</TableCell>
-                            {environments?.deploymentEnvironments?.map((e, index) => (
+                            {environments?.environments?.map((e, index) => (
                                 <TableCell key={index}>{e.name}</TableCell>
                             ))}
                         </TableRow>
@@ -226,7 +186,7 @@ const ApplicationDetail = ({applicationId, updateVersion}) => {
                         {environmentSetVariableNames.map((e, index) => (
                             <TableRow key={index}>
                                 <TableCell>{e}</TableCell>
-                                {environments?.deploymentEnvironments?.map((env, index2) => (
+                                {environments?.environments?.map((env, index2) => (
                                     <TableCell key={index2}>{env.environmentSettings[e]}</TableCell>
                                 ))}
                             </TableRow>

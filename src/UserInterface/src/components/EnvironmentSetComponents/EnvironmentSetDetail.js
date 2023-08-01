@@ -70,7 +70,7 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
     }
 
     useEffect(() => {
-        const transformedSettings = loadGrid(environmentSet.deploymentEnvironments);
+        const transformedSettings = loadGrid(environmentSet.environments);
         setTransformedSettings(transformedSettings);
     }, [environmentSet]);  // The function will run whenever environmentSet changes
 
@@ -78,18 +78,18 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
         var result = new SettingGridData();
         environments.forEach((env) => {
             result.environments.push(env.name);
-            if (env.environmentSettings === undefined)
+            if (env.settings === undefined)
                 return;
-            for (let setting in env.environmentSettings) {
+            for (let setting in env.settings) {
                 if (!result.settings[setting]) {
                     result.settings[setting] = [];
                 }
 
                 if (!result.settings[setting][env.name]) {
-                    result.settings[setting][env.name] = env.environmentSettings[setting];
+                    result.settings[setting][env.name] = env.settings[setting];
                 }
 
-                result.settings[setting][env.name] = env.environmentSettings[setting];
+                result.settings[setting][env.name] = env.settings[setting];
             }
         });
         return result;
@@ -98,10 +98,10 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
     const handleAddEnvironmentSetting = async (newValue) => {
         if (newValue === "")
             return;
-        environmentSet.deploymentEnvironments.forEach(env => {
+        environmentSet.environments.forEach(env => {
             let obj = {};
             obj[newValue] = "";
-            env.environmentSettings[newValue] = "";
+            env.settings[newValue] = "";
 
         });
         await settingsClient.addVariableToEnvironmentSet(environmentSet, newValue);
@@ -116,8 +116,8 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
 
 
     const handleSettingChange = async (settingName, environment, newValue) => {
-        var foundEnvironment = environmentSet.deploymentEnvironments.find(x => x.name === environment);
-        foundEnvironment.environmentSettings[settingName] = newValue;
+        var foundEnvironment = environmentSet.environments.find(x => x.name === environment);
+        foundEnvironment.settings[settingName] = newValue;
         await settingsClient.updateVariableOnEnvironmentSet(environmentSet, environment, settingName, newValue);
     };
 

@@ -47,8 +47,9 @@ public class Application
 
     public void Apply(ApplicationVariableAdded e)
     {
-        foreach (var env in EnvironmentSettings) env.Settings.Add(new Setting { Name = e.Name });
-        //foreach (var env in EnvironmentSettings.Keys) EnvironmentSettings[env].Add(new Setting { Name = e.Name });
+        EnvironmentSettings.First(x => x.Name == e.Environment).Settings.Add(new Setting { Name = e.Name });
+        // foreach (var env in EnvironmentSettings) 
+        //     env.Settings.Add(new Setting { Name = e.Name });
     }
 
     public void Apply(ApplicationVariableChanged e)

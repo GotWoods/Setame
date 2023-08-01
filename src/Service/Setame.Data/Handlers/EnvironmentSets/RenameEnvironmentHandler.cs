@@ -33,7 +33,7 @@ public class RenameEnvironmentHandler : IRequestHandler<RenameEnvironment, Comma
         _logger.LogDebug("Renaming {EnvironmentSet} to {NewName}", command.EnvironmentSetId, command.NewName);
         var environmentSet = await _environmentSetRepository.GetById(command.EnvironmentSetId);
 
-        if (environmentSet.DeploymentEnvironments.Any(x => x.Name == command.NewName))
+        if (environmentSet.Environments.Any(x => x.Name == command.NewName))
         {
             _logger.LogWarning("Could not rename {EnvironmentSet} to {NewName} as the environment already exists", command.EnvironmentSetId, command.NewName);
             return CommandResponse.FromError(Errors.DuplicateName(command.NewName));

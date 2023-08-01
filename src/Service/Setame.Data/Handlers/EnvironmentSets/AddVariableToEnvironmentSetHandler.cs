@@ -28,8 +28,8 @@ public class AddVariableToEnvironmentSetHandler : IRequestHandler<AddVariableToE
         var existing = await _environmentSetRepository.GetById(command.EnvironmentSetId);
 
         var found = false;
-        foreach (var environment in existing.DeploymentEnvironments)
-            if (environment.EnvironmentSettings.Any(x => x.Key == command.VariableName))
+        foreach (var environment in existing.Environments)
+            if (environment.Settings.Any(x => x.Key == command.VariableName))
             {
                 found = true;
                 break;
@@ -41,8 +41,8 @@ public class AddVariableToEnvironmentSetHandler : IRequestHandler<AddVariableToE
             return CommandResponse.FromError(Errors.DuplicateName(command.VariableName));
         }
 
-        foreach (var environment in existing.DeploymentEnvironments)
-        foreach (var setting in environment.EnvironmentSettings)
+        foreach (var environment in existing.Environments)
+        foreach (var setting in environment.Settings)
             if (setting.Key == command.VariableName)
             {
                 _logger.LogWarning("Variable already exists");

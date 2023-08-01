@@ -42,7 +42,7 @@ public class CreateApplicationHandlerTests
         var environmentSet = new EnvironmentSet
         {
             Id = command.EnvironmentSetId,
-            DeploymentEnvironments = new List<DeploymentEnvironment> { new() { Name = "Dev" }, new() { Name = "Prod" } }
+            Environments = new List<DeploymentEnvironment> { new() { Name = "Dev" }, new() { Name = "Prod" } }
         };
 
         _environmentSetDocumentSession.Setup(x => x.GetFromEventStream(It.IsAny<Guid>())).ReturnsAsync(environmentSet);
@@ -90,7 +90,7 @@ public class CreateApplicationHandlerTests
         var environmentSet = new EnvironmentSet
         {
             Id = command.EnvironmentSetId,
-            DeploymentEnvironments = new List<DeploymentEnvironment> { new() { Name = "Dev" }, new() { Name = "Prod" } }
+            Environments = new List<DeploymentEnvironment> { new() { Name = "Dev" }, new() { Name = "Prod" } }
         };
 
         _environmentSetDocumentSession.Setup(x => x.GetFromEventStream(command.EnvironmentSetId)).ReturnsAsync(environmentSet);

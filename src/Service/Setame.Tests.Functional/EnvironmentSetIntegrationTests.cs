@@ -42,29 +42,29 @@ public class EnvironmentSetIntegrationTests : IClassFixture<ApiTestWebApplicatio
             await AddEnvironment(environmentSet, "Dev");
             environmentSet = await GetEnvironmentSet(environmentSetId);
             Assert.Equal(3, environmentSet.Version);
-            Assert.Single(environmentSet.DeploymentEnvironments);
-            Assert.Equal("Dev", environmentSet.DeploymentEnvironments[0].Name);
+            Assert.Single(environmentSet.Environments);
+            Assert.Equal("Dev", environmentSet.Environments[0].Name);
 
             await AddEnvironment(environmentSet, "Stage");
             environmentSet = await GetEnvironmentSet(environmentSetId);
             Assert.Equal(4, environmentSet.Version);
-            Assert.Equal(2, environmentSet.DeploymentEnvironments.Count);
-            Assert.Equal("Dev", environmentSet.DeploymentEnvironments[0].Name);
-            Assert.Equal("Stage", environmentSet.DeploymentEnvironments[1].Name);
+            Assert.Equal(2, environmentSet.Environments.Count);
+            Assert.Equal("Dev", environmentSet.Environments[0].Name);
+            Assert.Equal("Stage", environmentSet.Environments[1].Name);
 
 
             await RenameEnvironment(environmentSet, "Stage", "Staging");
             environmentSet = await GetEnvironmentSet(environmentSetId);
             Assert.Equal(5, environmentSet.Version);
-            Assert.Equal(2, environmentSet.DeploymentEnvironments.Count);
-            Assert.Equal("Dev", environmentSet.DeploymentEnvironments[0].Name);
-            Assert.Equal("Staging", environmentSet.DeploymentEnvironments[1].Name);
+            Assert.Equal(2, environmentSet.Environments.Count);
+            Assert.Equal("Dev", environmentSet.Environments[0].Name);
+            Assert.Equal("Staging", environmentSet.Environments[1].Name);
 
             await DeleteEnvironment(environmentSet, "Staging");
             environmentSet = await GetEnvironmentSet(environmentSetId);
             Assert.Equal(6, environmentSet.Version);
-            Assert.Equal(1, environmentSet.DeploymentEnvironments.Count);
-            Assert.Equal("Dev", environmentSet.DeploymentEnvironments[0].Name);
+            Assert.Equal(1, environmentSet.Environments.Count);
+            Assert.Equal("Dev", environmentSet.Environments[0].Name);
             
 
            

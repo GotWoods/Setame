@@ -45,7 +45,7 @@ public class RenameEnvironmentHandlerTests
         var environmentSet = new EnvironmentSet
         {
             Id = command.EnvironmentSetId,
-            DeploymentEnvironments = new List<DeploymentEnvironment>
+            Environments = new List<DeploymentEnvironment>
             {
                 new DeploymentEnvironment {Name = "OldEnvironment"},
                 new DeploymentEnvironment {Name = "OtherEnvironment"}
@@ -94,7 +94,7 @@ public class RenameEnvironmentHandlerTests
         var environmentSet = new EnvironmentSet
         {
             Id = command.EnvironmentSetId,
-            DeploymentEnvironments = new List<DeploymentEnvironment>
+            Environments = new List<DeploymentEnvironment>
             {
                 new DeploymentEnvironment {Name = "OldEnvironment"},
                 new DeploymentEnvironment {Name = "OtherEnvironment"}

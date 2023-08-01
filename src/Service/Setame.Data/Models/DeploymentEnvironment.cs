@@ -6,6 +6,6 @@ public class DeploymentEnvironment
 
     public int Order { get; set; }
 
-    public Dictionary<string, string> EnvironmentSettings { get; set; } = new();
+    public Dictionary<string, string> Settings { get; set; } = new();
 }
 

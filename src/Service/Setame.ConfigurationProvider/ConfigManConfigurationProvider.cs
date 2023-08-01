@@ -8,8 +8,8 @@ namespace Setame.ConfigurationProvider;
 
 public class AppLoginRequest
 {
-    public string ApplicaitonName { get; set; }
-    public string Token { get; set; }
+    public string ApplicaitonName { get; set; } = string.Empty;
+    public string Token { get; set; } = String.Empty;
 }
 
 

@@ -27,7 +27,7 @@ public class AddEnvironmentToEnvironmentSetHandler : IRequestHandler<AddEnvironm
 
         //TODO: Add environment to all Children Applications?
         
-        foreach (var deploymentEnvironment in existing.DeploymentEnvironments)
+        foreach (var deploymentEnvironment in existing.Environments)
         {
             if (deploymentEnvironment.Name == command.Name)
             {

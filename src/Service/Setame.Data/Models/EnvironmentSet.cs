@@ -15,7 +15,8 @@ public class EnvironmentSet
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    public List<DeploymentEnvironment> DeploymentEnvironments { get; set; } = new();
+    public VariableGrid Settings { get; set; } = new VariableGrid();
+    public List<DeploymentEnvironment> Environments { get; set; } = new();
     public List<Guid> Applications { get; set; } = new();
     public long Version { get; set; }
 
@@ -23,25 +24,26 @@ public class EnvironmentSet
     {
         this.Id = e.Id;
         this.Name = e.Name;
-        this.DeploymentEnvironments = new List<DeploymentEnvironment>();
+        this.Environments = new List<DeploymentEnvironment>();
     }
 
     public void Apply(EnvironmentAdded e)
     {
         //TODO: Would this need to clone all variables into the environment then?
-        this.DeploymentEnvironments.Add(new DeploymentEnvironment() { Name=e.Name });
+        this.Environments.Add(new DeploymentEnvironment() { Name=e.Name });
     }
 
     public void Apply(EnvironmentRemoved e)
     {
-        this.DeploymentEnvironments.RemoveAll(x => x.Name == e.Name);
+        this.Environments.RemoveAll(x => x.Name == e.Name);
     }
 
     public void Apply(EnvironmentSetVariableAdded e)
     {
-        foreach (var env in this.DeploymentEnvironments)
+        foreach (var env in this.Environments)
         {
-            env.EnvironmentSettings.Add(e.Name, "");
+            env.Settings.Add(e.Name, "");
+            Settings[e.Name, env.Name] = "";
         }
     }
 
@@ -52,18 +54,21 @@ public class EnvironmentSet
 
     public void Apply(EnvironmentSetVariableChanged e)
     {
-        var environment = this.DeploymentEnvironments.First(x=>x.Name == e.Environment);
-        environment.EnvironmentSettings[e.VariableName] = e.NewValue;
+        var environment = this.Environments.First(x=>x.Name == e.Environment);
+        environment.Settings[e.VariableName] = e.NewValue;
+        Settings[e.VariableName, e.Environment] = e.NewValue;
     }
 
     public void Apply(EnvironmentSetVariableRenamed e)
     {
-        foreach (var environment in DeploymentEnvironments)
+        foreach (var environment in Environments)
         {
-            var value = environment.EnvironmentSettings[e.VariableName];
-            environment.EnvironmentSettings.Remove(e.VariableName);
-            environment.EnvironmentSettings.Add(e.NewName, value);
+            var value = environment.Settings[e.VariableName];
+            environment.Settings.Remove(e.VariableName);
+            environment.Settings.Add(e.NewName, value);
         }
+
+        Settings.RenameVariable(e.VariableName, e.NewName);
     }
 
     public void Apply(ApplicationAssociatedToEnvironmentSet e)
@@ -78,6 +83,7 @@ public class EnvironmentSet
 
     public void Apply(EnvironmentRenamed e)
     {
-        DeploymentEnvironments.First(x => x.Name == e.OldName).Name = e.NewName;
+        Environments.First(x => x.Name == e.OldName).Name = e.NewName;
+        Settings.RenameEnvironment(e.OldName, e.NewName);
     }
 }

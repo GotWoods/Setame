@@ -23,9 +23,9 @@ public class RenameEnvironmentSetVariableHandler : IRequestHandler<RenameEnviron
     {
         _logger.LogDebug("Renaming {EnvironmentSetId} variable {OldName} to {NewName}", command.EnvironmentSetId, command.OldName, command.NewName);
         var environmentSet = await _environmentSetRepository.GetById(command.EnvironmentSetId);
-        foreach (var deploymentEnvironment in environmentSet.DeploymentEnvironments)
+        foreach (var deploymentEnvironment in environmentSet.Environments)
         {
-            foreach (var environmentSetting in deploymentEnvironment.EnvironmentSettings)
+            foreach (var environmentSetting in deploymentEnvironment.Settings)
             {
                 if (environmentSetting.Key == command.NewName)
                 {
