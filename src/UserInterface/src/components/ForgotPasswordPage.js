@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, Typography, Box, Paper, Container } from '@mui/material';
 import SettingsClient from '../settingsClient';
-import { Link } from 'react-router-dom';
 
-const LoginPage = () => {
+const ForgotPasswordPage = () => {
   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const settingsClient = new SettingsClient();
@@ -20,19 +18,10 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (username === 'admin@admin.com' && password === 'admin') {
-      window.location.href = '/setup';
-      return;
-    }
-
-    try {
-      const data = await settingsClient.login(username, password);
-      localStorage.setItem('authToken', data.token);
-      localStorage.setItem('username', username);
-      window.location.href = '/';
-    } catch (error) {
-      setError('Invalid username or password');
-    }
+      const data = await settingsClient.forgotPassword(username);
+      // localStorage.setItem('authToken', data.token);
+      // localStorage.setItem('username', username);
+      // window.location.href = '/';
   };
 
   return (
@@ -40,7 +29,7 @@ const LoginPage = () => {
       <Box mt={8}>
         <Paper elevation={3} sx={{ padding: 3 }}>
           <Typography variant="h5" align="center" gutterBottom>
-            Login
+            Reset Password
           </Typography>
           <form onSubmit={handleSubmit}>
             <Box mt={2}>
@@ -53,30 +42,14 @@ const LoginPage = () => {
                 required
               />
             </Box>
-            <Box mt={2}>
-              <TextField
-                fullWidth
-                type="password"
-                label="Password"
-                variant="outlined"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </Box>
             {error && (
               <Box mt={2} color="error.main">
                 <Typography variant="body2">{error}</Typography>
               </Box>
             )}
             <Box mt={3}>
-            <Typography variant="body2" align="center">
-                <Link to="/ForgotPassword">Forgot Password</Link>
-              </Typography>
-            </Box>
-            <Box mt={3}>
               <Button fullWidth variant="contained" color="primary" type="submit">
-                Login
+                Reset
               </Button>
             </Box>
           </form>
@@ -86,4 +59,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default ForgotPasswordPage;

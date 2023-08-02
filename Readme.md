@@ -35,23 +35,19 @@ This is a rough roadmap of features we want to have (but not a guarantee)
 - Visual of applied config and why a given setting is being overriden
 - Internationalization
 - Rename environment when no apps are associated, should just proceed without the warning dialog
-- 
+
 ## TODO
 Items that are still pending before this is considered a Beta:
 
 - Forgot Password
 - Showing errors (both unexpected and validation errors) to user instead of console
+- Better returning of errors from the API
 
 ### Environment Sets
 - Order Environments
-- Duplicate Prevention (in progress)
 
 ### Applications
-- Duplicate Prevention (in progress)
 - Regenerate Token
  
 ### Users
 - All of it
-
-### Settings
-- No settings yet

@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Setame.Data;
+using Setame.Data.Handlers.Users;
 using Setame.Web.Models;
 
 namespace Setame.Web.Controllers
@@ -10,15 +12,31 @@ namespace Setame.Web.Controllers
     {
         private readonly IUserService _userService;
         private readonly AuthService _authService;
-        private readonly IEmailService _emailService;
+        private readonly IMediator _mediator;
         private readonly ILogger<AuthenticationController> _logger;
 
-        public AuthenticationController(IUserService userService, AuthService authService, IEmailService emailService, ILogger<AuthenticationController> logger)
+        public AuthenticationController(IUserService userService, AuthService authService, IMediator mediator, ILogger<AuthenticationController> logger)
         {
             _userService = userService;
             _authService = authService;
-            _emailService = emailService;
+            _mediator = mediator;
             _logger = logger;
+        }
+
+        [HttpPost("ForgotPassword")]
+        public async Task<IActionResult> ForgotPassword([FromBody] string username)
+        {
+            var results = await _mediator.Send(new RequestPasswordReset(username));
+            return NoContent();
+        }
+
+        [HttpPut("{token}/ForgotPasswordReset")]
+        public async Task<IActionResult> ForgotPasswordReset(string token, [FromBody] string newPassword)
+        {
+            var results = await _mediator.Send(new ResetPasswordFromToken(token, newPassword));
+            if (!results.WasSuccessful)
+                return BadRequest(results);
+            return Ok();
         }
 
         [HttpPost("login")]
@@ -38,13 +56,6 @@ namespace Setame.Web.Controllers
                 _logger.LogDebug("Password verification failed");
                 return Task.FromResult<IActionResult>(Unauthorized());
             }
-
-            // var mailRequest = new MailRequest();
-            // mailRequest.ToEmail = "dave@solidhouse.com";
-            // mailRequest.Subject = "Hello!";
-            // mailRequest.Body = "Someone logged in";
-            //
-            // await _emailService.SendEmailAsync(mailRequest);
             _logger.LogDebug("User credentials verified, generating token");
             var token = _authService.GenerateJwtToken(user.Id.ToString(), "Administrator");
             return Task.FromResult<IActionResult>(Ok(new { token }));

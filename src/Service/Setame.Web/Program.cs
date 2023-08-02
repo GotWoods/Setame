@@ -72,6 +72,7 @@ builder.Services.AddMarten(opts =>
     opts.Projections.Add<ApplicationChangeHistoryTransformation>(ProjectionLifecycle.Async);
     opts.Projections.Add<EnvironmentSetApplicationsProjection>(ProjectionLifecycle.Async);
     opts.Projections.Add<ActiveApplicationProjection>(ProjectionLifecycle.Inline);
+    opts.Projections.Add<PendingPasswordResetProjection>(ProjectionLifecycle.Async);
 
     //var agent = await StartDaemon();
     //opts.Projections.Snapshot<EnvironmentSet>(SnapshotLifecycle.Async, asyncConfiguration => {asyncConfiguration.}) //snapshot will create an actual document

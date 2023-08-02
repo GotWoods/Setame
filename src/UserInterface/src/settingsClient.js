@@ -29,7 +29,8 @@ class SettingsClient {
             return;
         }
 
-        console.log("version is now", versionedObject.version)
+        if (versionedObject)
+            console.log("version is now", versionedObject.version)
 
         throw new Error(`Request Failed. Status code: ${response.status}`);
     }
@@ -81,6 +82,28 @@ class SettingsClient {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ username, password }),
+        });
+        return this.handleResponse(response);
+    }
+
+    async forgotPassword(username) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/Authentication/ForgotPassword`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(username),
+        });
+        return this.handleResponse(response);
+    }
+
+    async passwordReset(token, newPassword) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/Authentication/${token}/ForgotPasswordReset`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newPassword),
         });
         return this.handleResponse(response);
     }

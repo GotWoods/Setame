@@ -14,6 +14,8 @@ import ProtectedOutlet from './components/ProtectedOutlet';
 import Settings from './components/Settings';
 import EnvironmentSetHistory from './components/EnvironmentSetComponents/EnvironmentSetHistory';
 import SetupPage from './components/SetupPage';
+import ForgotPasswordPage from './components/ForgotPasswordPage'
+import ResetPasswordPage from './components/ResetPasswordPage';
 
 function App() {
   return (
@@ -23,6 +25,8 @@ function App() {
         <div className="main-content">
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/forgotPassword" element={<ForgotPasswordPage />} />
+            <Route path="/resetPassword" element={<ResetPasswordPage />} />
             <Route path="/setup" element={<SetupPage />} />
             <Route path="/" element={<ProtectedOutlet />}>
               <Route index element={<Main />} />

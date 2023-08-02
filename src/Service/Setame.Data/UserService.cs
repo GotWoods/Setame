@@ -11,6 +11,8 @@ public interface IUserService
     Task CreateUserAsync(User user, string password);
     UserSummary? GetUserByUsernameAsync(string username);
     bool VerifyPassword(UserSummary user, string password);
+    string GenerateSalt();
+    string HashPassword(string password, string salt);
 }
 
 public class UserService : IUserService
@@ -41,7 +43,7 @@ public class UserService : IUserService
         return _querySession.Query<UserSummary>().FirstOrDefault(x => x.Username == username);
     }
 
-    private string GenerateSalt()
+    public string GenerateSalt()
     {
         var rng = RandomNumberGenerator.Create();
         var salt = new byte[32];
@@ -49,7 +51,7 @@ public class UserService : IUserService
         return Convert.ToBase64String(salt);
     }
 
-    private string HashPassword(string password, string salt)
+    public string HashPassword(string password, string salt)
     {
         using var hasher = new Rfc2898DeriveBytes(password, Convert.FromBase64String(salt), 10000);
         var hash = hasher.GetBytes(32);

@@ -21,15 +21,16 @@ namespace Setame.Data
         public async Task SendEmailAsync(MailRequest mailRequest)
         {
             var email = new MimeMessage();
-            email.Sender = MailboxAddress.Parse(_settings.MailFrom);
+            email.From.Add(MailboxAddress.Parse(_settings.MailFrom));
             email.To.Add(MailboxAddress.Parse(mailRequest.ToEmail));
             email.Subject = mailRequest.Subject;
             var builder = new BodyBuilder();
             builder.HtmlBody = mailRequest.Body;
-            builder.TextBody = mailRequest.Body;
+            //builder.TextBody = mailRequest.Body;
             email.Body = builder.ToMessageBody();
             using var smtp = new SmtpClient();
-            await smtp.ConnectAsync(_settings.Host, _settings.Port, SecureSocketOptions.StartTls);
+
+            await smtp.ConnectAsync(_settings.Host, _settings.Port, SecureSocketOptions.Auto);
             await smtp.AuthenticateAsync(_settings.MailFrom, _settings.Password);
             await smtp.SendAsync(email);
             await smtp.DisconnectAsync(true);

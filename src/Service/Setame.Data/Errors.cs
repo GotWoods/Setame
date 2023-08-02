@@ -21,6 +21,8 @@
         public static Errors VariableNotFoundRename(string name) => new Errors("Mx1002", "VariableNotFoundRename", name);
         public static Errors EnvironmentNotFound(string name) => new Errors("Mx1003", "EnvironmentNotFound", name);
         public static Errors VariableNotFound(string name) => new Errors("Mx1004", "VariableNotFound", name);
+        public static Errors TokenNotFound => new Errors("Mx1005", "TokenNotFound");
+        public static Errors TokenExpired => new Errors("Mx1006", "TokenExpired");
 
         private readonly List<string> _underlyingData;
 
