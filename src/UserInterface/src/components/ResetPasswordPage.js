@@ -20,10 +20,12 @@ const ResetPasswordPage = () => {
       return;
     }
 
-    console.log("calling client")
-    await settingsClient.passwordReset(token, password);
-    console.log("completed!")
-    setSuccess(true);
+    const result = await settingsClient.passwordReset(token, password);
+    if (result.wasSuccessful) {
+      setSuccess(true);
+    } else {
+      setError(result.errors);
+    }
   };
 
   return (
