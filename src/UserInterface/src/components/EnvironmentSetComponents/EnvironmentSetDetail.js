@@ -3,7 +3,7 @@ import AddEnvironmentDialog from './AddEnvironmentDialog';
 import { SettingGridData } from '../SettingGrid/SettingGridData';
 import SettingsGrid from '../SettingGrid/SettingGrid';
 import Box from '@mui/material/Box';
-import EnvironmentSetSettingsClient from '../../environmentSetSettingsClient';
+import EnvironmentSetSettingsClient from '../../clients/environmentSetSettingsClient';
 import {
     Button,
 } from '@mui/material';

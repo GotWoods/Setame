@@ -1,6 +1,6 @@
 // ProtectedOutlet.js
 import { Outlet, Navigate } from 'react-router-dom';
-import SettingsClient from '../settingsClient';
+import SettingsClient from '../clients/settingsClient';
 
 
 const ProtectedOutlet = () => {

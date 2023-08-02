@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { TextField, Button, Typography, Box, Paper, Container } from '@mui/material';
-import SettingsClient from '../settingsClient';
+import SettingsClient from '../clients/settingsClient';
 
 const ResetPasswordPage = () => {
   const [password, setPassword] = useState('');
@@ -13,7 +13,7 @@ const ResetPasswordPage = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get('token');
-  
+
   const handleSubmit = async () => {
     if (password !== confirmPassword) {
       setError('Passwords do not match');

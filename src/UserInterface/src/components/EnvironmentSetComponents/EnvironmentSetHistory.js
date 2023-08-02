@@ -9,7 +9,7 @@ import {
   TableRow,
   Paper,
 } from '@mui/material';
-import EnvironmentSetSettingsClient from '../../environmentSetSettingsClient';
+import EnvironmentSetSettingsClient from '../../clients/environmentSetSettingsClient';
 
 const EnvironmentSetHistory = () => {
   const { environmentSetId } = useParams();

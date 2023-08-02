@@ -11,8 +11,8 @@ import {
 } from '@mui/material';
 import { SettingGridData } from '../SettingGrid/SettingGridData';
 import SettingsGrid from '../SettingGrid/SettingGrid';
-import ApplicationSettingsClient from '../../applicationSettingsClient';
-import EnvironmentSetSettingsClient from '../../environmentSetSettingsClient';
+import ApplicationSettingsClient from '../../clients/applicationSettingsClient';
+import EnvironmentSetSettingsClient from '../../clients/environmentSetSettingsClient';
 
 const ApplicationDetail = ({applicationId, updateVersion}) => {
     const [application, setApplication] = useState(null);

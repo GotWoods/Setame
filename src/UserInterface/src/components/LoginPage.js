@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, Typography, Box, Paper, Container } from '@mui/material';
-import SettingsClient from '../settingsClient';
+import SettingsClient from '../clients/settingsClient';
 import { Link } from 'react-router-dom';
 
 const LoginPage = () => {

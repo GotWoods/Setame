@@ -9,7 +9,7 @@ import {
   TableRow,
   Paper,
 } from '@mui/material';
-import ApplicationSettingsClient from '../../applicationSettingsClient';
+import ApplicationSettingsClient from '../../clients/applicationSettingsClient';
 //import axios from 'axios';
 
 const ApplicationHistory = () => {

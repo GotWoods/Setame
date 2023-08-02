@@ -1,3 +1,5 @@
+import ClientResponse from "./clientResponse";
+
 // api.js
 class SettingsClient {
     get apiUrl() {
@@ -14,25 +16,22 @@ class SettingsClient {
 
     async handleResponse(response, versionedObject) {
         const etag = response.headers.get('etag');
-        //const headers = response.headers;
-        if (response.status === 200) {
+
+        if (response.status >= 200 && response.status < 300) {
             if (versionedObject) {
                 versionedObject.version = this.extractNumericValue(etag);
+                console.log("version is now", versionedObject.version)
             }
-            return await response.json();
-        }
-        
-        if (response.status === 204 || response.status === 201) { //no content || created 
-            if (versionedObject) {
-                versionedObject.version = this.extractNumericValue(etag);
+            if (response.status === 200) {
+                return await response.json();
             }
             return;
         }
-
-        if (versionedObject)
-            console.log("version is now", versionedObject.version)
-
         throw new Error(`Request Failed. Status code: ${response.status}`);
+    }
+
+    async handleObjectResponse(response, versionedObject) {
+        return ClientResponse.fromResponse(response, versionedObject)
     }
 
     extractNumericValue(etag) {

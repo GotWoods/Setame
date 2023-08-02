@@ -26,17 +26,15 @@ namespace Setame.Web.Controllers
         [HttpPost("ForgotPassword")]
         public async Task<IActionResult> ForgotPassword([FromBody] string username)
         {
-            var results = await _mediator.Send(new RequestPasswordReset(username));
-            return NoContent();
+            var response = await _mediator.Send(new RequestPasswordReset(username));
+            return ControllerHelper.HttpResultFrom(response);
         }
 
         [HttpPut("{token}/ForgotPasswordReset")]
         public async Task<IActionResult> ForgotPasswordReset(string token, [FromBody] string newPassword)
         {
-            var results = await _mediator.Send(new ResetPasswordFromToken(token, newPassword));
-            if (!results.WasSuccessful)
-                return BadRequest(results);
-            return Ok();
+            var response = await _mediator.Send(new ResetPasswordFromToken(token, newPassword));
+            return ControllerHelper.HttpResultFrom(response);
         }
 
         [HttpPost("login")]

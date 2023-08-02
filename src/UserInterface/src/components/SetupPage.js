@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Box, Paper, Container } from '@mui/material';
-import SetupClient from '../setupClient';
+import SetupClient from '../clients/setupClient';
 
 const SetupPage = () => {
     const isDevelopment = process.env.NODE_ENV === 'development';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
-import EnvironmentSetSettingsClient from '../../environmentSetSettingsClient';
+import EnvironmentSetSettingsClient from '../../clients/environmentSetSettingsClient';
 import { useNavigate } from 'react-router-dom';
 
 const EnvironmentSetName = ({ environmentSet, refreshRequested }) => {

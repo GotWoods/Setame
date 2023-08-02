@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import AddEnvironmentSetDialog from './AddEnvironmentSetDialog';
 import '../../App.css';
-import EnvironmentSetSettingsClient from '../../environmentSetSettingsClient';
+import EnvironmentSetSettingsClient from '../../clients/environmentSetSettingsClient';
 import EnvironmentSetDetail from './EnvironmentSetDetail';
 
 const EnvironmentSets = () => {

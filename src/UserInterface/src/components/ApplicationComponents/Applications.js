@@ -4,7 +4,7 @@ import Grid from '@mui/material/Grid';
 import { TextField } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import AddApplicationDialog from './AddApplicationDialog';
-import ApplicationSettingsClient from '../../applicationSettingsClient';
+import ApplicationSettingsClient from '../../clients/applicationSettingsClient';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ApplicationDetail from './ApplicationDetail';
