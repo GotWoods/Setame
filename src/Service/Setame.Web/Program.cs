@@ -34,6 +34,7 @@ builder.Services.AddOptions<MailSettings>().BindConfiguration("MailSettings");
 builder.Services.AddScoped(typeof(IDocumentSessionHelper<>), typeof(DocumentSessionHelper<>));
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehavior<,>));
 builder.Services.AddValidatorsFromAssemblyContaining<CreateApplicationValidator>();
+builder.Services.AddScoped<ICallbackUrlProvider, WebGetCallbackUrl>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {

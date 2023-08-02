@@ -5,6 +5,7 @@ import SettingsClient from '../clients/settingsClient';
 const ForgotPasswordPage = () => {
   const [username, setUsername] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false); 
 
   const settingsClient = new SettingsClient();
 
@@ -18,10 +19,12 @@ const ForgotPasswordPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-      const data = await settingsClient.forgotPassword(username);
-      // localStorage.setItem('authToken', data.token);
-      // localStorage.setItem('username', username);
-      // window.location.href = '/';
+    const result = await settingsClient.forgotPassword(username);
+    if (result.wasSuccessful) {
+      setSuccess(true); 
+    } else {
+      setError(result.errors);
+    }
   };
 
   return (
@@ -31,28 +34,34 @@ const ForgotPasswordPage = () => {
           <Typography variant="h5" align="center" gutterBottom>
             Reset Password
           </Typography>
-          <form onSubmit={handleSubmit}>
-            <Box mt={2}>
-              <TextField
-                fullWidth
-                label="Email"
-                variant="outlined"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-              />
-            </Box>
-            {error && (
-              <Box mt={2} color="error.main">
-                <Typography variant="body2">{error}</Typography>
+          {success ? (
+            <Typography variant="body2" align="center" gutterBottom>
+              A password reset was requested. Please check your email for how to reset your password.
+            </Typography>
+          ) : (
+            <form onSubmit={handleSubmit}>
+              <Box mt={2}>
+                <TextField
+                  fullWidth
+                  label="Email"
+                  variant="outlined"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                />
               </Box>
-            )}
-            <Box mt={3}>
-              <Button fullWidth variant="contained" color="primary" type="submit">
-                Reset
-              </Button>
-            </Box>
-          </form>
+              {error && (
+                <Box mt={2} color="error.main">
+                  <Typography variant="body2">{error}</Typography>
+                </Box>
+              )}
+              <Box mt={3}>
+                <Button fullWidth variant="contained" color="primary" type="submit">
+                  Reset
+                </Button>
+              </Box>
+            </form>
+          )}
         </Paper>
       </Box>
     </Container>

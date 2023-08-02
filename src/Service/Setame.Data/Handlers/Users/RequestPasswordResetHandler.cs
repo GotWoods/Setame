@@ -11,16 +11,18 @@ public record RequestPasswordReset(string EmailAddress) : IRequest<CommandRespon
 public class RequestPasswordResetHandler : IRequestHandler<RequestPasswordReset, CommandResponse>
 {
     private readonly IDocumentSessionHelper<User> _documentSession;
+    private readonly ICallbackUrlProvider _callbackUrlProvider;
     private readonly IEmailService _emailService;
     private readonly ILogger<RequestPasswordResetHandler> _logger;
     private readonly IQuerySession _querySession;
 
-    public RequestPasswordResetHandler(IQuerySession querySession, IEmailService emailService, IDocumentSessionHelper<User> documentSession, ILogger<RequestPasswordResetHandler> logger)
+    public RequestPasswordResetHandler(IQuerySession querySession, IEmailService emailService, IDocumentSessionHelper<User> documentSession, ICallbackUrlProvider callbackUrlProvider, ILogger<RequestPasswordResetHandler> logger)
     {
         _querySession = querySession;
         _emailService = emailService;
         _logger = logger;
         _documentSession = documentSession;
+        _callbackUrlProvider = callbackUrlProvider;
     }
 
     public async Task<CommandResponse> Handle(RequestPasswordReset request, CancellationToken cancellationToken)
@@ -36,12 +38,11 @@ public class RequestPasswordResetHandler : IRequestHandler<RequestPasswordReset,
         _logger.LogDebug("Reset token {Token} created for user {Email}", token, user.Id);
         await _documentSession.AppendToStreamAnonymously(user.Id, new PasswordResetRequested(token, DateTime.UtcNow.AddHours(1), user.Id));
 
-        //TODO: remove this hardcoded URL
         var email = new MailRequest
         {
             ToEmail = user.Username,
             Subject = "Setame Password Reset",
-            Body = $"Please click the following link to reset your password: https://setame.com/reset-password?token={token}"
+            Body = $"Please click the following link to reset your password: {_callbackUrlProvider.GetCallbackUrl()}/resetPassword?token={token}"
         };
 
         await _emailService.SendEmailAsync(email);

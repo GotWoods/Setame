@@ -30,9 +30,6 @@ class SettingsClient {
         throw new Error(`Request Failed. Status code: ${response.status}`);
     }
 
-    async handleObjectResponse(response, versionedObject) {
-        return ClientResponse.fromResponse(response, versionedObject)
-    }
 
     extractNumericValue(etag) {
         const regex = /(\d+)/;
@@ -93,7 +90,7 @@ class SettingsClient {
             },
             body: JSON.stringify(username),
         });
-        return this.handleResponse(response);
+        return ClientResponse.fromResponse(response);
     }
 
     async passwordReset(token, newPassword) {
@@ -104,7 +101,7 @@ class SettingsClient {
             },
             body: JSON.stringify(newPassword),
         });
-        return this.handleResponse(response);
+        return ClientResponse.fromResponse(response);
     }
 }
 
