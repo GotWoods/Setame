@@ -1,21 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import EnvironmentSetSettingsClient from '../../clients/environmentSetSettingsClient';
 import { useNavigate } from 'react-router-dom';
-
+import ErrorContext
+ from '../../ErrorContext';
 const EnvironmentSetName = ({ environmentSet, refreshRequested }) => {
     const [isEditingName, setIsEditingName] = useState(false);
     const [environmentSetName, setEnvironmentSetName] = useState(environmentSet.name);
     const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
     const settingsClient = new EnvironmentSetSettingsClient();
     const navigate = useNavigate();
+    const { setErrorMessage } = useContext(ErrorContext);
 
     const handleRenameEnvironmentClick = () => {
         setIsEditingName(true);
     }
 
     const handleRenameEnvironmentSet = async () => {
-        await settingsClient.renameEnvironmentSet(environmentSet, environmentSetName);
+        if (environmentSet.name == environmentSetName) //old is the same as the new
+        {
+            setIsEditingName(false);
+            return;
+        }
+
+        var result = await settingsClient.renameEnvironmentSet(environmentSet, environmentSetName);
+        if (!result.wasSuccessful) {
+            setErrorMessage(result.errors);
+            return;
+        }
         setIsEditingName(false);
     }
 

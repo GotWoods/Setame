@@ -23,6 +23,7 @@ public class EnvironmentSetsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<EnvironmentSet>>> GetAll()
     {
+        //TODO: have this be a Response object instead of just returning the data
         _logger.LogDebug("Getting all");
         var results = await _mediator.Send(new GetActiveEnvironmentSets());
         _logger.LogDebug("Found {Count} Environment Sets", results.Count);
@@ -32,6 +33,7 @@ public class EnvironmentSetsController : ControllerBase
     [HttpGet("{environmentSetId}")]
     public async Task<ActionResult<EnvironmentSet>> GetOne(Guid environmentSetId)
     {
+        //TODO: have this be a Response object instead of just returning the data
         _logger.LogDebug("Getting Environment Set {Id}", environmentSetId);
         var deploymentEnvironment = await _mediator.Send(new GetEnvironment(environmentSetId));
         Response.TrySetETagResponseHeader(deploymentEnvironment.Version.ToString());
@@ -42,6 +44,7 @@ public class EnvironmentSetsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> Create([FromBody] string name)
     {
+        //TODO: have this be a Response object instead of just returning the data
         _logger.LogDebug("Creating a new environment set {Name}", name);
         var result = await _mediator.Send(new CreateEnvironmentSet(name));
         if (!result.WasSuccessful)

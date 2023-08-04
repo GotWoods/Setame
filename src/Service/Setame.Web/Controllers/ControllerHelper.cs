@@ -14,7 +14,7 @@ namespace Setame.Web.Controllers
             if (!response.WasSuccessful)
                 return new BadRequestObjectResult(ErrorResponse.From(response));
 
-            httpResponse.TrySetETagResponseHeader(response.WasSuccessful);
+            httpResponse.TrySetETagResponseHeader(response.NewVersion);
             return new NoContentResult();
         }
     }
