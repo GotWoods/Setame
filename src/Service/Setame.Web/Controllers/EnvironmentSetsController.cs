@@ -68,11 +68,8 @@ public class EnvironmentSetsController : ControllerBase
     {
         var version = Request.GetIfMatchRequestHeader();
         var response = await _mediator.Send(new RenameEnvironmentSet(environmentSetId, version, newName));
-        if (response.WasSuccessful)
-        {
+        if (response.WasSuccessful) 
             _logger.LogDebug("Environment set {Id} was renamed to {NewName}", environmentSetId, newName);
-        }
-
         return ControllerHelper.HttpResultFrom(response, Response);
     }
 
@@ -84,7 +81,6 @@ public class EnvironmentSetsController : ControllerBase
         var response = await _mediator.Send(new AddEnvironmentToEnvironmentSet(environmentSetId, version, environmentName));
         if (response.WasSuccessful) 
             _logger.LogDebug("Environment set {Id} added a new environment named {EnvironmentName}", environmentSetId, environmentName);
-
         return ControllerHelper.HttpResultFrom(response, Response);
     }
 
@@ -95,7 +91,6 @@ public class EnvironmentSetsController : ControllerBase
         var response = await _mediator.Send(new DeleteEnvironmentFromEnvironmentSet(environmentSetId, version, environmentName));
         if (response.WasSuccessful) 
             _logger.LogDebug("Environment set {Id} had the environment {EnvironmentName} removed", environmentSetId, environmentName);
-
         return ControllerHelper.HttpResultFrom(response, Response);
     }
 
@@ -107,7 +102,6 @@ public class EnvironmentSetsController : ControllerBase
         var response = await _mediator.Send(new RenameEnvironment(environmentSetId, version, environmentName, newName));
         if (response.WasSuccessful) 
             _logger.LogDebug("Environment set {Id} had the environment {OldName} renamed to {NewName}", environmentSetId, environmentName, newName);
-
         return ControllerHelper.HttpResultFrom(response, Response);
     }
 
@@ -115,10 +109,10 @@ public class EnvironmentSetsController : ControllerBase
     public async Task<IActionResult> AddVariable(Guid environmentSetId, [FromBody] string variableName)
     {
         var version = Request.GetIfMatchRequestHeader();
-        await _mediator.Send(new AddVariableToEnvironmentSet(environmentSetId, version, variableName));
-        Response.TrySetETagResponseHeader(version + 1);
-        _logger.LogDebug("Environment set {Id} had the {VariableName} variable added", environmentSetId, variableName);
-        return NoContent();
+        var response = await _mediator.Send(new AddVariableToEnvironmentSet(environmentSetId, version, variableName));
+        if (response.WasSuccessful)
+            _logger.LogDebug("Environment set {Id} had the {VariableName} variable added", environmentSetId, variableName);
+        return ControllerHelper.HttpResultFrom(response, Response);
     }
 
     [HttpPut("{environmentSetId}/variable/{environment}/{variableName}")]
@@ -126,13 +120,10 @@ public class EnvironmentSetsController : ControllerBase
         [FromBody] string variableValue)
     {
         var version = Request.GetIfMatchRequestHeader();
-        await _mediator.Send(new UpdateEnvironmentSetVariable(environmentSetId, version, environment, variableName,
-            variableValue));
-        Response.TrySetETagResponseHeader(version + 1);
-        _logger.LogDebug(
-            "Environment set {Id} had the {VariableName} set to {VariableValue} for environment {Environment}",
-            environmentSetId, variableName, variableValue, environment);
-        return NoContent();
+        var response  = await _mediator.Send(new UpdateEnvironmentSetVariable(environmentSetId, version, environment, variableName, variableValue));
+        if (response.WasSuccessful)
+            _logger.LogDebug("Environment set {Id} had the {VariableName} set to {VariableValue} for environment {Environment}", environmentSetId, variableName, variableValue, environment);
+        return ControllerHelper.HttpResultFrom(response, Response);
     }
 
     [HttpPut("{environmentSetId}/variable/{variableName}/rename")]
@@ -140,9 +131,9 @@ public class EnvironmentSetsController : ControllerBase
         [FromBody] string newName)
     {
         var version = Request.GetIfMatchRequestHeader();
-        await _mediator.Send(new RenameEnvironmentSetVariable(environmentSetId, version, variableName, newName));
-        Response.TrySetETagResponseHeader(version + 1);
-        _logger.LogDebug("Environment set {Id} had the {VariableName} variable renamed to {NewName}", environmentSetId, variableName, newName);
-        return NoContent();
+        var response = await _mediator.Send(new RenameEnvironmentSetVariable(environmentSetId, version, variableName, newName));
+        if (response.WasSuccessful)
+            _logger.LogDebug("Environment set {Id} had the {VariableName} variable renamed to {NewName}", environmentSetId, variableName, newName);
+        return ControllerHelper.HttpResultFrom(response, Response);
     }
 }

@@ -92,7 +92,7 @@ class EnvironmentSetSettingsClient extends SettingsClient {
             headers: this.getHeaders(environmentSet.version),
             body: JSON.stringify(variableName),
         });
-        return this.handleResponse(response, environmentSet);
+        return ClientResponse.fromResponse(response, environmentSet);
     }
 
     async updateVariableOnEnvironmentSet(environmentSet, environment, variableName, newValue, ) {
@@ -101,7 +101,7 @@ class EnvironmentSetSettingsClient extends SettingsClient {
             headers: this.getHeaders(environmentSet.version),
             body: JSON.stringify(newValue),
         });
-        return this.handleResponse(response, environmentSet);
+        return ClientResponse.fromResponse(response, environmentSet);
     }
 
     async renameVariableOnEnvironmentSet(environmentSet, originalName, newName, ) {
@@ -110,7 +110,7 @@ class EnvironmentSetSettingsClient extends SettingsClient {
             headers: this.getHeaders(environmentSet.version),
             body: JSON.stringify(newName),
         });
-        return this.handleResponse(response, environmentSet);
+        return ClientResponse.fromResponse(response, environmentSet);
     }
 
 

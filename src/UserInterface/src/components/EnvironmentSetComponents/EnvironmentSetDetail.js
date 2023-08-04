@@ -117,21 +117,33 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
             env.settings[newValue] = "";
 
         });
-        await settingsClient.addVariableToEnvironmentSet(environmentSet, newValue);
+        var result = await settingsClient.addVariableToEnvironmentSet(environmentSet, newValue);
+        if (!result.wasSuccessful) {
+            setErrorMessage(result.errors);
+            return;
+        }
     };
 
 
     const handleSettingRename = async (originalName, newName) => {
         if (newName === "")
             return;
-        await settingsClient.renameVariableOnEnvironmentSet(environmentSet, originalName, newName);
+        var result = await settingsClient.renameVariableOnEnvironmentSet(environmentSet, originalName, newName);
+        if (!result.wasSuccessful) {
+            setErrorMessage(result.errors);
+            return;
+        }
     };
 
 
     const handleSettingChange = async (settingName, environment, newValue) => {
         var foundEnvironment = environmentSet.environments.find(x => x.name === environment);
         foundEnvironment.settings[settingName] = newValue;
-        await settingsClient.updateVariableOnEnvironmentSet(environmentSet, environment, settingName, newValue);
+        var result = await settingsClient.updateVariableOnEnvironmentSet(environmentSet, environment, settingName, newValue);
+        if (!result.wasSuccessful) {
+            setErrorMessage(result.errors);
+            return;
+        }
     };
 
     const handleEnvironmentRename = async (originalValue, newValue) => {
