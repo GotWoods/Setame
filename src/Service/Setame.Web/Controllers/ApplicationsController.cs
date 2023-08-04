@@ -61,8 +61,7 @@ public class ApplicationsController : ControllerBase
     {
         var version = Request.GetIfMatchRequestHeader();
         var result = await _mediator.Send(new RenameApplication(applicationId, version, newName));
-        Response.TrySetETagResponseHeader(version + 1);
         _logger.LogDebug("Application {ApplicationId} renamed to {NewName}", applicationId, newName);
-        return ControllerHelper.HttpResultFrom(result);
+        return ControllerHelper.HttpResultFrom(result, Response);
     }
 }

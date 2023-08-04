@@ -42,6 +42,7 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
             var result = await settingsClient.renameEnvironment(environmentSet, originalEnvironmentName, editedEnvironmentName);
             if (!result.wasSuccessful) {
                 setErrorMessage(result.errors);
+                return;
             }
             setOriginalEnvironmentName(null);
             setEditedEnvironmentName(null);
@@ -52,6 +53,10 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
 
     const handleDeleteEnvironment = async (environmentName) => {
         const response = await settingsClient.getEnvironmentSetToApplicationAssociation(environmentSet.id);
+        if (!response.wasSuccessful) {
+            setErrorMessage(response.errors);
+            return;
+        }
         setApplications(response.applications);
         setEnvironmentToDelete(environmentName);
         setDeleteEnvironmentDialogOpen(true);
@@ -64,7 +69,11 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
 
     const handleConfirmDeleteEnvironment = async () => {
         if (environmentToDelete !== null) {
-            await settingsClient.deleteEnvironment(environmentSet, environmentToDelete);
+            var result = await settingsClient.deleteEnvironment(environmentSet, environmentToDelete);
+            if (!result.wasSuccessful) {
+                setErrorMessage(result.errors);
+                return;
+            }
             setEnvironmentToDelete(null);
         }
         setDeleteEnvironmentDialogOpen(false);

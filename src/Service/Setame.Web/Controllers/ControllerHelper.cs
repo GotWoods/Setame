@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Setame.Data.Handlers;
@@ -8,10 +9,12 @@ namespace Setame.Web.Controllers
 {
     public class ControllerHelper
     {
-        public static IActionResult HttpResultFrom(CommandResponse response)
+        public static IActionResult HttpResultFrom(CommandResponse response, HttpResponse httpResponse)
         {
             if (!response.WasSuccessful)
                 return new BadRequestObjectResult(ErrorResponse.From(response));
+
+            httpResponse.TrySetETagResponseHeader(response.WasSuccessful);
             return new NoContentResult();
         }
     }

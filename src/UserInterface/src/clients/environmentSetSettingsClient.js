@@ -47,7 +47,7 @@ class EnvironmentSetSettingsClient extends SettingsClient {
             headers: this.getHeaders(environmentSet.version),
             body: JSON.stringify(newValue),
         });
-        return this.handleResponse(response, environmentSet);
+        return ClientResponse.fromResponse(response, environmentSet);
     }
 
     async deleteEnvironmentSet(environmentSet) {
@@ -56,7 +56,7 @@ class EnvironmentSetSettingsClient extends SettingsClient {
             headers: this.getHeaders(),
         });
 
-        return this.handleResponse(response);
+        return ClientResponse.fromResponse(response);
     }
 
     async deleteEnvironment(envrionmentSet, environment) {
@@ -65,7 +65,7 @@ class EnvironmentSetSettingsClient extends SettingsClient {
             headers: this.getHeaders(),
         });
 
-        return this.handleResponse(response);
+        return ClientResponse.fromResponse(response);
     }
 
     async addEnvironmentSet(name) {
@@ -83,7 +83,7 @@ class EnvironmentSetSettingsClient extends SettingsClient {
             headers: this.getHeaders(environmentSet.version),
             body: JSON.stringify(environmentName),
         });
-        return this.handleResponse(response, environmentSet);
+        return ClientResponse.fromResponse(response, environmentSet);
     }
 
     async addVariableToEnvironmentSet(environmentSet, variableName) {
