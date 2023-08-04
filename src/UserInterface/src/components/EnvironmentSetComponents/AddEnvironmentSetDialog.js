@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
@@ -6,14 +6,19 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import EnvironmentSetSettingsClient from '../../clients/environmentSetSettingsClient';
-
+import ErrorContext from '../../ErrorContext';
 
 const AddEnvironmentSetDialog = ({ open, onClose, onAdded }) => {
   const [environmentName, setEnvironmentName] = useState('');
   const settingsClient = new EnvironmentSetSettingsClient();
-
+  const { setErrorMessage } = useContext(ErrorContext);
   const handleAddEnvironment = async () => {
-    await settingsClient.addEnvironmentSet(environmentName);
+    var result = await settingsClient.addEnvironmentSet(environmentName);
+    if (!result.wasSuccessful) {
+      setErrorMessage(result.errors);
+      return;
+    }
+
     onClose();
     if (onAdded) {
       onAdded();

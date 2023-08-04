@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import AddEnvironmentDialog from './AddEnvironmentDialog';
 import { SettingGridData } from '../SettingGrid/SettingGridData';
 import SettingsGrid from '../SettingGrid/SettingGrid';
@@ -10,6 +10,7 @@ import {
 import EnvironmentSetName from './EnvironmentSetName';
 import RenameEnvironmentDialog from './RenameEnvironmentDialog';
 import DeleteEnvironmentDialog from './DeleteEnvironmentDialog';
+import ErrorContext from '../../ErrorContext';
 
 const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
     const [transformedSettings, setTransformedSettings] = useState([]);
@@ -22,7 +23,7 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
     const [originalEnvironmentName, setOriginalEnvironmentName] = useState(null);
     const [deleteEnvironmentDialogOpen, setDeleteEnvironmentDialogOpen] = useState(false);
     const [environmentToDelete, setEnvironmentToDelete] = useState(null);
-
+    const { setErrorMessage } = useContext(ErrorContext);
 
     const handleAddEnvironmentSetDialogClose = () => {
         setEnvironmentDialogOpen(false);
@@ -38,7 +39,10 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
 
     const handleConfirmRenameEnvironment = async () => {
         if (editedEnvironmentName !== null) {
-            await settingsClient.renameEnvironment(environmentSet, originalEnvironmentName, editedEnvironmentName);
+            var result = await settingsClient.renameEnvironment(environmentSet, originalEnvironmentName, editedEnvironmentName);
+            if (!result.wasSuccessful) {
+                setErrorMessage(result.errors);
+            }
             setOriginalEnvironmentName(null);
             setEditedEnvironmentName(null);
         }

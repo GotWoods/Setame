@@ -38,7 +38,7 @@ const App = () => {
             <div className="error-dialog">
               <div className="error-message">The following errors occurred:
                 {errorMessage.map((error, index) => (
-                  <div key={index}>{error}</div>
+                  <div key={index}>{error.message}</div>
                 ))}
               </div>
               <button onClick={closeErrorDialog}>Acknowledge</button>

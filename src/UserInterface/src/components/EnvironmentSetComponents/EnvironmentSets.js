@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import Button from '@mui/material/Button';
 import AddEnvironmentSetDialog from './AddEnvironmentSetDialog';
 import '../../App.css';
 import EnvironmentSetSettingsClient from '../../clients/environmentSetSettingsClient';
 import EnvironmentSetDetail from './EnvironmentSetDetail';
+import ErrorContext from '../../ErrorContext';
+
 
 const EnvironmentSets = () => {
   const [environments, setEnvironmentSets] = useState([]);
   const [environmentSetDialogOpen, setEnvironmentSetDialogOpen] = useState(false);
-
+  const { setErrorMessage } = useContext(ErrorContext);
+  
   const fetchEnvironmentSets = React.useCallback(async () => {
     let settingsClient = new EnvironmentSetSettingsClient();
     let data = await settingsClient.getEnvironmentSets();

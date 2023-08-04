@@ -1,4 +1,5 @@
 import SettingsClient from "./settingsClient";
+import ClientResponse from "./clientResponse";
 
 class EnvironmentSetSettingsClient extends SettingsClient {
     async getEnvironmentSet(name) {
@@ -37,7 +38,7 @@ class EnvironmentSetSettingsClient extends SettingsClient {
             headers: this.getHeaders(environmentSet.version),
             body: JSON.stringify(newName),
         });
-        return this.handleResponse(response, environmentSet);
+        return ClientResponse.fromResponse(response);
     }
 
     async renameEnvironment(environmentSet, oldValue,newValue) {
@@ -73,7 +74,7 @@ class EnvironmentSetSettingsClient extends SettingsClient {
             headers: this.getHeaders(),
             body: JSON.stringify(name),
         });
-        return this.handleResponse(response);
+        return ClientResponse.fromResponse(response);
     }
 
     async addEnvironmentToEnvironmentSet(environmentSet, environmentName) {
