@@ -45,7 +45,7 @@ public class ApplicationsController : ControllerBase
         _logger.LogDebug("Creating a new application with name of {ApplicationName}", application.Name);
         var id = CombGuidIdGeneration.NewGuid();
         var result = await _mediator.Send(new CreateApplication(id, application.Name, application.Token, application.EnvironmentSetId), ct);
-        return Ok(id);
+        return result.WasSuccessful ? Ok(id) : BadRequest(result);
     }
 
     [HttpDelete("{applicationId}")]
@@ -60,9 +60,9 @@ public class ApplicationsController : ControllerBase
     public async Task<IActionResult> RenameApplication(Guid applicationId, [FromBody] string newName, CancellationToken ct)
     {
         var version = Request.GetIfMatchRequestHeader();
-        await _mediator.Send(new RenameApplication(applicationId, version, newName));
+        var result = await _mediator.Send(new RenameApplication(applicationId, version, newName));
         Response.TrySetETagResponseHeader(version + 1);
         _logger.LogDebug("Application {ApplicationId} renamed to {NewName}", applicationId, newName);
-        return NoContent();
+        return ControllerHelper.HttpResultFrom(result);
     }
 }

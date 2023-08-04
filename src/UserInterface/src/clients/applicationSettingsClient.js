@@ -1,4 +1,5 @@
 import SettingsClient from "./settingsClient";
+import ClientResponse from "./clientResponse";
 
 class ApplicationSettingsClient extends SettingsClient {
     
@@ -49,7 +50,7 @@ class ApplicationSettingsClient extends SettingsClient {
             body: JSON.stringify(newName)
         });
 
-        return this.handleResponse(response, application);
+        return ClientResponse.fromResponse(response, application);
     }
 
 

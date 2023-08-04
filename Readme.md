@@ -41,8 +41,7 @@ Items that are still pending before this is considered a Beta:
 
 - Showing errors (both unexpected and validation errors) to user instead of console
 - Better returning of errors from the API
-- Test out the actual client again after all the changes recently
- 
+- Test out the actual client config provider again after all the changes recently
 
 ### Environment Sets
 - Order Environments

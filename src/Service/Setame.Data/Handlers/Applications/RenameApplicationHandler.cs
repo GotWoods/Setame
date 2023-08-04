@@ -24,10 +24,10 @@ public class RenameApplicationHandler : IRequestHandler<RenameApplication, Comma
         _logger.LogDebug("Renaming {Application} to {NewName}", command.ApplicationId, command.NewName);
         var response = new CommandResponse();
         var existing =  _querySession.GetByName(command.NewName);
-        if (existing == null)
+        if (existing != null)
         {
             _logger.LogWarning("Could not rename to {NewName} as an application already has that name", command.NewName);
-            response.Errors.Add(Errors.ApplicationNotFound(command.ApplicationId));
+            response.Errors.Add(Errors.DuplicateName(command.NewName));
         }
 
         await _documentSession.AppendToStream(command.ApplicationId, command.ExpectedVersion, new ApplicationRenamed(command.NewName));

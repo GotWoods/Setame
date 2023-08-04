@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import { TextField } from '@mui/material';
@@ -8,6 +8,7 @@ import ApplicationSettingsClient from '../../clients/applicationSettingsClient';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ApplicationDetail from './ApplicationDetail';
+import ErrorContext from '../../ErrorContext';
 
 const Applications = () => {
   const [openAddApplicationDialog, setOpenAddApplicationDialog] = useState(false);
@@ -16,6 +17,7 @@ const Applications = () => {
   const settingsClient = new ApplicationSettingsClient();
   const [selectedApplicationId, setSelectedApplicationId] = useState(null);
   const [editingApplicationId, setEditingApplicationId] = useState(null);
+  const { setErrorMessage } = useContext(ErrorContext);
 
   const fetchApplications = React.useCallback(async () => {
     let client = new ApplicationSettingsClient();
@@ -63,7 +65,13 @@ const Applications = () => {
 
   const handleUpdateApplicationName = async (application, newName) => {
     setEditingApplicationId(null);
-    await settingsClient.renameApplication(application, newName);
+    var result = await settingsClient.renameApplication(application, newName);
+    console.log("Application rename result ", result);
+    if (!result.wasSuccessful)
+    {
+        console.log("There were errors", result.errors)
+        setErrorMessage(result.errors);
+    }
     fetchApplications();
   };
 

@@ -31,14 +31,10 @@
             return new Errors(errorCode, message);
 
         }
-    }
 
-
-    public class WTF
-    {
-        public WTF()
+        public override string ToString()
         {
-            Errors.DuplicateName("test");
+            return string.Format(this.Message);
         }
     }
 }
