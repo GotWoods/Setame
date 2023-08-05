@@ -75,7 +75,7 @@ class ApplicationSettingsClient extends SettingsClient {
             body: JSON.stringify(value),
         });
 
-        return this.handleResponse(response, application);
+        return ClientResponse.fromResponse(response, application);
     }
 
     async renameApplicationSetting(application, oldName, newName) {
@@ -85,7 +85,7 @@ class ApplicationSettingsClient extends SettingsClient {
             body: JSON.stringify(newName),
         });
 
-        return this.handleResponse(response, application);
+        return ClientResponse.fromResponse(response, application);
     }
 
     async addGlobalApplicationSetting(application, newSettingName) {
@@ -107,7 +107,7 @@ class ApplicationSettingsClient extends SettingsClient {
             body: JSON.stringify(value),
         });
 
-        return this.handleResponse(response, application);
+        return ClientResponse.fromResponse(response, application);
     }
 
     async addApplication(applicationName, environmentSetId, token) {

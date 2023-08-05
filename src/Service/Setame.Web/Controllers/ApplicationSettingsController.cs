@@ -24,7 +24,7 @@ public class ApplicationSettingsController : ControllerBase
 
     [HttpGet]
     [Authorize(Roles = "Application")]
-    public ActionResult Get()
+    public IActionResult Get()
     {
         var claim = User.FindFirst(ClaimTypes.NameIdentifier);
         if (claim == null)
@@ -37,7 +37,7 @@ public class ApplicationSettingsController : ControllerBase
     }
 
     [HttpPost("{applicationId}/{environment}")]
-    public async Task<ActionResult> CreateNew(Guid applicationId, string environment, [FromBody] string variable, CancellationToken ct)
+    public async Task<IActionResult> CreateNew(Guid applicationId, string environment, [FromBody] string variable, CancellationToken ct)
     {
         var version = Request.GetIfMatchRequestHeader();
         CommandResponse? response = null;
@@ -56,31 +56,31 @@ public class ApplicationSettingsController : ControllerBase
     }
 
     [HttpPut("{applicationId}/{environment}/{variable}")]
-    public async Task<ActionResult> Update(Guid applicationId, string environment, string variable, [FromBody] string value, CancellationToken ct)
+    public async Task<IActionResult> Update(Guid applicationId, string environment, string variable, [FromBody] string value, CancellationToken ct)
     {
         var version = Request.GetIfMatchRequestHeader();
+        CommandResponse result = null!;
         if (environment == "default")
         {
             _logger.LogDebug("Updating default {Variable} for Application {ApplicationId}. Set to {Value}", variable, applicationId, value);
-            await _mediator.Send(new UpdateDefaultApplicationVariable(applicationId, version, variable, value));
+            result = await _mediator.Send(new UpdateDefaultApplicationVariable(applicationId, version, variable, value), ct);
         }
         else
         {
             _logger.LogDebug("Updating {Environment} {Variable} for Application {ApplicationId}. Set to {Value}", environment, variable, applicationId, value);
-            await _mediator.Send(new UpdateApplicationVariable(applicationId, version, environment, variable, value));
+            result = await _mediator.Send(new UpdateApplicationVariable(applicationId, version, environment, variable, value), ct);
         }
 
-        Response.TrySetETagResponseHeader(version + 1);
-        return NoContent();
+        return ControllerHelper.HttpResultFrom(result, Response);
     }
 
     [HttpPost("{applicationId}/{variable}/rename")]
     public async Task<IActionResult> RenameVariable(Guid applicationId, string variable, [FromBody] string newName)
     {
         var version = Request.GetIfMatchRequestHeader();
-        await _mediator.Send(new RenameApplicationVariable(applicationId, version, variable, newName));
-        _logger.LogDebug("For Application {ApplicationId}, {Variable} renamed to {NewName}", applicationId, variable, newName);
-        Response.TrySetETagResponseHeader(version + 1);
-        return NoContent();
+        var result = await _mediator.Send(new RenameApplicationVariable(applicationId, version, variable, newName));
+        if (result.WasSuccessful)
+            _logger.LogDebug("For Application {ApplicationId}, {Variable} renamed to {NewName}", applicationId, variable, newName);
+        return ControllerHelper.HttpResultFrom(result, Response);
     }
 }

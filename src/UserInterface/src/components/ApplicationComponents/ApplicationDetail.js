@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
     Table,
     TableBody,
@@ -13,14 +13,16 @@ import { SettingGridData } from '../SettingGrid/SettingGridData';
 import SettingsGrid from '../SettingGrid/SettingGrid';
 import ApplicationSettingsClient from '../../clients/applicationSettingsClient';
 import EnvironmentSetSettingsClient from '../../clients/environmentSetSettingsClient';
-
+import ErrorContext
+ from '../../ErrorContext';
 const ApplicationDetail = ({applicationId, updateVersion}) => {
     const [application, setApplication] = useState(null);
     const [newSettingName, setNewSettingName] = useState('');
     const [newSettingValue, setNewSettingValue] = useState('');
     const [transformedSettings, setTransformedSettings] = useState([]);
     const settingsClient = new ApplicationSettingsClient();
-    
+    const { setErrorMessage } = useContext(ErrorContext);
+
     const fetchEnvironments = React.useCallback(async () => {
         let  settingsClient = new ApplicationSettingsClient();
         let  environmentSetSettingsClient = new EnvironmentSetSettingsClient();
@@ -84,16 +86,34 @@ const ApplicationDetail = ({applicationId, updateVersion}) => {
 
     const handleUpdateEnvironmentSettings = async (name, value) => {
         console.log("handleUpdateEnvironmentSettings", name, value);
-        await settingsClient.updateGlobalApplicationSetting(application, name, value);
+        var result = await settingsClient.updateGlobalApplicationSetting(application, name, value);
+        if (!result.wasSuccessful) {
+            setErrorMessage(result.errors);
+            return;
+        }
         updateVersion(application.id, application.version);
     }
     const handleSettingChange = async (settingName, environment, newValue) => {
-        await settingsClient.updateApplicationSetting(application, environment, settingName, newValue);
+        var result = await settingsClient.updateApplicationSetting(application, environment, settingName, newValue);
+        if (!result.wasSuccessful) {
+            setErrorMessage(result.errors);
+            return;
+        }
         updateVersion(application.id, application.version);
     };
 
     const handleSettingRename = async (oldSettingName, newSettingName) => {
-        await settingsClient.renameApplicationSetting(application, oldSettingName, newSettingName);
+        var result = await settingsClient.renameApplicationSetting(application, oldSettingName, newSettingName);
+        if (!result.wasSuccessful) {
+            setErrorMessage(result.errors);
+            return;
+        }
+
+        transformedSettings.settings[newSettingName] = transformedSettings.settings[oldSettingName]; //copy children from old to new
+        delete transformedSettings.settings[oldSettingName];
+        setTransformedSettings({...transformedSettings}); //use the spread operator to create a new reference so React updates
+
+
         updateVersion(application.id, application.version);
     };
 

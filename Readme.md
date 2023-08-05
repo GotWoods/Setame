@@ -53,6 +53,7 @@ Items that are still pending before this is considered a Beta:
 
 ### Applications
 - Regenerate Token
+- Rename of a default setting is calling a put to https://localhost:7219/api/ApplicationSettings/0189c3c1-31f1-466a-ab01-aa70289edb9d/default/default12 (there looks to be no handling of a global rename)
  
 ### Users
 - All of it
