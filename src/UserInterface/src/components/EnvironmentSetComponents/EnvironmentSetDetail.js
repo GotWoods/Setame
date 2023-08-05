@@ -139,6 +139,8 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
         //console.log("Current setting", )
         transformedSettings.settings[newName] = transformedSettings.settings[originalName]; //copy children from old to new
         delete transformedSettings.settings[originalName];
+
+        
         console.log("After rename grid", transformedSettings)
       
         setTransformedSettings({...transformedSettings}); //use the spread operator to create a new reference so React updates
