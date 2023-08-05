@@ -46,12 +46,6 @@ const EnvironmentSets = () => {
             Add New Environment Set
           </Button>
         </div>
-        <p>
-          Create an environment set for each distinct set of environments your application could move through. For example if you have one set of applications that moves through Dev,Test,Prod and another that moved through Dev,Test,UAT,Prod, you would create two different Environment Sets.
-        </p><p>
-          Variables applied to an Environment Set are inherited by any application tied to that Environment Set. This is a good spot to put global variables used by ALL applications (e.g. the URL of a central logging server)
-          {/* TODO: Refresh on adding an env */}
-        </p>
       </div>
 
       <AddEnvironmentSetDialog key={environmentSetDialogOpen ? 'open' : 'closed'} open={environmentSetDialogOpen} onClose={handleAddEnvironmentSetDialogClose} onAdded={fetchEnvironmentSets} />

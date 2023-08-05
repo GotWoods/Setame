@@ -87,6 +87,21 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
         editingEnvironmentRef.current = editingEnvironment;
     }, [editingEnvironment]);
 
+    useEffect(() => {
+        transformedSettings.settings = sortObjectByKeys(transformedSettings.settings);
+        console.log("new settings applied", transformedSettings);
+        setSettings(transformedSettings);
+    }, [transformedSettings]);
+
+    function sortObjectByKeys(obj) {
+        const sortedKeys = Object.keys(obj).sort();
+        const sortedObj = {};
+        sortedKeys.forEach(key => {
+          sortedObj[key] = obj[key];
+        });
+        return sortedObj;
+      }
+
     return (
         <TableContainer component={Paper}>
             <Table>

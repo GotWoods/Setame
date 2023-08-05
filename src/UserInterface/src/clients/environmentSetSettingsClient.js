@@ -38,7 +38,7 @@ class EnvironmentSetSettingsClient extends SettingsClient {
             headers: this.getHeaders(environmentSet.version),
             body: JSON.stringify(newName),
         });
-        return ClientResponse.fromResponse(response);
+        return ClientResponse.fromResponse(response, environmentSet);
     }
 
     async renameEnvironment(environmentSet, oldValue,newValue) {

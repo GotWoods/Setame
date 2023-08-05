@@ -45,6 +45,10 @@ Items that are still pending before this is considered a Beta:
 
 ### Environment Sets
 - Order Environments
+- Delete Environment not appearing to work
+- Delete setting
+- Renaming an environment variable appears to create a duplicate
+- Confirm Delete Environment Set / Environment
 
 ### Applications
 - Regenerate Token

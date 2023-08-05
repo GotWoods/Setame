@@ -12,6 +12,14 @@ code {
     monospace;
 }
 
+header a:visited {
+  color: white; 
+}
+
+header a {
+  color: white; 
+}
+
 a,
 a:visited {
   color: blue; 
