@@ -55,10 +55,10 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
 
     const handleDeleteEnvironment = async (environmentName) => {
         const response = await settingsClient.getEnvironmentSetToApplicationAssociation(environmentSet.id);
-        if (!response.wasSuccessful) {
-            setErrorMessage(response.errors);
-            return;
-        }
+        // if (!response.wasSuccessful) {
+        //     setErrorMessage(response.errors);
+        //     return;
+        // }
         setApplications(response.applications);
         setEnvironmentToDelete(environmentName);
         setDeleteEnvironmentDialogOpen(true);

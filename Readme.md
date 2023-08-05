@@ -43,7 +43,6 @@ Items that are still pending before this is considered a Beta:
 - Test out the actual client config provider again after all the changes recently
 
 ### Environment Sets
-- Delete Environment not appearing to work
 - Delete setting
 - Renaming an environment variable appears to create a duplicate
 - Confirm Delete Environment Set / Environment

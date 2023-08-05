@@ -59,13 +59,13 @@ class EnvironmentSetSettingsClient extends SettingsClient {
         return ClientResponse.fromResponse(response);
     }
 
-    async deleteEnvironment(envrionmentSet, environment) {
-        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${envrionmentSet.id}/environment/${environment}`, {
+    async deleteEnvironment(envrironmentSet, environment) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${envrironmentSet.id}/environment/${environment}`, {
             method: 'DELETE',
-            headers: this.getHeaders(),
+            headers: this.getHeaders(envrironmentSet.version),
         });
 
-        return ClientResponse.fromResponse(response);
+        return ClientResponse.fromResponse(response, envrironmentSet);
     }
 
     async addEnvironmentSet(name) {
