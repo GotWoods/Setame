@@ -17,7 +17,7 @@ const EnvironmentSetName = ({ environmentSet, refreshRequested }) => {
     }
 
     const handleRenameEnvironmentSet = async () => {
-        if (environmentSet.name == environmentSetName) //old is the same as the new
+        if (environmentSet.name === environmentSetName) //old is the same as the new
         {
             setIsEditingName(false);
             return;

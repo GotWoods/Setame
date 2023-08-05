@@ -19,6 +19,7 @@ on startup and be changed without requiring an application to be redeployed for 
 This is a rough roadmap of features we want to have (but not a guarantee)
 
 - Secret storage
+- Order Environments
 - Add custom environment to an application in addition of what comes from environment set (this will then require ordering of environments)
 - Environment Groups. A set of environment variables tied to an environment set that can be applied to multiple applications. This allows the user to attach commonly re-used variables to an application that may not be used for ALL applications (That is where you would use the environment set method)
 - Ability to Duplicate Environment Set
@@ -44,11 +45,11 @@ Items that are still pending before this is considered a Beta:
 - Test out the actual client config provider again after all the changes recently
 
 ### Environment Sets
-- Order Environments
 - Delete Environment not appearing to work
 - Delete setting
 - Renaming an environment variable appears to create a duplicate
 - Confirm Delete Environment Set / Environment
+- Bug with adding a new environment to a set
 
 ### Applications
 - Regenerate Token
