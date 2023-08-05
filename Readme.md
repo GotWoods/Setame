@@ -40,8 +40,6 @@ This is a rough roadmap of features we want to have (but not a guarantee)
 ## TODO
 Items that are still pending before this is considered a Beta:
 
-- Showing errors (both unexpected and validation errors) to user instead of console
-- Better returning of errors from the API
 - Test out the actual client config provider again after all the changes recently
 
 ### Environment Sets
