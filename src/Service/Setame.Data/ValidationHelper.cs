@@ -6,7 +6,7 @@ public class ValidationHelper
 {
     public static bool BeValidString(string name)
     {
-        const string allowedPattern = @"^[\p{L}\p{N}\p{Zs}-]+$";
-        return !string.IsNullOrEmpty(name) && Regex.IsMatch(name, allowedPattern);
+        const string allowedPattern = @"^[\p{L}\p{N}\p{Zs}\p{P}]*$";
+        return Regex.IsMatch(name, allowedPattern);
     }
 }

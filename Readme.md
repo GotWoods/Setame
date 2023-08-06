@@ -48,8 +48,8 @@ Items that are still pending before this is considered a Beta:
 
 ### Applications
 - Regenerate Token
-- Rename of a default setting is calling a put to https://localhost:7219/api/ApplicationSettings/0189c3c1-31f1-466a-ab01-aa70289edb9d/default/default12 (there looks to be no handling of a global rename)
 - Ability to Delete a setting
+- Adding a setting to an environment is failing if the app was created after the environment set was created
 	
 ### Users
 - All of it
