@@ -83,4 +83,14 @@ public class ApplicationSettingsController : ControllerBase
             _logger.LogDebug("For Application {ApplicationId}, {Variable} renamed to {NewName}", applicationId, variable, newName);
         return ControllerHelper.HttpResultFrom(result, Response);
     }
+
+    [HttpPost("{applicationId}/{variable}/renameDefault")]
+    public async Task<IActionResult> RenameDefaultVariable(Guid applicationId, string variable, [FromBody] string newName)
+    {
+        var version = Request.GetIfMatchRequestHeader();
+        var result = await _mediator.Send(new RenameDefaultApplicationVariable(applicationId, version, variable, newName));
+        if (result.WasSuccessful)
+            _logger.LogDebug("For Application {ApplicationId}, default {Variable} renamed to {NewName}", applicationId, variable, newName);
+        return ControllerHelper.HttpResultFrom(result, Response);
+    }
 }

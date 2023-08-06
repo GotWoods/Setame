@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import {
     Table,
     TableBody,
@@ -14,18 +14,19 @@ import SettingsGrid from '../SettingGrid/SettingGrid';
 import ApplicationSettingsClient from '../../clients/applicationSettingsClient';
 import EnvironmentSetSettingsClient from '../../clients/environmentSetSettingsClient';
 import ErrorContext
- from '../../ErrorContext';
-const ApplicationDetail = ({applicationId, updateVersion}) => {
+    from '../../ErrorContext';
+const ApplicationDetail = ({ applicationId, updateVersion }) => {
     const [application, setApplication] = useState(null);
     const [newSettingName, setNewSettingName] = useState('');
     const [newSettingValue, setNewSettingValue] = useState('');
     const [transformedSettings, setTransformedSettings] = useState([]);
     const settingsClient = new ApplicationSettingsClient();
     const { setErrorMessage } = useContext(ErrorContext);
+    const originalValueRef = useRef('');
 
     const fetchEnvironments = React.useCallback(async () => {
-        let  settingsClient = new ApplicationSettingsClient();
-        let  environmentSetSettingsClient = new EnvironmentSetSettingsClient();
+        let settingsClient = new ApplicationSettingsClient();
+        let environmentSetSettingsClient = new EnvironmentSetSettingsClient();
         const application = await settingsClient.getApplication(applicationId);
         setApplication(application);
         const environmentSet = await environmentSetSettingsClient.getEnvironmentSet(application.environmentSetId);
@@ -40,7 +41,7 @@ const ApplicationDetail = ({applicationId, updateVersion}) => {
                 uniqueKeys.add(key);
             });
         });
-      }, [applicationId, ]);
+    }, [applicationId,]);
 
     useEffect(() => {
         fetchEnvironments();
@@ -93,6 +94,32 @@ const ApplicationDetail = ({applicationId, updateVersion}) => {
         }
         updateVersion(application.id, application.version);
     }
+
+    const handleRenameDefaultSettings = async (oldName, newName) => {
+        console.log("handleRenameDefaultSettings", oldName, newName);
+        var result = await settingsClient.renameGlobalApplicationSetting(application, oldName, newName);
+        if (!result.wasSuccessful) {
+            setErrorMessage(result.errors);
+            return;
+        }
+        // Update local state
+        setApplication(prevApplication => {
+            return {
+                ...prevApplication,
+                applicationDefaults: prevApplication.applicationDefaults.map(setting => {
+                    if (setting.name === oldName) {
+                        return { ...setting, name: newName };
+                    }
+                    return setting;
+                })
+            }
+        });
+
+
+
+        updateVersion(application.id, application.version);
+    }
+
     const handleSettingChange = async (settingName, environment, newValue) => {
         var result = await settingsClient.updateApplicationSetting(application, environment, settingName, newValue);
         if (!result.wasSuccessful) {
@@ -111,7 +138,7 @@ const ApplicationDetail = ({applicationId, updateVersion}) => {
 
         transformedSettings.settings[newSettingName] = transformedSettings.settings[oldSettingName]; //copy children from old to new
         delete transformedSettings.settings[oldSettingName];
-        setTransformedSettings({...transformedSettings}); //use the spread operator to create a new reference so React updates
+        setTransformedSettings({ ...transformedSettings }); //use the spread operator to create a new reference so React updates
 
 
         updateVersion(application.id, application.version);
@@ -140,8 +167,8 @@ const ApplicationDetail = ({applicationId, updateVersion}) => {
         <div>
 
 
-                    {/* <Button variant="contained" color="primary">View Applied Settings</Button> &nbsp;&nbsp; */}
-              
+            {/* <Button variant="contained" color="primary">View Applied Settings</Button> &nbsp;&nbsp; */}
+
             <h2>Default Settings</h2>
             <TableContainer component={Paper}>
                 <Table>
@@ -158,7 +185,16 @@ const ApplicationDetail = ({applicationId, updateVersion}) => {
                                     <TextField
                                         defaultValue={setting.name}
                                         fullWidth
-                                        onBlur={(e) => handleUpdateEnvironmentSettings(e.target.value, setting.value)}
+                                        onFocus={(e) => {
+                                            originalValueRef.current = e.target.value;
+                                        }}
+                                        onBlur={(e) => {
+                                            if (setting.name === '') {
+                                                handleUpdateEnvironmentSettings(e.target.value, setting.value)
+                                            } else {
+                                                handleRenameDefaultSettings(originalValueRef.current, e.target.value)
+                                            }
+                                        }}
                                     />
                                 </TableCell>
                                 <TableCell>

@@ -1,8 +1,6 @@
 ﻿namespace Setame.Data.Models;
 
-public interface IApplicationEvent
-{
-}
+public interface IApplicationEvent { }
 
 public record ApplicationCreated(Guid Id, string Name, string Token, Guid EnvironmentSetId) : IApplicationEvent;
 
@@ -19,6 +17,7 @@ public record ApplicationDefaultVariableAdded(string VariableName) : IApplicatio
 public record ApplicationDefaultVariableChanged(string VariableName, string NewValue) : IApplicationEvent;
 
 public record ApplicationVariableRenamed(string VariableName, string NewName) : IApplicationEvent;
+public record ApplicationDefaultVariableRenamed(string VariableName, string NewName) : IApplicationEvent;
 
 public record ApplicationDeleted(Guid ApplicationId) : IApplicationEvent;
 
@@ -48,8 +47,6 @@ public class Application
     public void Apply(ApplicationVariableAdded e)
     {
         EnvironmentSettings.First(x => x.Name == e.Environment).Settings.Add(new Setting { Name = e.Name });
-        // foreach (var env in EnvironmentSettings) 
-        //     env.Settings.Add(new Setting { Name = e.Name });
     }
 
     public void Apply(ApplicationVariableChanged e)
@@ -61,6 +58,11 @@ public class Application
     public void Apply(ApplicationVariableRenamed e)
     {
         foreach (var env in EnvironmentSettings) env.Settings.First(x => x.Name == e.VariableName).Name = e.NewName;
+    }
+
+    public void Apply(ApplicationDefaultVariableRenamed e)
+    {
+        ApplicationDefaults.First(x => x.Name == e.VariableName).Name = e.NewName;
     }
 
     public void Apply(ApplicationEnvironmentAdded e)

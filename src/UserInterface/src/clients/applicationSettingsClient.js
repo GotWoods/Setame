@@ -88,6 +88,16 @@ class ApplicationSettingsClient extends SettingsClient {
         return ClientResponse.fromResponse(response, application);
     }
 
+    async renameGlobalApplicationSetting(application, oldName, newName) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/ApplicationSettings/${application.id}/${oldName}/renameDefault`, {
+            method: 'POST',
+            headers: this.getHeaders(application.version),
+            body: JSON.stringify(newName),
+        });
+
+        return ClientResponse.fromResponse(response, application);
+    }
+
     async addGlobalApplicationSetting(application, newSettingName) {
         const response = await this.apiRequest(`${this.apiUrl}/api/ApplicationSettings/${application.id}/default`, {
             method: 'POST',

@@ -43,14 +43,13 @@ Items that are still pending before this is considered a Beta:
 - Test out the actual client config provider again after all the changes recently
 
 ### Environment Sets
-- Delete setting
-- Renaming an environment variable appears to create a duplicate
-- Confirm Delete Environment Set / Environment
-- Bug with adding a new environment to a set
+- Ability to Delete a setting
+- Confirm Delete Environment Set (should be same logic as deleting an environment)
 
 ### Applications
 - Regenerate Token
 - Rename of a default setting is calling a put to https://localhost:7219/api/ApplicationSettings/0189c3c1-31f1-466a-ab01-aa70289edb9d/default/default12 (there looks to be no handling of a global rename)
- 
+- Ability to Delete a setting
+	
 ### Users
 - All of it
