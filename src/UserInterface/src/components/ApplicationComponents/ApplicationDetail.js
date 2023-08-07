@@ -153,6 +153,15 @@ const ApplicationDetail = ({ applicationId, updateVersion }) => {
         updateVersion(application.id, application.version);
     };
 
+    
+    const handleSettingDelete = async (settingName) => {
+        var result = await settingsClient.deleteSetting(application, settingName);
+        if (!result.wasSuccessful) {
+            setErrorMessage(result.errors);
+            return;
+        }
+
+    }
 
     if (!application) {
         return <div>Loading...</div>;
@@ -259,6 +268,7 @@ const ApplicationDetail = ({ applicationId, updateVersion }) => {
                     onAddSetting={handleAddEnvironmentSetting}
                     onSettingChange={handleSettingChange}
                     onSettingRename={handleSettingRename}
+                    onSettingDelete={handleSettingDelete}
                     showEditButtons={false}
                 />
             )}

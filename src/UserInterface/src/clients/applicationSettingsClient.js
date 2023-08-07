@@ -129,6 +129,17 @@ class ApplicationSettingsClient extends SettingsClient {
 
         return this.handleResponse(response);
     }
+
+
+    async deleteSetting(application, variableName) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/ApplicationSettings/${application.id}/${variableName}`, {
+            method: 'DELETE',
+            headers: this.getHeaders(application.version),
+            //body: JSON.stringify(newValue),
+        });
+        return ClientResponse.fromResponse(response, application);
+    }
+
 }
 
 export default ApplicationSettingsClient;

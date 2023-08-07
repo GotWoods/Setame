@@ -15,6 +15,7 @@ public record ApplicationVariableChanged(string Environment, string VariableName
 public record ApplicationDefaultVariableAdded(string VariableName) : IApplicationEvent;
 
 public record ApplicationDefaultVariableChanged(string VariableName, string NewValue) : IApplicationEvent;
+public record ApplicationVariableDeleted(string VariableName);
 
 public record ApplicationVariableRenamed(string VariableName, string NewName) : IApplicationEvent;
 public record ApplicationDefaultVariableRenamed(string VariableName, string NewName) : IApplicationEvent;
@@ -90,6 +91,12 @@ public class Application
     {
         foreach (var environmentSetting in EnvironmentSettings)
             environmentSetting.Settings.RemoveAll(x => x.Name == e.Name);
+    }
+
+    public void Apply(ApplicationVariableDeleted e)
+    {
+        foreach (var environmentSetting in EnvironmentSettings)
+            environmentSetting.Settings.RemoveAll(x => x.Name == e.VariableName);
     }
 
     // public Dictionary<string, string> GetAppliedSettings(DeploymentEnvironment environment)

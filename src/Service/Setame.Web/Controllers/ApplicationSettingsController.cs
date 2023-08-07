@@ -84,6 +84,14 @@ public class ApplicationSettingsController : ControllerBase
         return ControllerHelper.HttpResultFrom(result, Response);
     }
 
+    [HttpDelete("{applicationId}/{variable}")]
+    public async Task<IActionResult> DeleteVariable(Guid applicationId, string variable)
+    {
+        var version = Request.GetIfMatchRequestHeader();
+        var result = await _mediator.Send(new DeleteApplicationVariable(applicationId, version, variable));
+        return ControllerHelper.HttpResultFrom(result, Response);
+    }
+
     [HttpPost("{applicationId}/{variable}/renameDefault")]
     public async Task<IActionResult> RenameDefaultVariable(Guid applicationId, string variable, [FromBody] string newName)
     {
