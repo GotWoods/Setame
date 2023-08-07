@@ -43,13 +43,13 @@ Items that are still pending before this is considered a Beta:
 - Test out the actual client config provider again after all the changes recently
 
 ### Environment Sets
-- Ability to Delete a setting
 - Confirm Delete Environment Set (should be same logic as deleting an environment)
+- Confirm Delete Setting
 - Can blank out the name of an variable and it will allow the warn you
 
 ### Applications
 - Regenerate Token
-- Ability to Delete a setting
+- - Confirm Delete Setting
 - Adding a setting to an environment is failing if the app was created after the environment set was created (error is EnviornmentNotFound)
 	
 ### Users
