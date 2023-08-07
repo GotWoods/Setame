@@ -104,6 +104,15 @@ class EnvironmentSetSettingsClient extends SettingsClient {
         return ClientResponse.fromResponse(response, environmentSet);
     }
 
+    async deleteSetting(environmentSet, variableName) {
+        const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSet.id}/variable/${variableName}`, {
+            method: 'DELETE',
+            headers: this.getHeaders(environmentSet.version),
+            //body: JSON.stringify(newValue),
+        });
+        return ClientResponse.fromResponse(response, environmentSet);
+    }
+
     async renameVariableOnEnvironmentSet(environmentSet, originalName, newName, ) {
         const response = await this.apiRequest(`${this.apiUrl}/api/environmentSets/${environmentSet.id}/variable/${originalName}/rename`, {
             method: 'PUT',

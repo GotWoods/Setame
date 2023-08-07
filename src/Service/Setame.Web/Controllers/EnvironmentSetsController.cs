@@ -139,4 +139,14 @@ public class EnvironmentSetsController : ControllerBase
             _logger.LogDebug("Environment set {Id} had the {VariableName} variable renamed to {NewName}", environmentSetId, variableName, newName);
         return ControllerHelper.HttpResultFrom(response, Response);
     }
+
+    [HttpDelete("{environmentSetId}/variable/{variableName}")]
+    public async Task<IActionResult> DeleteVariable(Guid environmentSetId, string variableName)
+    {
+        var version = Request.GetIfMatchRequestHeader();
+        var response = await _mediator.Send(new DeleteEnvironmentSetVariable(environmentSetId, version, variableName));
+        if (response.WasSuccessful)
+            _logger.LogDebug("{VariableName} deleted from Environment Set {EnvironmentSetId}", variableName, environmentSetId);
+        return ControllerHelper.HttpResultFrom(response, Response);
+    }
 }

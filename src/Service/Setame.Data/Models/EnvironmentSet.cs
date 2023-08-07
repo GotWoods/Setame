@@ -17,6 +17,7 @@ public record EnvironmentSetVariableAdded(string Name);
 public record EnvironmentSetVariableChanged(string Environment, string VariableName, string NewValue);
 
 public record EnvironmentSetVariableRenamed(string VariableName, string NewName);
+public record EnvironmentSetVariableDeleted(string VariableName);
 
 public record ApplicationAssociatedToEnvironmentSet(Guid ApplicationId, Guid EnvironmentSetId);
 
@@ -93,5 +94,15 @@ public class EnvironmentSet
     {
         Environments.First(x => x.Name == e.OldName).Name = e.NewName;
         Settings.RenameEnvironment(e.OldName, e.NewName);
+    }
+
+    public void Apply(EnvironmentSetVariableDeleted e)
+    {
+        foreach (var environment in Environments)
+        {
+            environment.Settings.Remove(e.VariableName);
+        }
+
+     //   Settings.RemoveVariable(e.VariableName);
     }
 }

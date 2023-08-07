@@ -159,6 +159,16 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
         setApplications(response.applications);
 
     }
+
+    const handleDeleteSetting = async (settingName) => {
+        var result = await settingsClient.deleteSetting(environmentSet, settingName);
+        if (!result.wasSuccessful) {
+            setErrorMessage(result.errors);
+            return;
+        }
+
+    }
+
     return (
         <div>
             <AddEnvironmentDialog
@@ -177,6 +187,7 @@ const EnvironmentSetDetail = ({ environmentSet, refreshRequested }) => {
                             onAddSetting={handleAddEnvironmentSetting}
                             onSettingRename={handleSettingRename}
                             onSettingChange={handleSettingChange}
+                            onSettingDelete={handleDeleteSetting}
                             onEnvironmentRename={handleEnvironmentRename}
                             onDeleteEnvironment={handleDeleteEnvironment}
                             showEditButtons={true}

@@ -10,7 +10,7 @@ import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Button from '@mui/material/Button';
 
-const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSettingRename, onEnvironmentRename, onDeleteEnvironment, showEditButtons }) => {
+const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSettingRename, onSettingDelete, onEnvironmentRename, onDeleteEnvironment, showEditButtons }) => {
     const [settings, setSettings] = useState(transformedSettings);
     const [errors, setErrors] = useState({}); // a map of error states
     const [editingEnvironment, setEditingEnvironment] = useState(null);
@@ -73,6 +73,11 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
             if (onSettingRename !== undefined)
                 onSettingRename(originalValue, newValue);
         }
+    }
+
+    const handleDeleteSetting = (settingName)  => {
+        //TODO: confirmation here
+            onSettingDelete(settingName);
     }
 
     const handleAddRow = () => {
@@ -167,6 +172,9 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
                                         }}
                                     />
                                 </Tooltip>
+                                <Button color="secondary" onClick={() => handleDeleteSetting(settingName) }>
+                                                        <i className="fa-solid fa-trash-can"></i>
+                                                    </Button>
                             </TableCell>
                             {settings.environments.map((env) => (
                                 <TableCell key={settingName + env}>
