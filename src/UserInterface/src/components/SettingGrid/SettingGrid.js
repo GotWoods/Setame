@@ -64,6 +64,12 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
     }
 
     const handleSettingRename = (originalValue, newValue) => {
+        const trimmedNewValue = newValue.trim();
+        if (trimmedNewValue === "") {
+            setErrors({ ...errors, [originalValue]: true });
+            return;
+        }
+
         if (newValue in settings.settings && newValue !== originalValue) {
             const updatedErrors = Object.keys(settings.settings).reduce((errorsMap, settingName) => ({
                 ...errorsMap,
@@ -141,7 +147,7 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
                                                 key={env + Date.now()}
                                                 defaultValue={env}
                                                 onBlur={(e) => {
-                                                    const newValue = e.target.value;
+                                                    const newValue = e.target.value.trim();
                                                     if (newValue !== editingEnvironmentRef.current) {
                                                         handleEnvironmentRename(newValue);
                                                     }
@@ -177,7 +183,7 @@ const SettingsGrid = ({ transformedSettings, onAddSetting, onSettingChange, onSe
                         {Object.keys(settings.settings).map((settingName) => (
                             <TableRow key={settingName}>
                                 <TableCell>
-                                    <Tooltip title={errors[settingName] ? "Variable name already exists" : ""}>
+                                    <Tooltip title={errors[settingName] ? "Variable name cannot be blank or already exists" : ""}>
                                         <TextField
 
                                             error={errors[settingName]}

@@ -44,7 +44,6 @@ Items that are still pending before this is considered a Beta:
 
 ### Environment Sets
 - Confirm Delete Environment Set (should be same logic as deleting an environment)
-- Can blank out the name of a variable and it will not warn you
 
 ### Applications
 - Regenerate Token
