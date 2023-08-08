@@ -68,7 +68,12 @@ public class Application
 
     public void Apply(ApplicationEnvironmentAdded e)
     {
-        EnvironmentSettings.Add(new Environment { Name = e.Name });
+        var environment = new Environment { Name = e.Name };
+        var template = EnvironmentSettings.FirstOrDefault(); //use this to copy all variable names to the new environment 
+        if (template != null)
+            foreach (var setting in template.Settings)
+                environment.Settings.Add(new Setting { Name = setting.Name });
+        EnvironmentSettings.Add(environment);
     }
 
 

@@ -47,7 +47,6 @@ Items that are still pending before this is considered a Beta:
 
 ### Applications
 - Regenerate Token
-- Adding a setting to an environment is failing if the app was created after the environment set was created (error is EnviornmentNotFound)
 	
 ### Users
 - All of it
