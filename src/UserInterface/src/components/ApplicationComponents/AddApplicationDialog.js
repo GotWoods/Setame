@@ -9,8 +9,9 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import ApplicationSettingsClient from '../../clients/applicationSettingsClient';
 import EnvironmentSetSettingsClient from '../../clients/environmentSetSettingsClient';
-
-
+import { FormControl } from '@mui/material';
+import InputLabel from '@mui/material/InputLabel';
+import OutlinedInput from '@mui/material/OutlinedInput';
 const AddApplicationDialog = ({ open, onClose, onApplicationAdded }) => {
   const [applicationName, setApplicationName] = useState('');
   const [token, setToken] = useState('');
@@ -32,17 +33,23 @@ const AddApplicationDialog = ({ open, onClose, onApplicationAdded }) => {
     const client = new EnvironmentSetSettingsClient();
     const result = await client.getEnvironmentSets(); 
     setEnvironmentSets(result);
+
+     // Select the first environment set by default
+     if (result.length > 0) {
+      setSelectedEnvironmentSet(result[0].id);
+    }
   }, []);
   
   useEffect(() => {
     if (open) {
       fetchEnvironmentSets();
+      generateToken();
     }
   }, [open, fetchEnvironmentSets]);
 
   const generateToken = () => {
     // Generate a random token (change this according to your requirements)
-    const newToken = Math.random().toString(36).substr(2, 10);
+    const newToken = Math.random().toString(36).substring(2, 20);
     setToken(newToken);
   };
 
@@ -61,11 +68,21 @@ const AddApplicationDialog = ({ open, onClose, onApplicationAdded }) => {
             value={applicationName}
             onChange={(e) => setApplicationName(e.target.value)}
           />
-          <Select fullWidth value={selectedEnvironmentSet} onChange={(e) => setSelectedEnvironmentSet(e.target.value)}>
-            {environmentSets.map((set) => (
-              <MenuItem key={set.id} value={set.id}>{set.name}</MenuItem>
-            ))}
-          </Select>
+         <FormControl variant="outlined" fullWidth margin="dense">
+    <InputLabel htmlFor="environment-set">Environment Set</InputLabel>
+    <Select
+        label="Environment Set"
+        value={selectedEnvironmentSet}
+        onChange={(e) => setSelectedEnvironmentSet(e.target.value)}
+        input={
+            <OutlinedInput label="Environment Set" id="environment-set" />
+        }
+    >
+        {environmentSets.map((set) => (
+            <MenuItem key={set.id} value={set.id}>{set.name}</MenuItem>
+        ))}
+    </Select>
+</FormControl>
           <TextField
             margin="dense"
             id="token"
@@ -78,7 +95,7 @@ const AddApplicationDialog = ({ open, onClose, onApplicationAdded }) => {
             }}
           />
           <Button color="primary" onClick={generateToken}>
-            Generate Token
+            Generate New Token
           </Button>
         </DialogContent>
         <DialogActions>
