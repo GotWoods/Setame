@@ -8,14 +8,18 @@ namespace Setame.Data.Handlers.EnvironmentSets;
 public record AddEnvironmentToEnvironmentSet(Guid EnvironmentSetId, int ExpectedVersion, string Name) : IRequest<CommandResponse>;
 public class AddEnvironmentToEnvironmentSetHandler : IRequestHandler<AddEnvironmentToEnvironmentSet, CommandResponse>
 {
-    private readonly IDocumentSessionHelper<EnvironmentSet> _documentSession;
+    private readonly IDocumentSessionHelper<EnvironmentSet> _environmentSetDocumentSession;
+    private readonly IDocumentSessionHelper<Application> _applicationDocumentSession;
     private readonly IEnvironmentSetRepository _environmentSetRepository;
+    private readonly IEnvironmentSetApplicationAssociationRepository _environmentSetApplicationAssociationRepository;
     private readonly ILogger<AddEnvironmentToEnvironmentSet> _logger;
 
-    public AddEnvironmentToEnvironmentSetHandler(IDocumentSessionHelper<EnvironmentSet> documentSession, IEnvironmentSetRepository environmentSetRepository, ILogger<AddEnvironmentToEnvironmentSet> logger)
+    public AddEnvironmentToEnvironmentSetHandler(IDocumentSessionHelper<EnvironmentSet> environmentSetDocumentSession, IDocumentSessionHelper<Application> applicationDocumentSession, IEnvironmentSetRepository environmentSetRepository, IEnvironmentSetApplicationAssociationRepository environmentSetApplicationAssociationRepository,  ILogger<AddEnvironmentToEnvironmentSet> logger)
     {
-        _documentSession = documentSession;
+        _environmentSetDocumentSession = environmentSetDocumentSession;
+        _applicationDocumentSession = applicationDocumentSession;
         _environmentSetRepository = environmentSetRepository;
+        _environmentSetApplicationAssociationRepository = environmentSetApplicationAssociationRepository;
         _logger = logger;
     }
     
@@ -25,7 +29,7 @@ public class AddEnvironmentToEnvironmentSetHandler : IRequestHandler<AddEnvironm
         var existing = await _environmentSetRepository.GetById(command.EnvironmentSetId);
       
 
-        //TODO: Add environment to all Children Applications?
+     
         
         foreach (var deploymentEnvironment in existing.Environments)
         {
@@ -36,8 +40,16 @@ public class AddEnvironmentToEnvironmentSetHandler : IRequestHandler<AddEnvironm
             }
         }
 
-        await _documentSession.AppendToStream(command.EnvironmentSetId, command.ExpectedVersion, new EnvironmentAdded(command.Name));
-        await _documentSession.SaveChangesAsync();
+        var association = _environmentSetApplicationAssociationRepository.Get(command.EnvironmentSetId);
+        foreach (var application in association.Applications)
+        {
+            await _applicationDocumentSession.AppendToStream(application.Id, new ApplicationEnvironmentAdded(command.Name));
+        }
+
+
+        await _environmentSetDocumentSession.AppendToStream(command.EnvironmentSetId, command.ExpectedVersion, new EnvironmentAdded(command.Name));
+        await _environmentSetDocumentSession.SaveChangesAsync();
+        await _applicationDocumentSession.SaveChangesAsync();
         _logger.LogDebug("Environment added");
         return CommandResponse.FromSuccess(command.ExpectedVersion+1);
     }

@@ -29,7 +29,6 @@ public class EnvironmentSetRepository : IEnvironmentSetRepository
 
     public ActiveEnvironmentSet? GetByName(string name)
     {
-        //TODO: this should only be active environments that are queried 
         return _querySession.Query<ActiveEnvironmentSet>().FirstOrDefault(x => x.Name == name);
     }
 }

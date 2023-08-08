@@ -39,7 +39,6 @@ public class EnvironmentSet
 
     public void Apply(EnvironmentAdded e)
     {
-        //TODO: Would this need to clone all variables into the environment then?
         Environments.Add(new DeploymentEnvironment { Name = e.Name });
     }
 
