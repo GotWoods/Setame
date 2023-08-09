@@ -64,6 +64,9 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddMarten(opts =>
 {
+    // var app = builder.Build();
+    // using var scope = app.Services.CreateScope();
+
     opts.Connection(builder.Configuration.GetConnectionString("DefaultConnection")!);
     opts.Events.MetadataConfig.HeadersEnabled = true;
     opts.Schema.For<EnvironmentSet>().SoftDeleted();
@@ -74,6 +77,11 @@ builder.Services.AddMarten(opts =>
     opts.Projections.Add<EnvironmentSetApplicationsProjection>(ProjectionLifecycle.Async);
     opts.Projections.Add<ActiveApplicationProjection>(ProjectionLifecycle.Inline);
     opts.Projections.Add<PendingPasswordResetProjection>(ProjectionLifecycle.Async);
+    //opts.Projections.Add<ApplicationSettingProjection>(ProjectionLifecycle.Async);
+    opts.Projections.Add(new ApplicationSettingProjection(scope.ServiceProvider.GetRequiredService<IApplicationRepository>(), scope.ServiceProvider.GetRequiredService<IEnvironmentSetRepository>()), ProjectionLifecycle.Async);
+    //opts.Projections.Add(typeof(ApplicationSettingProjection), ProjectionLifecycle.Async);
+    //opts.Projections.
+
 
     //var agent = await StartDaemon();
     //opts.Projections.Snapshot<EnvironmentSet>(SnapshotLifecycle.Async, asyncConfiguration => {asyncConfiguration.}) //snapshot will create an actual document
@@ -141,5 +149,7 @@ Log.CloseAndFlush();
 
 namespace Setame.Web
 {
-    public partial class Program { }
+    public class Program
+    {
+    }
 }

@@ -32,7 +32,7 @@ namespace Setame.Data
 
             await smtp.ConnectAsync(_settings.Host, _settings.Port, SecureSocketOptions.Auto);
             await smtp.AuthenticateAsync(_settings.MailFrom, _settings.Password);
-            await smtp.SendAsync(email);
+            var result = await smtp.SendAsync(email);
             await smtp.DisconnectAsync(true);
         }
     }

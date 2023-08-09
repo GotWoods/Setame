@@ -9,7 +9,7 @@ namespace Setame.Data.Projections;
 public class ApplicationChangeHistoryTransformation : EventProjection
 {
     [MartenIgnore]
-    public Guid GetId<T>(IEvent<T> input) where T : notnull
+    public Guid GetUserId<T>(IEvent<T> input) where T : notnull
     {
         var header = input.GetHeader("user-id");
         if (header == null)
@@ -26,7 +26,7 @@ public class ApplicationChangeHistoryTransformation : EventProjection
             input.Timestamp,
             ApplicationActionType.Create,
             $"Created: '{input.Data.Name}'",
-            GetId(input)
+            GetUserId(input)
         );
     }
 
@@ -39,7 +39,7 @@ public class ApplicationChangeHistoryTransformation : EventProjection
             input.Timestamp,
             ApplicationActionType.Create,
             $"Renamed: '{input.Data.NewName}'",
-            GetId(input)
+            GetUserId(input)
         );
     }
 
@@ -52,7 +52,7 @@ public class ApplicationChangeHistoryTransformation : EventProjection
             input.Timestamp,
             ApplicationActionType.VariableCreate,
             $"Application Variable Created: '{input.Data.Name}'",
-            GetId(input)
+            GetUserId(input)
         );
     }
 
@@ -65,7 +65,7 @@ public class ApplicationChangeHistoryTransformation : EventProjection
             input.Timestamp,
             ApplicationActionType.VariableChange,
             $"Application Variable {input.Data.VariableName} changed to {input.Data.NewValue} for {input.Data.Environment}",
-            GetId(input)
+            GetUserId(input)
         );
     }
 
@@ -78,7 +78,7 @@ public class ApplicationChangeHistoryTransformation : EventProjection
             input.Timestamp,
             ApplicationActionType.VariableRename,
             $"Application Variable {input.Data.VariableName} renamed to {input.Data.NewName}",
-            GetId(input)
+            GetUserId(input)
         );
     }
 
@@ -91,7 +91,7 @@ public class ApplicationChangeHistoryTransformation : EventProjection
             input.Timestamp,
             ApplicationActionType.VariableRename,
             $"Application Default {input.Data.VariableName} added",
-            GetId(input)
+            GetUserId(input)
         );
     }
 
@@ -104,7 +104,7 @@ public class ApplicationChangeHistoryTransformation : EventProjection
             input.Timestamp,
             ApplicationActionType.VariableRename,
             $"Application Default {input.Data.VariableName} changed to {input.Data.NewValue}",
-            GetId(input)
+            GetUserId(input)
         );
     }
 }

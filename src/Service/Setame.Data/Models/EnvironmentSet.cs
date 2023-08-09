@@ -1,25 +1,27 @@
 ﻿namespace Setame.Data.Models;
 
-public record EnvironmentSetCreated(Guid Id, string Name);
+public interface IEnvironmentSetEvent { }
 
-public record EnvironmentSetRenamed(Guid Id, string NewName);
+public record EnvironmentSetCreated(Guid Id, string Name) : IEnvironmentSetEvent;
 
-public record EnvironmentAdded(string Name);
+public record EnvironmentSetRenamed(Guid Id, string NewName) : IEnvironmentSetEvent;
 
-public record EnvironmentRemoved(string Name);
+public record EnvironmentAdded(string Name) : IEnvironmentSetEvent;
 
-public record EnvironmentRenamed(string OldName, string NewName);
+public record EnvironmentRemoved(string Name) : IEnvironmentSetEvent;
 
-public record EnvironmentSetDeleted(Guid Id);
+public record EnvironmentRenamed(string OldName, string NewName) : IEnvironmentSetEvent;
 
-public record EnvironmentSetVariableAdded(string Name);
+public record EnvironmentSetDeleted(Guid Id) : IEnvironmentSetEvent;
 
-public record EnvironmentSetVariableChanged(string Environment, string VariableName, string NewValue);
+public record EnvironmentSetVariableAdded(string Name) : IEnvironmentSetEvent;
 
-public record EnvironmentSetVariableRenamed(string VariableName, string NewName);
-public record EnvironmentSetVariableDeleted(string VariableName);
+public record EnvironmentSetVariableChanged(string Environment, string VariableName, string NewValue) : IEnvironmentSetEvent;
 
-public record ApplicationAssociatedToEnvironmentSet(Guid ApplicationId, Guid EnvironmentSetId);
+public record EnvironmentSetVariableRenamed(string VariableName, string NewName) : IEnvironmentSetEvent;
+public record EnvironmentSetVariableDeleted(string VariableName) : IEnvironmentSetEvent;
+
+public record ApplicationAssociatedToEnvironmentSet(Guid ApplicationId, Guid EnvironmentSetId) : IEnvironmentSetEvent;
 
 public class EnvironmentSet
 {
