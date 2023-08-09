@@ -14,28 +14,24 @@ namespace Setame.Data.Projections
 
     public class ApplicationSettingProjection : CustomProjection<ApplicationSettings, Guid> 
     {
-        private readonly IApplicationRepository _applicationRepository;
-        private readonly IEnvironmentSetRepository _environmentSetRepository;
+        
 
-        public ApplicationSettingProjection(IApplicationRepository applicationRepository, IEnvironmentSetRepository environmentSetRepository)
+        public ApplicationSettingProjection()
         {
             AggregateByStream();
-
-            _applicationRepository = applicationRepository;
-            _environmentSetRepository = environmentSetRepository;
             IncludeType<IApplicationEvent>();
             IncludeType<IEnvironmentSetEvent>();
         }
 
-        public override async ValueTask ApplyChangesAsync(DocumentSessionBase session, EventSlice<ApplicationSettings, Guid> slice, CancellationToken cancellation,
-            ProjectionLifecycle lifecycle = ProjectionLifecycle.Inline)
+
+
+        public override async ValueTask ApplyChangesAsync(DocumentSessionBase session, EventSlice<ApplicationSettings, Guid> slice, CancellationToken cancellation, ProjectionLifecycle lifecycle = ProjectionLifecycle.Inline)
         {
 
             var aggregate = slice.Aggregate;
 
-            var firstEvent = slice.Events().FirstOrDefault();
-
-            if (firstEvent is not IApplicationEvent && firstEvent is not IEnvironmentSetEvent)
+            var firstEvent = slice.Events().FirstOrDefault()?.EventType;
+            if (!typeof(IApplicationEvent).IsAssignableFrom(firstEvent))
             {
                 return;
             }
@@ -46,8 +42,8 @@ namespace Setame.Data.Projections
             }
 
 
-            var application = await _applicationRepository.GetById(slice.Id);
-            var environmentSet = await _environmentSetRepository.GetById(application.EnvironmentSetId);
+            var application = await session.Events.AggregateStreamAsync<Application>(slice.Id, token: cancellation);
+            var environmentSet = await session.Events.AggregateStreamAsync<EnvironmentSet>(application.EnvironmentSetId, token: cancellation);
             
             aggregate.Settings = new VariableGrid();
             //apply the environment set

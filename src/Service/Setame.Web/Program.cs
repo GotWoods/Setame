@@ -78,7 +78,7 @@ builder.Services.AddMarten(opts =>
     opts.Projections.Add<ActiveApplicationProjection>(ProjectionLifecycle.Inline);
     opts.Projections.Add<PendingPasswordResetProjection>(ProjectionLifecycle.Async);
     //opts.Projections.Add<ApplicationSettingProjection>(ProjectionLifecycle.Async);
-    opts.Projections.Add(new ApplicationSettingProjection(scope.ServiceProvider.GetRequiredService<IApplicationRepository>(), scope.ServiceProvider.GetRequiredService<IEnvironmentSetRepository>()), ProjectionLifecycle.Async);
+    opts.Projections.Add(new ApplicationSettingProjection(), ProjectionLifecycle.Async);
     //opts.Projections.Add(typeof(ApplicationSettingProjection), ProjectionLifecycle.Async);
     //opts.Projections.
 
