@@ -8,6 +8,8 @@ public class ActiveApplication
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public int Version { get; set; }
+
+    public string Token { get; set; } = string.Empty;
 }
 
 public class ActiveApplicationProjection : SingleStreamProjection<ActiveApplication>
@@ -19,7 +21,7 @@ public class ActiveApplicationProjection : SingleStreamProjection<ActiveApplicat
 
     public ActiveApplication Create(ApplicationCreated created)
     {
-        return new ActiveApplication { Name = created.Name, Id = created.Id };
+        return new ActiveApplication { Name = created.Name, Id = created.Id, Token = created.Token };
     }
 
     public void Apply(ApplicationRenamed e, ActiveApplication current)
@@ -27,7 +29,7 @@ public class ActiveApplicationProjection : SingleStreamProjection<ActiveApplicat
         current.Name = e.NewName;
     }
 
-    //subscribe so version matches underlying changes
+    //subscribe to all application events so version matches underlying changes
     public void Apply(IApplicationEvent e, ActiveApplication current)
     {
 

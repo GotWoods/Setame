@@ -47,6 +47,7 @@ Items that are still pending before this is considered a Beta:
 
 ### Applications
 - Regenerate Token
-	
+- Delete Global Setting
+
 ### Users
 - All of it

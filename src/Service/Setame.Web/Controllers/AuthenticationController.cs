@@ -1,7 +1,9 @@
-﻿using MediatR;
+﻿using Marten;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Setame.Data;
 using Setame.Data.Handlers.Users;
+using Setame.Data.Projections;
 using Setame.Web.Models;
 
 namespace Setame.Web.Controllers
@@ -13,13 +15,15 @@ namespace Setame.Web.Controllers
         private readonly IUserService _userService;
         private readonly AuthService _authService;
         private readonly IMediator _mediator;
+        private readonly IQuerySession _querySession;
         private readonly ILogger<AuthenticationController> _logger;
 
-        public AuthenticationController(IUserService userService, AuthService authService, IMediator mediator, ILogger<AuthenticationController> logger)
+        public AuthenticationController(IUserService userService, AuthService authService, IMediator mediator, IQuerySession querySession, ILogger<AuthenticationController> logger)
         {
             _userService = userService;
             _authService = authService;
             _mediator = mediator;
+            _querySession = querySession;
             _logger = logger;
         }
 
@@ -62,17 +66,12 @@ namespace Setame.Web.Controllers
         [HttpPost("AppLogin")]
         public IActionResult AppLogin([FromBody] AppLoginRequest request)
         {
-            //TODO: hash this token with the secret key? Then the calling app needs the key too though
-            //  var application = await _applicationService.GetApplicationByIdAsync(request.ApplicaitonName);
-            //
-            //  if (application == null || application.Token != request.Token)
-            //  {
-            //      return Unauthorized();
-            //  }
-            //
-            //  var token = _authService.GenerateJwtToken(application.Name, "Application");
-            // return Ok(new { token });
-            return Ok();
+            var application = _querySession.Query<ActiveApplication>().FirstOrDefault(x=>x.Name == request.ApplicationName);
+            if (application == null || application.Token != request.Token)
+                return Unauthorized();
+
+            var jwtToken = _authService.GenerateJwtToken(application.Name, "Application");
+            return Ok(new { token = jwtToken });
         }
     }
 }
