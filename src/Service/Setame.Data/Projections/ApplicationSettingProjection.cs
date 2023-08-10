@@ -20,7 +20,7 @@ namespace Setame.Data.Projections
         {
             AggregateByStream();
             IncludeType<IApplicationEvent>();
-            IncludeType<IEnvironmentSetEvent>();
+         //   IncludeType<IEnvironmentSetEvent>();
         }
 
 

@@ -41,10 +41,11 @@ public class AddEnvironmentToEnvironmentSetHandler : IRequestHandler<AddEnvironm
         }
 
         var association = _environmentSetApplicationAssociationRepository.Get(command.EnvironmentSetId);
-        foreach (var application in association.Applications)
-        {
-            await _applicationDocumentSession.AppendToStream(application.Id, new ApplicationEnvironmentAdded(command.Name));
-        }
+        if (association != null)
+            foreach (var application in association.Applications)
+            {
+                await _applicationDocumentSession.AppendToStream(application.Id, new ApplicationEnvironmentAdded(command.Name));
+            }
 
 
         await _environmentSetDocumentSession.AppendToStream(command.EnvironmentSetId, command.ExpectedVersion, new EnvironmentAdded(command.Name));

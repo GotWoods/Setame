@@ -3,6 +3,7 @@ using FluentValidation;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
 using Marten.Events.Projections;
+using Marten.Services.Json;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -14,6 +15,7 @@ using Setame.Data.Handlers.EnvironmentSets;
 using Setame.Data.Models;
 using Setame.Data.Projections;
 using Setame.Web;
+using Weasel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -66,6 +68,12 @@ builder.Services.AddMarten(opts =>
 {
     // var app = builder.Build();
     // using var scope = app.Services.CreateScope();
+
+    opts.UseDefaultSerialization(
+        serializerType: SerializerType.SystemTextJson,
+        enumStorage: EnumStorage.AsString,
+        casing: Casing.CamelCase
+    );
 
     opts.Connection(builder.Configuration.GetConnectionString("DefaultConnection")!);
     opts.Events.MetadataConfig.HeadersEnabled = true;

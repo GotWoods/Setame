@@ -5,7 +5,7 @@ namespace Setame.Data.Data;
 
 public interface IEnvironmentSetApplicationAssociationRepository
 {
-    EnvironmentSetApplicationAssociation Get(Guid environmentSetId);
+    EnvironmentSetApplicationAssociation? Get(Guid environmentSetId);
 }
 
 public class EnvironmentSetApplicationAssociationRepository : IEnvironmentSetApplicationAssociationRepository
@@ -17,10 +17,10 @@ public class EnvironmentSetApplicationAssociationRepository : IEnvironmentSetApp
         _querySession = querySession;
     }
 
-    public EnvironmentSetApplicationAssociation Get(Guid environmentSetId)
+    public EnvironmentSetApplicationAssociation? Get(Guid environmentSetId)
     {
         var associations = _querySession.Query<EnvironmentSetApplicationAssociation>()
-            .First(x => x.Id == environmentSetId);
+            .FirstOrDefault(x => x.Id == environmentSetId);
         return associations;
     }
 }
