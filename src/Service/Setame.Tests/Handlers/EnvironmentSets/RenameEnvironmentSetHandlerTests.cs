@@ -4,6 +4,7 @@ using Setame.Data;
 using Setame.Data.Data;
 using Setame.Data.Handlers.EnvironmentSets;
 using Setame.Data.Models;
+using Setame.Data.Projections;
 
 namespace Setame.Tests.Handlers.EnvironmentSets;
 
@@ -34,7 +35,7 @@ public class RenameEnvironmentSetHandlerTests
             "NewEnvironmentSet" // Provide a unique NewName
         );
 
-        _environmentSetRepository.Setup(x => x.GetByName(command.NewName)).Returns((EnvironmentSet)null!); // Return null to simulate a unique NewName
+        _environmentSetRepository.Setup(x => x.GetByName(command.NewName)).Returns((ActiveEnvironmentSet)null!); // Return null to simulate a unique NewName
 
         // Act
         var response = await _subject.Handle(command, CancellationToken.None);
@@ -58,7 +59,7 @@ public class RenameEnvironmentSetHandlerTests
             "DuplicateEnvironmentSet" // Provide a duplicate NewName
         );
 
-        var existingEnvironmentSet = new EnvironmentSet
+        var existingEnvironmentSet = new ActiveEnvironmentSet()
         {
             Id = Guid.NewGuid(),
             Name = "DuplicateEnvironmentSet"

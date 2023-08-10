@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
 using Setame.Data;
+using Setame.Data.Data;
 using Setame.Data.Handlers.EnvironmentSets;
 using Setame.Data.Models;
 
@@ -10,11 +11,13 @@ public class UpdateEnvironmentSetVariableHandlerTests
 {
     private readonly Mock<IDocumentSessionHelper<EnvironmentSet>> _documentSession;
     private readonly UpdateEnvironmentSetVariableHandler _subject;
+    private readonly Mock<IEnvironmentSetRepository> _environmentSetRepository;
 
     public UpdateEnvironmentSetVariableHandlerTests()
     {
         _documentSession = new Mock<IDocumentSessionHelper<EnvironmentSet>>();
-        _subject = new UpdateEnvironmentSetVariableHandler(_documentSession.Object, new Mock<ILogger<UpdateEnvironmentSetVariableHandler>>().Object);
+        _environmentSetRepository = new Mock<IEnvironmentSetRepository>();
+        _subject = new UpdateEnvironmentSetVariableHandler(_documentSession.Object, _environmentSetRepository.Object, new Mock<ILogger<UpdateEnvironmentSetVariableHandler>>().Object);
     }
 
     [Fact]

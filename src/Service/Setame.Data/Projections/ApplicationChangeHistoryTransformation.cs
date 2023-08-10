@@ -20,7 +20,6 @@ public class ApplicationChangeHistoryTransformation : EventProjection
     public ApplicationChangeHistory Transform(IEvent<ApplicationCreated> input)
     {
         return new ApplicationChangeHistory(
-
             CombGuidIdGeneration.NewGuid(),
             input.StreamId,
             input.Timestamp,
@@ -33,7 +32,6 @@ public class ApplicationChangeHistoryTransformation : EventProjection
     public ApplicationChangeHistory Transform(IEvent<ApplicationRenamed> input)
     {
         return new ApplicationChangeHistory(
-
             CombGuidIdGeneration.NewGuid(),
             input.StreamId,
             input.Timestamp,
@@ -46,7 +44,6 @@ public class ApplicationChangeHistoryTransformation : EventProjection
     public ApplicationChangeHistory Transform(IEvent<ApplicationVariableAdded> input)
     {
         return new ApplicationChangeHistory(
-
             CombGuidIdGeneration.NewGuid(),
             input.StreamId,
             input.Timestamp,
@@ -59,7 +56,6 @@ public class ApplicationChangeHistoryTransformation : EventProjection
     public ApplicationChangeHistory Transform(IEvent<ApplicationVariableChanged> input)
     {
         return new ApplicationChangeHistory(
-
             CombGuidIdGeneration.NewGuid(),
             input.StreamId,
             input.Timestamp,
@@ -72,7 +68,6 @@ public class ApplicationChangeHistoryTransformation : EventProjection
     public ApplicationChangeHistory Transform(IEvent<ApplicationVariableRenamed> input)
     {
         return new ApplicationChangeHistory(
-
             CombGuidIdGeneration.NewGuid(),
             input.StreamId,
             input.Timestamp,
@@ -85,7 +80,6 @@ public class ApplicationChangeHistoryTransformation : EventProjection
     public ApplicationChangeHistory Transform(IEvent<ApplicationDefaultVariableAdded> input)
     {
         return new ApplicationChangeHistory(
-
             CombGuidIdGeneration.NewGuid(),
             input.StreamId,
             input.Timestamp,
@@ -98,7 +92,6 @@ public class ApplicationChangeHistoryTransformation : EventProjection
     public ApplicationChangeHistory Transform(IEvent<ApplicationDefaultVariableChanged> input)
     {
         return new ApplicationChangeHistory(
-
             CombGuidIdGeneration.NewGuid(),
             input.StreamId,
             input.Timestamp,
@@ -110,7 +103,6 @@ public class ApplicationChangeHistoryTransformation : EventProjection
 }
 
 public record ApplicationChangeHistory(Guid Id, Guid ApplicationId, DateTimeOffset EventTime, ApplicationActionType ApplicationActionType, string Description, Guid User);
-
 
 public enum ApplicationActionType
 {

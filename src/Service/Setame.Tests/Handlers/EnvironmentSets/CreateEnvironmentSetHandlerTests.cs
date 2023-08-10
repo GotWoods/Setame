@@ -5,6 +5,7 @@ using Setame.Data;
 using Setame.Data.Data;
 using Setame.Data.Handlers.EnvironmentSets;
 using Setame.Data.Models;
+using Setame.Data.Projections;
 
 namespace Setame.Tests.Handlers.EnvironmentSets;
 
@@ -46,7 +47,7 @@ public class CreateEnvironmentSetHandlerTests
         // Arrange
         var command = new CreateEnvironmentSet("Sample EnvironmentSet"); // Provide a duplicate environment set name
 
-        var existingEnvironmentSet = new EnvironmentSet
+        var existingEnvironmentSet = new ActiveEnvironmentSet()
         {
             Id = CombGuidIdGeneration.NewGuid(),
             Name = command.Name // Set the name to match the command (simulating a duplicate name)

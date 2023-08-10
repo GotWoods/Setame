@@ -28,7 +28,6 @@ public class CreateApplicationVariableHandlerTests
         var command = new CreateApplicationVariable(
             Guid.NewGuid(), // Provide a valid ApplicationId
             1, // Provide the expected version of the application
-            "Dev", // Provide an existing environment
             "VariableName" // Provide a unique variable name
         );
 
@@ -62,47 +61,12 @@ public class CreateApplicationVariableHandlerTests
     }
 
     [Fact]
-    public async Task Handle_InvalidEnvironment_FailureResponse()
-    {
-        // Arrange
-        var command = new CreateApplicationVariable(
-            Guid.NewGuid(),
-            1,
-            "Dev",
-            "VariableName"
-        );
-
-        var application = new Application
-        {
-            Id = command.ApplicationId,
-            Version = command.ExpectedVersion,
-            EnvironmentSettings = new List<Environment>
-            {
-                new Environment
-                {
-                    Name = "Prod" // Add a different environment (not "Dev")
-                }
-            }
-        };
-
-        _applicationRepository.Setup(x => x.GetById(command.ApplicationId))
-            .ReturnsAsync(application);
-
-        // Act
-        var ex = await Assert.ThrowsAsync<NullReferenceException>(async () => await _subject.Handle(command, CancellationToken.None));
-
-        // Assert
-        Assert.Equal("Environment " + command.Environment + " could not be found on the application", ex.Message); // Check the exception message
-    }
-
-    [Fact]
     public async Task Handle_DuplicateVariableName_FailureResponse()
     {
         // Arrange
         var command = new CreateApplicationVariable(
             Guid.NewGuid(),
             1,
-            "Dev",
             "VariableName"
         );
 
