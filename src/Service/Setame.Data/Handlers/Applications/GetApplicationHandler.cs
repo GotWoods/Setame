@@ -1,5 +1,5 @@
-﻿using Marten;
-using MediatR;
+﻿using MediatR;
+using Setame.Data.Data;
 using Setame.Data.Models;
 
 namespace Setame.Data.Handlers.Applications;
@@ -8,16 +8,18 @@ public record GetApplication(Guid ApplicationId) : IRequest<Application>;
 
 public class GetApplicationHandler : IRequestHandler<GetApplication, Application>
 {
-    private readonly IQuerySession _querySession;
+    
+    private readonly IApplicationRepository _applicationRepository;
 
-    public GetApplicationHandler(IQuerySession querySession)
+    public GetApplicationHandler(IApplicationRepository applicationRepository)
     {
-        _querySession = querySession;
+
+        _applicationRepository = applicationRepository;
     }
 
     public async Task<Application> Handle(GetApplication request, CancellationToken cancellationToken)
     {
-        return await _querySession.Events.AggregateStreamAsync<Application>(request.ApplicationId, token: cancellationToken) ?? throw new NullReferenceException("Application could not be found");
+        return await _applicationRepository.GetById(request.ApplicationId);
     }
 }
 

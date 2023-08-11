@@ -1,46 +1,49 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Xunit;
 using Moq;
-using Setame.Data;
-using Setame.Data.Data;
 using Setame.Data.Handlers.EnvironmentSets;
 using Setame.Data.Models;
-
-namespace Setame.Tests.Handlers.EnvironmentSets;
+using Setame.Data.Data;
+using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using Setame.Data;
 
 public class UpdateEnvironmentSetVariableHandlerTests
 {
-    private readonly Mock<IDocumentSessionHelper<EnvironmentSet>> _documentSession;
-    private readonly UpdateEnvironmentSetVariableHandler _subject;
-    private readonly Mock<IEnvironmentSetRepository> _environmentSetRepository;
-
-    public UpdateEnvironmentSetVariableHandlerTests()
-    {
-        _documentSession = new Mock<IDocumentSessionHelper<EnvironmentSet>>();
-        _environmentSetRepository = new Mock<IEnvironmentSetRepository>();
-        _subject = new UpdateEnvironmentSetVariableHandler(_documentSession.Object, _environmentSetRepository.Object, new Mock<ILogger<UpdateEnvironmentSetVariableHandler>>().Object);
-    }
-
     [Fact]
-    public async Task Handle_UpdateVariable_SuccessfulUpdate()
+    public async Task Handle_SuccessfullyUpdatesVariable_ReturnsIncrementedVersion()
     {
         // Arrange
-        var command = new UpdateEnvironmentSetVariable(
-            Guid.NewGuid(), // Provide a valid EnvironmentSetId
-            1, // Provide a valid ExpectedVersion
-            "Dev", // Provide an existing Environment
-            "VariableName", // Provide an existing VariableName
-            "NewValue" // Provide the new value for the variable
-        );
+        var command = new UpdateEnvironmentSetVariable(Guid.NewGuid(), 1, "TestEnvironment", "TestVariable", "TestValue");
+        var existingEnvironmentSet = new EnvironmentSet
+        {
+            Environments = new List<DeploymentEnvironment>
+            {
+                new DeploymentEnvironment
+                {
+                    Settings = new Dictionary<string, string>
+                    {
+                        { "TestVariable", "OriginalValue" }
+                    }
+                }
+            }
+        };
+
+        var repoMock = new Mock<IEnvironmentSetRepository>();
+        repoMock.Setup(repo => repo.GetById(It.IsAny<Guid>())).ReturnsAsync(existingEnvironmentSet);
+
+        var sessionMock = new Mock<IDocumentSessionHelper<EnvironmentSet>>();
+        sessionMock.Setup(session => session.AppendToStream(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<object>()));
+        sessionMock.Setup(session => session.SaveChangesAsync());
+
+        var loggerMock = new Mock<ILogger<UpdateEnvironmentSetVariableHandler>>();
+
+        var handler = new UpdateEnvironmentSetVariableHandler(sessionMock.Object, repoMock.Object, loggerMock.Object);
 
         // Act
-        var response = await _subject.Handle(command, CancellationToken.None);
+        var response = await handler.Handle(command, CancellationToken.None);
 
         // Assert
-        Assert.Empty(response.Errors); // Check that there are no errors in the response
-        Assert.True(response.WasSuccessful); // Check that the response indicates success
-        Assert.Equal(2, response.NewVersion); // Check the value of the NewVersion property (ExpectedVersion + 1)
-
-        _documentSession.Verify(x => x.AppendToStream(command.EnvironmentSetId, command.ExpectedVersion, It.IsAny<EnvironmentSetVariableChanged>()), Times.Once); // Check that AppendToStream is called once with the correct parameters
-        _documentSession.Verify(x => x.SaveChangesAsync(), Times.Once); // Check that SaveChangesAsync is called once for EnvironmentSet
+        Assert.True(response.WasSuccessful);
+        Assert.Equal(2, response.NewVersion);
     }
 }

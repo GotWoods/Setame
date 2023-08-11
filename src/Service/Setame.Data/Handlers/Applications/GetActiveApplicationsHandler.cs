@@ -1,22 +1,26 @@
 ﻿using Marten;
 using MediatR;
+using Setame.Data.Data;
 using Setame.Data.Projections;
 
 namespace Setame.Data.Handlers.Applications
 {
     public record GetActiveApplications : IRequest<List<ActiveApplication>>;
-    internal class GetActiveApplicationsHandler : IRequestHandler<GetActiveApplications, List<ActiveApplication>>
-    {
-        private readonly IQuerySession _querySession;
 
-        public GetActiveApplicationsHandler(IQuerySession querySession)
+    public class GetActiveApplicationsHandler : IRequestHandler<GetActiveApplications, List<ActiveApplication>>
+    {
+        private readonly IApplicationRepository _applicationRepository;
+        
+
+        public GetActiveApplicationsHandler(IApplicationRepository applicationRepository)
         {
-            _querySession = querySession;
+            _applicationRepository = applicationRepository;
+            
         }
 
         public Task<List<ActiveApplication>> Handle(GetActiveApplications request, CancellationToken cancellationToken)
         {
-            var allActivateApplications = _querySession.Query<ActiveApplication>().ToList();
+            var allActivateApplications = _applicationRepository.GetAllActive();
             return Task.FromResult(allActivateApplications);
         }
     }

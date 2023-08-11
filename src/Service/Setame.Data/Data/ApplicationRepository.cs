@@ -8,6 +8,7 @@ public interface IApplicationRepository
 {
     ActiveApplication? GetByName(string name);
     Task<Application> GetById(Guid id);
+    List<ActiveApplication> GetAllActive();
 }
 
 public class ApplicationRepository : IApplicationRepository
@@ -22,6 +23,11 @@ public class ApplicationRepository : IApplicationRepository
     public ActiveApplication? GetByName(string name)
     {
         return _querySession.Query<ActiveApplication>().FirstOrDefault(x => x.Name == name);
+    }
+
+    public List<ActiveApplication> GetAllActive()
+    {
+        return _querySession.Query<ActiveApplication>().ToList();
     }
 
     public async Task<Application> GetById(Guid id)

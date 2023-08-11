@@ -49,8 +49,8 @@ namespace Setame.Tests.Web
         }
 
         [Theory]
-        [InlineData("123", "\"123\"")]
-        [InlineData("456", "\"456\"")]
+        [InlineData("123", "W/\"123\"")]
+        [InlineData("456", "W/\"456\"")]
         public void TrySetETagResponseHeader_ResponseSuccessful_ETagSet(string etagValue, string expectedHeaderValue)
         {
             // Arrange

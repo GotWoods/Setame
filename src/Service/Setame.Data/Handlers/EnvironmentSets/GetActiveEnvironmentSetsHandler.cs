@@ -1,30 +1,31 @@
-﻿using Marten;
-using MediatR;
+﻿using MediatR;
+using Setame.Data.Data;
 using Setame.Data.Models;
 using Setame.Data.Projections;
 
 namespace Setame.Data.Handlers.EnvironmentSets;
 
 public record GetActiveEnvironmentSets : IRequest<List<EnvironmentSet>>;
-internal class GetActiveEnvironmentSetsHandler : IRequestHandler<GetActiveEnvironmentSets, List<EnvironmentSet>>
-{
-    private readonly IQuerySession _querySession;
 
-    public GetActiveEnvironmentSetsHandler(IQuerySession querySession)
+public class GetActiveEnvironmentSetsHandler : IRequestHandler<GetActiveEnvironmentSets, List<EnvironmentSet>>
+{
+    private readonly IEnvironmentSetRepository _environmentSetRepository;
+
+    public GetActiveEnvironmentSetsHandler(IEnvironmentSetRepository environmentSetRepository)
     {
-        _querySession = querySession;
+        
+        _environmentSetRepository = environmentSetRepository;
     }
 
     public async Task<List<EnvironmentSet>> Handle(GetActiveEnvironmentSets request, CancellationToken cancellationToken)
     {
-        var summary = await _querySession.Query<ActiveEnvironmentSet>().ToListAsync(token: cancellationToken);
+        var summary = await _environmentSetRepository.GetAllActiveEnvironmentSets();
         var items = new List<EnvironmentSet>();
 
         foreach (var activeEnvironmentSet in summary)
         {
-            var aggregateStreamAsync = await _querySession.Events.AggregateStreamAsync<EnvironmentSet>(activeEnvironmentSet.Id, token: cancellationToken);
-            if (aggregateStreamAsync != null)
-                items.Add(aggregateStreamAsync);
+            var aggregateStreamAsync = await _environmentSetRepository.GetById(activeEnvironmentSet.Id);
+            items.Add(aggregateStreamAsync);
         }
 
         var sorted = items.OrderBy(x => x.Name);

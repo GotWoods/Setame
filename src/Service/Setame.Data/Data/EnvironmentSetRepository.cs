@@ -1,4 +1,5 @@
-﻿using Marten;
+﻿using System.Threading;
+using Marten;
 using Setame.Data.Models;
 using Setame.Data.Projections;
 
@@ -8,6 +9,7 @@ public interface IEnvironmentSetRepository
 {
     Task<EnvironmentSet> GetById(Guid id);
     ActiveEnvironmentSet? GetByName(string name);
+    Task<IReadOnlyList<ActiveEnvironmentSet>> GetAllActiveEnvironmentSets();
 }
 
 public class EnvironmentSetRepository : IEnvironmentSetRepository
@@ -30,5 +32,10 @@ public class EnvironmentSetRepository : IEnvironmentSetRepository
     public ActiveEnvironmentSet? GetByName(string name)
     {
         return _querySession.Query<ActiveEnvironmentSet>().FirstOrDefault(x => x.Name == name);
+    }
+
+    public async Task<IReadOnlyList<ActiveEnvironmentSet>> GetAllActiveEnvironmentSets()
+    {
+        return await _querySession.Query<ActiveEnvironmentSet>().ToListAsync();
     }
 }
