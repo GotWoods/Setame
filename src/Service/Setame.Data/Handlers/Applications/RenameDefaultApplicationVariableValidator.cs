@@ -1,7 +1,9 @@
-﻿using FluentValidation;
+﻿using System.Diagnostics.CodeAnalysis;
+using FluentValidation;
 
 namespace Setame.Data.Handlers.Applications;
 
+[ExcludeFromCodeCoverage]
 public class RenameDefaultApplicationVariableValidator : AbstractValidator<RenameDefaultApplicationVariable>
 {
     public RenameDefaultApplicationVariableValidator()

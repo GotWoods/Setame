@@ -1,7 +1,9 @@
-﻿using FluentValidation;
+﻿using System.Diagnostics.CodeAnalysis;
+using FluentValidation;
 
 namespace Setame.Data.Handlers.EnvironmentSets;
 
+[ExcludeFromCodeCoverage]
 public class RenameEnvironmentSetValidator : AbstractValidator<RenameEnvironmentSet>
 {
     public RenameEnvironmentSetValidator()

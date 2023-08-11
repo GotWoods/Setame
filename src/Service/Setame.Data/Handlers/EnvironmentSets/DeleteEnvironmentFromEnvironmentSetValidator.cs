@@ -1,7 +1,9 @@
-﻿using FluentValidation;
+﻿using System.Diagnostics.CodeAnalysis;
+using FluentValidation;
 
 namespace Setame.Data.Handlers.EnvironmentSets;
 
+[ExcludeFromCodeCoverage]
 public class DeleteEnvironmentFromEnvironmentSetValidator : AbstractValidator<DeleteEnvironmentFromEnvironmentSet>
 {
     public DeleteEnvironmentFromEnvironmentSetValidator()
