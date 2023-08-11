@@ -29,4 +29,8 @@
     <ProjectReference Include="..\Setame.Web\Setame.Web.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Handlers\Users\" />
+  </ItemGroup>
+
 </Project>

@@ -42,25 +42,16 @@ namespace Setame.Web.Controllers
         }
 
         [HttpPost("login")]
-        public Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             _logger.LogDebug("Login requested for {Username}", request.Username);
-            var user = _userService.GetUserByUsernameAsync(request.Username);
+            var result = await _mediator.Send(new UserLogin(request.Username, request.Password));
+            if (!result.WasSuccessful)
+                return Unauthorized();
 
-            if (user == null)
-            {
-                _logger.LogDebug("User not found");
-                return Task.FromResult<IActionResult>(Unauthorized());
-            }
-
-            if (!_userService.VerifyPassword(user, request.Password))
-            {
-                _logger.LogDebug("Password verification failed");
-                return Task.FromResult<IActionResult>(Unauthorized());
-            }
             _logger.LogDebug("User credentials verified, generating token");
-            var token = _authService.GenerateJwtToken(user.Id.ToString(), "Administrator");
-            return Task.FromResult<IActionResult>(Ok(new { token }));
+            var token = _authService.GenerateJwtToken(result.Data.Id.ToString(), "Administrator");
+            return Ok(new { token });
         }
 
         [HttpPost("AppLogin")]

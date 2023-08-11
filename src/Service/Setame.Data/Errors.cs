@@ -23,6 +23,7 @@
         public static Errors VariableNotFound(string name) => new Errors("Mx1004", "VariableNotFound", name);
         public static Errors TokenNotFound => new Errors("Mx1005", "TokenNotFound");
         public static Errors TokenExpired => new Errors("Mx1006", "TokenExpired");
+        public static Errors AuthenticationFailed => new Errors("Mx1007", "AuthenticationFailed");
 
         private readonly List<string> _underlyingData;
 
