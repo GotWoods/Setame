@@ -1,6 +1,7 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 import { styled } from '@mui/system';
+import SettingsClient from '../clients/settingsClient';
 
 const StyledAppBar = styled(AppBar)({
   flexGrow: 1,
@@ -11,7 +12,13 @@ const TitleTypography = styled(Typography)({
 });
 
 const NavigationBar = () => {
-  const token = localStorage.getItem('authToken');
+  const settingsClient = new SettingsClient();
+  let token = localStorage.getItem('authToken');
+  if (settingsClient.isJwtTokenExpired())
+  {
+    token = null;
+  }
+
   return (
     <StyledAppBar position="static">
       <Toolbar>
