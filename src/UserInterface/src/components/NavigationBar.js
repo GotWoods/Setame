@@ -37,12 +37,12 @@ const NavigationBar = () => {
         <Button color="inherit" href="/variableGroups">
           Variable Groups
         </Button> */}
-        <Button color="inherit" href="/users">
+        {/* <Button color="inherit" href="/users">
           Users
         </Button>
         <Button color="inherit" href="/settings">
           Settings
-        </Button>
+        </Button> */}
         </>
         )}
       </Toolbar>

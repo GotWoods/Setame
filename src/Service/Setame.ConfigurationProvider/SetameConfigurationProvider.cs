@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Newtonsoft.Json;
@@ -6,35 +7,28 @@ using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Setame.ConfigurationProvider;
 
-public class AppLoginRequest
-{
-    public string ApplicaitonName { get; set; } = string.Empty;
-    public string Token { get; set; } = String.Empty;
-}
-
-
-
-public class ConfigManConfigurationProvider : Microsoft.Extensions.Configuration.ConfigurationProvider
+public class SetameConfigurationProvider : Microsoft.Extensions.Configuration.ConfigurationProvider
 {
     private readonly HttpClient _httpClient;
     private readonly Uri _serviceUri;
 
-    public ConfigManConfigurationProvider(string application, Uri serviceUri, string clientSecret)
+    public SetameConfigurationProvider(string application, Uri serviceUri, string environment,  string clientToken)
     {
         _serviceUri = serviceUri;
         _httpClient = new HttpClient();
 
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        GetTokenAsync(serviceUri, application, clientSecret).GetAwaiter().GetResult();
+        GetTokenAsync(serviceUri, application, environment, clientToken).GetAwaiter().GetResult();
     }
 
-    private async Task GetTokenAsync(Uri serviceUri, string clientId, string clientSecret)
+    private async Task GetTokenAsync(Uri serviceUri, string clientId, string environment, string clientToken)
     {
-        var fullUrl = Path.Combine(_serviceUri + "api/Authentication/AppLogin");
+        var fullUrl = $"{serviceUri}api/Authentication/AppLogin";
         var request = new AppLoginRequest
         {
-            ApplicaitonName = clientId,
-            Token = clientSecret
+            ApplicationName = clientId,
+            Token = clientToken,
+            Environment = environment
         };
         var jsonData = JsonSerializer.Serialize(request);
 
@@ -64,12 +58,12 @@ public class ConfigManConfigurationProvider : Microsoft.Extensions.Configuration
     private async Task LoadSettings()
     {
         //var fullUrl = Path.Combine(_serviceUri + "api/ApplicationSettings");
-        var fullUrl = "https://localhost:7219/api/ApplicationSettings";
+        var fullUrl = $"{_serviceUri}api/Client";
         var response = await _httpClient.GetAsync(fullUrl);
         if (response.IsSuccessStatusCode)
         {
             var json = await response.Content.ReadAsStringAsync();
-            Data = JsonConvert.DeserializeObject<Dictionary<string, string>>(json)!;
+            Data = JsonConvert.DeserializeObject<LoggingDictionary<string, string>>(json)!;
         }
         else
         {

@@ -1,6 +1,7 @@
 ## Setame
-Setame is a configuration management server designed to have a central location to store configuration. Applications can be configured to load their configuration
-on startup and be changed without requiring an application to be redeployed for a config change.
+Setame is a configuration management server that is easy to understand and manage. Configuration is stored in a hierarchy that allows the easy sharing, re-using, and overriding of values. 
+
+
 
 ## Features
 - Ability to define global deployment environments as well as global settings that all applications can inherit (e.g. you can set a log server for all applications)

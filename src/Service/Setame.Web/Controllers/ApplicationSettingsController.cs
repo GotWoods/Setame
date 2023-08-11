@@ -22,19 +22,7 @@ public class ApplicationSettingsController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet]
-    [Authorize(Roles = "Application")]
-    public IActionResult Get()
-    {
-        var claim = User.FindFirst(ClaimTypes.NameIdentifier);
-        if (claim == null)
-        {
-            _logger.LogWarning("Can not find application @{Claims}", User.Claims);
-            return NotFound("Claim not found");
-        }
-
-        return Ok();
-    }
+ 
 
     [HttpPost("{applicationId}/{environment}")]
     public async Task<IActionResult> CreateNew(Guid applicationId, string environment, [FromBody] string variable, CancellationToken ct)

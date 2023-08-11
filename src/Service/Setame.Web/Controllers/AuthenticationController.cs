@@ -1,4 +1,5 @@
-﻿using Marten;
+﻿using JasperFx.Core;
+using Marten;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Setame.Data;
@@ -50,7 +51,7 @@ namespace Setame.Web.Controllers
                 return Unauthorized();
 
             _logger.LogDebug("User credentials verified, generating token");
-            var token = _authService.GenerateJwtToken(result.Data.Id.ToString(), "Administrator");
+            var token = _authService.GenerateJwtToken(result.Data.Id.ToString(), "Administrator", "");
             return Ok(new { token });
         }
 
@@ -61,7 +62,7 @@ namespace Setame.Web.Controllers
             if (application == null || application.Token != request.Token)
                 return Unauthorized();
 
-            var jwtToken = _authService.GenerateJwtToken(application.Name, "Application");
+            var jwtToken = _authService.GenerateJwtToken(application.Id.ToString(), "Application", request.Environment);
             return Ok(new { token = jwtToken });
         }
     }

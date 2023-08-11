@@ -20,6 +20,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Setame.Tests", "Setame.Test
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{CAA1F119-90B4-4FC2-BAF2-E80AACCB923E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Setame.Demo.Console", "..\Setame.Demo.Console\Setame.Demo.Console.csproj", "{D7F8E267-2D3E-4256-9FD2-7D2066593508}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +52,10 @@ Global
 		{CAA1F119-90B4-4FC2-BAF2-E80AACCB923E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CAA1F119-90B4-4FC2-BAF2-E80AACCB923E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CAA1F119-90B4-4FC2-BAF2-E80AACCB923E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7F8E267-2D3E-4256-9FD2-7D2066593508}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7F8E267-2D3E-4256-9FD2-7D2066593508}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7F8E267-2D3E-4256-9FD2-7D2066593508}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7F8E267-2D3E-4256-9FD2-7D2066593508}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

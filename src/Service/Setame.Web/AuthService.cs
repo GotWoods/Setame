@@ -15,7 +15,7 @@ namespace Setame.Web
             _configuration = configuration;
         }
 
-        public string GenerateJwtToken(string userId, string role)
+        public string GenerateJwtToken(string userId, string role, string environment)
         {
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]!));
             var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
@@ -23,7 +23,8 @@ namespace Setame.Web
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, userId),
-                new Claim(ClaimTypes.Role, role)
+                new Claim(ClaimTypes.Role, role),
+                new Claim(ClaimTypes.Actor , environment)
             };
 
             var tokenOptions = new JwtSecurityToken(

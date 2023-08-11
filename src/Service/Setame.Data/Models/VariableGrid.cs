@@ -89,4 +89,20 @@ public class VariableGrid
             }
         }
     }
+
+    public Dictionary<string, string?> GetVariablesForEnvironment(string environment)
+    {
+        var environmentData = new Dictionary<string, string?>();
+
+        foreach (var variableEntry in data)
+        {
+            if (variableEntry.Value.TryGetValue(environment, out var value))
+            {
+                environmentData[variableEntry.Key] = value;
+            }
+        }
+
+        return environmentData;
+    }
+
 }

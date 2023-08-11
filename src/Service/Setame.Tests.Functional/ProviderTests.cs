@@ -12,7 +12,7 @@ public class ProviderTests
     //         {
     //             webBuilder
     //                 .UseTestServer()
-    //                 .ConfigureAppConfiguration(x => x.AddConfigMan())
+    //                 .ConfigureAppConfiguration(x => x.AddSetame())
     //                 .ConfigureServices(services =>
     //                 {
     //                     //services.AddMyServices();
@@ -42,7 +42,7 @@ public class ProviderTests
         var applicationId = "Email Service";
         var apiUrl = new Uri("https://localhost:7219/");
 
-       var configManConfigurationProvider = new ConfigManConfigurationProvider(applicationId, apiUrl, "fqgfa2msm0");
+       var configManConfigurationProvider = new SetameConfigurationProvider(applicationId, apiUrl, "fqgfa2msm0");
         
         // Act
         configManConfigurationProvider.Load();
